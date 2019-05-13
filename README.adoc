@@ -86,7 +86,7 @@ After you are done checking out the application, stop the Open Liberty server:
 mvn liberty:stop-server
 ```
 
-=== Changing the template interface to use asynchronous methods
+== Changing the template interface to use asynchronous methods
 
 Navigate to the `start` directory to begin.
 
@@ -101,7 +101,7 @@ SystemClient.java
 include::finish/src/main/java/io/openliberty/guides/inventory/client/SystemClient.java[tags=**;!copyright]
 ----
 
-=== Responding asynchronously to an HTTP request
+== Responding asynchronously to an HTTP request
 
 [role="code_command hotspot", subs="quotes"]
 ----
