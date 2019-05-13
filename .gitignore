@@ -1,0 +1,10 @@
+target/
+.apt_generated/
+.settings/
+.vscode/
+.project
+.classpath
+.factorypath
+MANIFEST.MF
+README.html
+.DS_Store

@@ -1,0 +1,228 @@
+// Copyright (c) 2017, 2019 IBM Corporation and others.
+// Licensed under Creative Commons Attribution-NoDerivatives
+// 4.0 International (CC BY-ND 4.0)
+//   https://creativecommons.org/licenses/by-nd/4.0/
+//
+// Contributors:
+//   IBM Corporation
+:projectid: async-rest-client
+:page-layout: guide-multipane
+:page-duration: 15 minutes
+:page-releasedate: 2018-03-09
+:page-guide-category: microprofile
+:page-essential: true
+:page-essential-order: 2
+:page-description: Learn how to use Contexts and Dependency Injection to manage and inject dependencies into microservices.
+:guide-author: Open Liberty
+:page-tags: ['MicroProfile', 'Java EE']
+:page-permalink: /guides/{projectid}
+:page-related-guides: ['rest-intro']
+:common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
+:source-highlighter: prettify
+:figure-caption!:
+= Consuming RESTful services asynchronously
+
+[.hidden]
+NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
+
+Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
+
+== What you'll learn
+
+You will learn how to...
+
+The application that you will be working with is an `inventory` service,
+which stores the information about various JVMs that run on different systems.
+Whenever a request is made to the `inventory` service to retrieve the JVM
+system properties of a particular host, the `inventory` service communicates with the `system`
+service on that host to get these system properties. The system properties are then stored and returned.
+
+The implementation of the application and its services are provided for you in the `start/src` directory.
+The `system` service can be found in the `start/src/main/java/io/openliberty/guides/system` directory, 
+and the `inventory` service can be found in the `start/src/main/java/io/openliberty/guides/inventory` directory. 
+If you want to learn more about RESTful web services and how to build them, see
+https://openliberty.io/guides/rest-intro.html[Creating a RESTful web service^] for details about how to build the `system` service.
+The `inventory` service is built in a similar way.
+
+=== What are asynchronous methods?
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec commodo, eros ullamcorper tincidunt mollis, lectus purus bibendum quam, eu sagittis ipsum dolor tempus erat. Donec luctus viverra rhoncus. Nam nec lectus vitae metus consectetur suscipit vitae eget velit. Quisque egestas nibh ut hendrerit varius. Integer condimentum dignissim nibh efficitur luctus. Nullam vehicula eleifend nibh sed mollis. Maecenas aliquam urna ac est faucibus, sed consequat erat convallis. Nunc in dignissim nisi, quis sollicitudin tellus.
+
+Phasellus ut turpis sed erat gravida posuere non non erat. Pellentesque pharetra, ipsum consequat elementum pulvinar, risus ante tincidunt nunc, sed rhoncus leo dui at erat. Praesent nec fringilla elit. In lectus lorem, dignissim ut dignissim vitae, aliquam eu purus. Mauris lobortis lorem eros, ut finibus tellus rutrum ac. Nulla egestas massa eu massa pulvinar, feugiat placerat dolor dignissim. Cras ut maximus felis, vel fringilla eros. Maecenas hendrerit nec erat vulputate eleifend. Fusce egestas egestas metus. Donec id turpis sed erat sollicitudin interdum id eget est. Suspendisse laoreet diam non auctor sodales. Aliquam convallis molestie arcu, eget interdum tellus blandit id. Vivamus elementum ipsum id est laoreet, non volutpat odio rhoncus. Morbi elit odio, gravida at nisl ut, tempor aliquam lectus. Etiam laoreet aliquam ornare.
+
+// =================================================================================================
+// Getting started
+// =================================================================================================
+
+[role='command']
+include::{common-includes}/gitclone.adoc[]
+
+=== Try what you'll build
+
+The `finish` directory in the root of this guide contains the finished inventory application. Give it a try before you proceed.
+
+To try out the application, first navigate to the `finish` directory and then run the following
+Maven goals to build the application and run it inside Open Liberty:
+
+[role='command']
+```
+cd finish
+mvn install liberty:start-server
+```
+
+Point your browser to the http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems^] URL. This is the starting point of the `inventory`
+service and it displays the current contents of the inventory. As you might expect, these are empty since
+nothing is stored in the inventory yet. Next, point your browser to the http://localhost:9080/inventory/systems/localhost[http://localhost:9080/inventory/systems/localhost^] URL.
+You see a result in JSON format with the system properties of your local JVM. When you visit this URL, these system
+properties are automatically stored in the inventory. Go back to http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems^] and
+you see a new entry for `localhost`. For simplicity, only the OS name and username are shown here for
+each host. You can repeat this process for your own hostname or any other machine that is running
+the `system` service.
+
+After you are done checking out the application, stop the Open Liberty server:
+
+[role='command']
+```
+mvn liberty:stop-server
+```
+
+=== Changing the template interface to use asynchronous methods
+
+Navigate to the `start` directory to begin.
+
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `SystemClient` class.#
+`src/main/java/io/openliberty/guides/inventory/client/SystemClient.java`
+----
+SystemClient.java
+[source, Java, linenums, role='code_column']
+----
+include::finish/src/main/java/io/openliberty/guides/inventory/client/SystemClient.java[tags=**;!copyright]
+----
+
+=== Responding asynchronously to an HTTP request
+
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `InventoryResource` class.#
+`src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
+----
+InventoryResource.java
+[source, Java, linenums, role='code_column']
+----
+include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[tags=**;!copyright]
+----
+
+// =================================================================================================
+// Building the application
+// =================================================================================================
+
+[role='command']
+include::{common-includes}/mvnbuild.adoc[]
+
+You can find the `inventory` and `system` services at the following URLs:
+
+- http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems^]
+- http://localhost:9080/system/properties[http://localhost:9080/system/properties^]
+
+[role='command']
+include::{common-includes}/mvncompile.adoc[]
+
+
+// =================================================================================================
+// Testing
+// =================================================================================================
+
+== Testing the inventory application
+
+While you can test your application manually, you should rely on automated tests since they trigger
+a failure whenever a code change introduces a defect.
+Since the application is a RESTful web service application, you can use
+JUnit and the RESTful web service Client API to write tests.
+In testing the functionality of the application, the scopes and dependencies are being tested.
+
+[role="code_command hotspot", subs="quotes"]
+----
+#Create the `InventoryEndpointTest` class.#
+`src/test/java/it/io/openliberty/guides/inventory/InventoryEndpointTest.java`
+----
+
+The [hotspot=28 file=0]`@BeforeClass` annotation is placed on a method that runs before any of the test cases.
+In this case, the [hotspot=29-32 file=0]`oneTimeSetup()` method retrieves the port number for the Open Liberty server and builds
+a base URL string that is used throughout the tests.
+
+The [hotspot=34 file=0]`@Before` and [hotspot=40 file=0]`@After` annotations are placed on methods that run before and after every test case.
+These methods are generally used to perform any setup and teardown tasks. In this case, the [hotspot=35-38 file=0]`setup()` method
+creates a JAX-RS client, which makes HTTP requests to the `inventory` service. This client must
+also be registered with a JSON-P provider ([hotspot=37 file=0]`JsrJsonpProvider`) to process JSON resources. The [hotspot=41-43 file=0]`teardown()`
+method simply destroys this client instance.
+
+See the following descriptions of the test cases:
+
+* [hotspot=53-65 file=0]`testEmptyInventory()` verifies that the inventory is initially empty when the server first starts up.
+
+* [hotspot=67-87 file=0]`testHostRegistration()` verifies that a host is correctly added to the inventory.
+
+* [hotspot=89-115 file=0]`testSystemPropertiesMatch()` verifies that the JVM system properties returned by the `system` service match
+the ones stored in the `inventory` service.
+
+* [hotspot=117-132 file=0]`testUnknownHost()` verifies that an unknown host or a host that does not expose their JVM system
+properties is correctly handled as an error.
+
+To force these test cases to run in a particular order, put them in a [hotspot=46-51 file=0]`testSuite()` method and label
+it with a [hotspot=45 file=0]`@Test` annotation so that it automatically runs when your test class run.
+
+Finally, the [hotspot file=1]`src/test/java/it/io/openliberty/guides/system/SystemEndpointTest.java` file
+is included for you to test the basic functionality of the `system` service.
+If a test failure occurs, then you might have introduced a bug into the code.
+
+InventoryEndpointTest.java
+[source, Java, linenums, role='code_column']
+----
+include::finish/src/test/java/it/io/openliberty/guides/inventory/InventoryEndpointTest.java[tags=**;!copyright;!javadoc]
+----
+
+SystemEndpointTest.java
+[source, Java, linenums, role='code_column']
+----
+include::finish/src/test/java/it/io/openliberty/guides/system/SystemEndpointTest.java[tags=**;!copyright;!javadoc]
+----
+
+// =================================================================================================
+// Running the tests
+// =================================================================================================
+
+[role='command']
+include::{common-includes}/mvnverify.adoc[]
+
+[source, role='no_copy']
+----
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running it.io.openliberty.guides.system.SystemEndpointTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.99 sec - in it.io.openliberty.guides.system.SystemEndpointTest
+Running it.io.openliberty.guides.inventory.InventoryEndpointTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.325 sec - in it.io.openliberty.guides.inventory.InventoryEndpointTest
+
+Results :
+
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+----
+
+To see whether the tests detect a failure, change the endpoint for the `inventory` service in
+the [hotspot file=0]`src/main/java/io/openliberty/guides/inventory/InventoryResource.java` file to something else, then
+run the Maven build again. You see a test failure occur.
+
+InventoryResource.java
+[source, Java, linenums, role='code_column']
+----
+include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[tags=**;!copyright]
+----
+
+== Great work! You're done!
+
+You have just completed building a simple inventory application by making asynchronous HTTP requests using Open Liberty.
+
+include::{common-includes}/attribution.adoc[subs="attributes"]
