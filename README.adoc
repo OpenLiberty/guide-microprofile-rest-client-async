@@ -41,7 +41,7 @@ The implementations of the application and its services are provided for you in 
 The `system` service can be found in the `start/src/main/java/io/openliberty/guides/system` directory, 
 and the `inventory` service can be found in the `start/src/main/java/io/openliberty/guides/inventory` directory. 
 
-If you are not too familiar with MicroProfile Rest Client, then read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces] guide to learn more about it.
+If you are not too familiar with MicroProfile Rest Client, then read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide to learn more about it.
 
 === What is asynchronous programming?
 
