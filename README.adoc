@@ -29,7 +29,7 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices over H
 
 == What you'll learn
 
-You will learn how to...
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You will update a template interface that maps to the remote service that you want to call to use a `CompletionStage` return type making the method asynchronous.
 
 The application that you will be working with is an `inventory` service,
 which stores the information about various JVMs that run on different systems.
@@ -44,11 +44,13 @@ If you want to learn more about RESTful web services and how to build them, see
 https://openliberty.io/guides/rest-intro.html[Creating a RESTful web service^] for details about how to build the `system` service.
 The `inventory` service is built in a similar way.
 
-=== What are asynchronous methods?
+=== What is asynchronous programming?
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec commodo, eros ullamcorper tincidunt mollis, lectus purus bibendum quam, eu sagittis ipsum dolor tempus erat. Donec luctus viverra rhoncus. Nam nec lectus vitae metus consectetur suscipit vitae eget velit. Quisque egestas nibh ut hendrerit varius. Integer condimentum dignissim nibh efficitur luctus. Nullam vehicula eleifend nibh sed mollis. Maecenas aliquam urna ac est faucibus, sed consequat erat convallis. Nunc in dignissim nisi, quis sollicitudin tellus.
+Asynchronous programming can be thought of in terms of a take-out restaraunt. When you join one of the lines to order at the register, you tell them your order, you pay, and you'll usually get some sort of order number. At this point you will leave the line and wait 5-10 minutes off to the side for the cooks to prepare your order. Once your order is ready, your number will be called and you can pick up your food and your request for food has been fulfilled. In a synchronous model, you would place your order and continue waiting in line for your food to be prepared therefore blocking other customers from proceeding and placing their order.
 
-Phasellus ut turpis sed erat gravida posuere non non erat. Pellentesque pharetra, ipsum consequat elementum pulvinar, risus ante tincidunt nunc, sed rhoncus leo dui at erat. Praesent nec fringilla elit. In lectus lorem, dignissim ut dignissim vitae, aliquam eu purus. Mauris lobortis lorem eros, ut finibus tellus rutrum ac. Nulla egestas massa eu massa pulvinar, feugiat placerat dolor dignissim. Cras ut maximus felis, vel fringilla eros. Maecenas hendrerit nec erat vulputate eleifend. Fusce egestas egestas metus. Donec id turpis sed erat sollicitudin interdum id eget est. Suspendisse laoreet diam non auctor sodales. Aliquam convallis molestie arcu, eget interdum tellus blandit id. Vivamus elementum ipsum id est laoreet, non volutpat odio rhoncus. Morbi elit odio, gravida at nisl ut, tempor aliquam lectus. Etiam laoreet aliquam ornare.
+Asynchronous methods are methods that allow you to perform a lengthy operation such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it is complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaraunt anology, calling the `prepareFood()` method asynchronously means that the person at the register is free to take more orders from their line as they've been freed up from serving you.
+
+In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. There could be slowness in the network, or maybe the upstream service is simply overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it could be used instead to get other work done.
 
 // =================================================================================================
 // Getting started
@@ -90,9 +92,11 @@ mvn liberty:stop-server
 
 Navigate to the `start` directory to begin.
 
+First, you will replace the system client interface to change it for the methods to be asynchronous.
+
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `SystemClient` class.#
+#Replace the `SystemClient` interface.#
 `src/main/java/io/openliberty/guides/inventory/client/SystemClient.java`
 ----
 SystemClient.java
@@ -101,7 +105,11 @@ SystemClient.java
 include::finish/src/main/java/io/openliberty/guides/inventory/client/SystemClient.java[tags=**;!copyright]
 ----
 
+The only change is that the `getProperties()` method now returns `CompletionStage<Properties>` instead of `Properties`. This change makes the method asynchronous.
+
 == Responding asynchronously to an HTTP request
+
+JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type you may return a `CompletionStage<Response>` type. Completion stages can be chained together using the `thenApplyAsync()` method, and exceptions can be handled using the `exceptionally()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -113,6 +121,10 @@ InventoryResource.java
 ----
 include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[tags=**;!copyright]
 ----
+
+Similar to the synchronous approach, if we successfully get the properties from the server running at a given hostname then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the `thenApplyAsync()` and `exceptionally()` methods.
+
+A completion stage represents a unit of computation, once that computation completes it can either be finished or chained with additional completion stages using `thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, it functinally behaves similar to a catch block. When you return a completion stage in the resource, it does not necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the user once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
