@@ -37,7 +37,7 @@ Whenever a request is made to the `inventory` service to retrieve the JVM
 system properties of a particular host, the `inventory` service communicates with the `system`
 service on that host to get these system properties. The system properties are then stored and returned.
 
-The implementation of the application and its services are provided for you in the `start/src` directory.
+The implementations of the application and its services are provided for you in the `start/src` directory.
 The `system` service can be found in the `start/src/main/java/io/openliberty/guides/system` directory, 
 and the `inventory` service can be found in the `start/src/main/java/io/openliberty/guides/inventory` directory. 
 
@@ -45,11 +45,11 @@ If you are not too familiar with MicroProfile Rest Client, then read the https:/
 
 === What is asynchronous programming?
 
-Asynchronous programming can be thought of in terms of a take-out restaraunt. When you join one of the lines to order at the register, you tell them your order, you pay, and you'll usually get some sort of order number. At this point you will leave the line and wait 5-10 minutes off to the side for the cooks to prepare your food. Once your order is ready, your number will be called and you can pick up your food and your request for food has been fulfilled. In a synchronous model, you would place your order and continue waiting in line at the counter for your food to be prepared therefore blocking other customers from proceeding and placing their order.
+Asynchronous programming can be thought of as a take-out restaurant. When you join one of the lines to order at the register, you tell them your order, you pay, and you'll usually get some sort of order number. At this point, you’ll leave the line and wait 5 - 10 minutes off to the side for the cooks to prepare your food. Once your order is ready, your number will be called and you can pick up your food and your request for food has been fulfilled. In a synchronous model, you would place your order and continue waiting in line at the counter for your food to be prepared therefore blocking other customers from proceeding and placing their order.
 
-Asynchronous methods are methods that allow you to perform a lengthy operation such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it is complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaraunt anology, calling the `prepareFood()` method asynchronously means that the person at the register is free to take more orders from their line as they've been freed up from the responsibility of serving the previous person until their order is ready.
+Asynchronous methods are methods that allow you to perform a lengthy operation such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, calling the `prepareFood()` method asynchronously frees up the person at the register. Since they're free, the person can take more orders from their line as they've been freed up from the responsibility of serving the previous person until their order is ready.
 
-In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. There could be slowness in the network, or maybe the upstream service is simply overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it could be used instead to get other work done.
+In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. There might be slowness in the network, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it might be used instead to get other work done.
 
 // =================================================================================================
 // Getting started
@@ -76,8 +76,8 @@ service and it displays the current contents of the inventory. As you might expe
 nothing is stored in the inventory yet. Next, point your browser to the http://localhost:9080/inventory/systems/localhost[http://localhost:9080/inventory/systems/localhost^] URL.
 You see a result in JSON format with the system properties of your local JVM. When you visit this URL, these system
 properties are automatically stored in the inventory. Go back to http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems^] and
-you see a new entry for `localhost`. For simplicity, only the OS name and username are shown here for
-each host. You can repeat this process for your own hostname or any other machine that is running
+you see a new entry for `localhost`. For simplicity, only the OS name and user name are shown here for
+each host. You can repeat this process for your own host name or any other machine that is running
 the `system` service.
 
 After you are done checking out the application, stop the Open Liberty server:
@@ -121,9 +121,9 @@ InventoryResource.java
 include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[tags=**;!copyright]
 ----
 
-Similar to the synchronous approach, if we successfully get the properties from the server running at a given hostname then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the `thenApplyAsync()` and `exceptionally()` methods.
+Similar to the synchronous approach, if we successfully get the properties from the server running at a given host name then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the `thenApplyAsync()` and `exceptionally()` methods.
 
-A completion stage represents a unit of computation, once that computation completes it can either be finished or chained with additional completion stages using `thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, it functinally behaves similar to a catch block. When you return a completion stage in the resource, it does not necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the user once the `CompletionStage` has completed.
+A completion stage represents a unit of computation once that computation completes it can either be finished or chained with more completion stages using `thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, it functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the user once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
