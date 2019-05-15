@@ -41,7 +41,9 @@ public class InventoryResource {
   @GET
   @Path("/{hostname}")
   @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response> getPropertiesForHost(@PathParam("hostname") String hostname) throws MalformedURLException {
+  public CompletionStage<Response> getPropertiesForHost(
+    @PathParam("hostname") String hostname) throws MalformedURLException {
+
     // Get properties for host
     SystemClient client = RestClientBuilder.newBuilder()
       .baseUrl(new URL("http://" + hostname + ":9080"))
@@ -56,7 +58,7 @@ public class InventoryResource {
       .exceptionally((e) -> {
         return Response
           .status(Response.Status.NOT_FOUND)
-          .entity("ERROR: Unknown hostname or the system service may not be " 
+          .entity("ERROR: Unknown hostname or the system service may not be "
                   + "running on " + hostname)
           .build();
       });
