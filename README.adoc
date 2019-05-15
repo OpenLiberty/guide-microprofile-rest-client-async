@@ -8,15 +8,15 @@
 :projectid: async-rest-client
 :page-layout: guide-multipane
 :page-duration: 15 minutes
-:page-releasedate: 2018-03-09
+:page-releasedate: 2019-07-05
 :page-guide-category: microprofile
-:page-essential: true
-:page-essential-order: 2
-:page-description: Learn how to use Contexts and Dependency Injection to manage and inject dependencies into microservices.
+:page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
+:page-seo-title: Consuming REST services asynchronously
+:page-seo-description: A tutorial on how to consume REST services asynchronously with MicroProfile Rest Client.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Java EE']
 :page-permalink: /guides/{projectid}
-:page-related-guides: ['rest-intro']
+:page-related-guides: ['microprofile-rest-client']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
 :figure-caption!:
