@@ -5,11 +5,12 @@
 //
 // Contributors:
 //   IBM Corporation
-:projectid: async-rest-client
+:projectid: microprofile-rest-client-async
 :page-layout: guide-multipane
 :page-duration: 15 minutes
 :page-releasedate: 2019-07-05
 :page-guide-category: microprofile
+:page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
 :page-seo-title: Consuming REST services asynchronously
 :page-seo-description: A tutorial on how to consume REST services asynchronously with MicroProfile Rest Client.
@@ -19,7 +20,6 @@
 :page-related-guides: ['microprofile-rest-client']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
-:figure-caption!:
 = Consuming RESTful services asynchronously
 
 [.hidden]
@@ -29,7 +29,7 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices over H
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You will update a template interface that maps to the remote service that you want to call to use a `CompletionStage` return type making the method asynchronous.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update a template interface that maps to the remote service that you want to call. You'll change it to use a `CompletionStage` return type making the method asynchronous.
 
 The application that you will be working with is an `inventory` service,
 which stores the information about various JVMs that run on different systems.
@@ -45,11 +45,11 @@ If you are not too familiar with MicroProfile Rest Client, then read the https:/
 
 === What is asynchronous programming?
 
-Asynchronous programming can be thought of as a take-out restaurant. When you join one of the lines to order at the register, you tell them your order, you pay, and you'll usually get some sort of order number. At this point, you’ll leave the line and wait 5 - 10 minutes off to the side for the cooks to prepare your food. Once your order is ready, your number will be called and you can pick up your food and your request for food has been fulfilled. In a synchronous model, you would place your order and continue waiting in line at the counter for your food to be prepared therefore blocking other customers from proceeding and placing their order.
+Asynchronous programming can be thought of as a take-out restaurant. After ordering at the register and paying for your food, you’ll usually receive an order number. While your food is being prepared, you can leave the line and wait on the side. Once your order is ready, as indicated by your number being called, you can pick up your food. Your request for food has now been fulfilled. However, in a synchronous model, you would place your order and continue waiting in line at the counter, while blocking other customers from placing their order.
 
-Asynchronous methods are methods that allow you to perform a lengthy operation such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, calling the `prepareFood()` method asynchronously frees up the person at the register. Since they're free, the person can take more orders from their line as they've been freed up from the responsibility of serving the previous person until their order is ready.
+Asynchronous methods allow you to perform a lengthy operation, such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, calling the `prepareFood()` method asynchronously frees up the person at the register. Since they're free, the person can take more orders from their line as they've been freed up from the responsibility of serving the previous person until their order is ready.
 
-In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. There might be slowness in the network, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it might be used instead to get other work done.
+In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
 // =================================================================================================
 // Getting started
@@ -91,7 +91,7 @@ mvn liberty:stop-server
 
 Navigate to the `start` directory to begin.
 
-First, you will replace the system client interface to change it for the methods to be asynchronous.
+First, you will replace the system client interface to make the methods asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -108,7 +108,7 @@ The only change is that the [hotspot=21 file=0]`getProperties()` method now retu
 
 == Responding asynchronously to an HTTP request
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type you may return a `CompletionStage<Response>` type. Completion stages can be chained together using the [hotspot=42-45 file=0]`thenApplyAsync()` method, and exceptions can be handled using the [hotspot=46-52 file=0]`exceptionally()` method.
+JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you may return a `CompletionStage<Response>` type. Completion stages can be chained together using the [hotspot=42-45 file=0]`thenApplyAsync()` method, and exceptions can be handled using the [hotspot=46-52 file=0]`exceptionally()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -121,9 +121,9 @@ InventoryResource.java
 include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[tags=**;!copyright]
 ----
 
-Similar to the synchronous approach, if we successfully get the properties from the server running at a given host name then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the [hotspot=42-45 file=0]`thenApplyAsync()` and [hotspot=46-52 file=0]`exceptionally()` methods.
+Similar to the synchronous approach, if we successfully get the properties from the server running at a given host name, then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs, then the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the [hotspot=42-45 file=0]`thenApplyAsync()` and [hotspot=46-52 file=0]`exceptionally()` methods.
 
-A completion stage represents a unit of computation once that computation completes it can either be finished or chained with more completion stages using [hotspot=42-45 file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=46-52 file=0]`exceptionally()` method, it functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=42-45 file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=46-52 file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
@@ -163,9 +163,9 @@ the ones stored in the `inventory` service.
 * [hotspot=117-132 file=0]`testUnknownHost()` verifies that an unknown host or a host that does not expose their JVM system
 properties is correctly handled as an error.
 
-Finally, the [hotspot file=1]`src/test/java/it/io/openliberty/guides/system/SystemEndpointTest.java` file
+Finally, the [hotspot file=1]`SystemEndpointTest.java` file
 is included for you to test the basic functionality of the `system` service.
-If a test failure occurs, then you might have introduced a bug into the code.
+It can be found under the `src/test/java/it/io/openliberty/guides/system/` directory.
 
 InventoryEndpointTest.java
 [source, Java, linenums, role='code_column']
