@@ -5,7 +5,7 @@
 //
 // Contributors:
 //   IBM Corporation
-:projectid: async-rest-client
+:projectid: microprofile-rest-client-async
 :page-layout: guide-multipane
 :page-duration: 15 minutes
 :page-releasedate: 2019-07-05
