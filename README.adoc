@@ -10,6 +10,7 @@
 :page-duration: 15 minutes
 :page-releasedate: 2019-07-05
 :page-guide-category: microprofile
+:page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
 :page-seo-title: Consuming REST services asynchronously
 :page-seo-description: A tutorial on how to consume REST services asynchronously with MicroProfile Rest Client.
@@ -19,7 +20,6 @@
 :page-related-guides: ['microprofile-rest-client']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
-:figure-caption!:
 = Consuming RESTful services asynchronously
 
 [.hidden]
