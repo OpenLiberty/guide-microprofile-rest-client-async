@@ -51,10 +51,13 @@ public class InventoryResource {
       .build(SystemClient.class);
 
     CompletionStage<Response> response = client.getProperties()
+      // tag::thenApplyAsync[]
       .thenApplyAsync((props) -> {
         manager.add(hostname, props);
         return Response.ok(props).build();
       })
+      // end::thenApplyAsync[]
+      // tag::exceptionally[]
       .exceptionally((e) -> {
         return Response
           .status(Response.Status.NOT_FOUND)
@@ -62,6 +65,7 @@ public class InventoryResource {
                   + "running on " + hostname)
           .build();
       });
+      // end::exceptionally[]
 
     return response;
   }
