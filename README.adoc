@@ -109,7 +109,7 @@ include::{common-includes}/mvnbuild.adoc[]
 You can find the `inventory` and `system` services at the following URLs:
 
 - http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems^]
-- \http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems/\[system-hostname\]^]
+- http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems/localhost^]
 - http://localhost:9080/system/properties[http://localhost:9080/system/properties^]
 
 Switching to an asynchronous programming model has freed up the thread handling your request to `/inventory/systems/[system-hostname]` handle other work while MicroProfile REST Client makes a request to the `system` microservice.
