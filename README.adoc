@@ -39,8 +39,6 @@ Asynchronous methods allow you to perform a lengthy operation, such as IO asynch
 
 In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-=== Inventory and system microservices
-
 The application that you will be working with is an `inventory` service,
 which stores the information about various JVMs that run on different systems.
 Whenever a request is made to the `inventory` service to retrieve the JVM
