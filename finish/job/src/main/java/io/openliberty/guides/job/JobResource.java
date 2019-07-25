@@ -56,12 +56,13 @@ public class JobResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public List<JobResultModel> getJobResults() {
-    return manager.getResults()
+  public JobsModel getJobResults() {
+    return new JobsModel(
+      manager.getResults()
       .entrySet()
       .stream()
       .map(es -> new JobResultModel(es.getKey(), es.getValue()))
-      .collect(Collectors.toList());
+      .collect(Collectors.toList()));
   }
 
   @GET
