@@ -71,16 +71,16 @@ First, you will replace the system client interface to make the methods asynchro
 `src/main/java/io/openliberty/guides/inventory/client/SystemClient.java`
 ----
 SystemClient.java
-[source, Java, linenums, role='code_column']
+[source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/src/main/java/io/openliberty/guides/inventory/client/SystemClient.java[tags=**;!copyright]
+include::finish/src/main/java/io/openliberty/guides/inventory/client/SystemClient.java[]
 ----
 
-The only change is that the [hotspot=21 file=0]`getProperties()` method now returns `CompletionStage<Properties>` instead of `Properties`. This change makes the method asynchronous. Since the method now has a return type of `CompletionStage<Properties>`, you will not be able to directly manipulate the `Properties` object. As you will see in the next section, you will be able to indirectly use the `Properties` object by chaining callbacks.
+The only change is that the [hotspot=getProperties file=0]`getProperties()` method now returns `CompletionStage<Properties>` instead of `Properties`. This change makes the method asynchronous. Since the method now has a return type of `CompletionStage<Properties>`, you will not be able to directly manipulate the `Properties` object. As you will see in the next section, you will be able to indirectly use the `Properties` object by chaining callbacks.
 
 == Responding asynchronously to an HTTP request
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you may return a `CompletionStage<Response>` type. Completion stages can be chained together using the [hotspot=42-45 file=0]`thenApplyAsync()` method, and exceptions can be handled using the [hotspot=46-52 file=0]`exceptionally()` method.
+JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you may return a `CompletionStage<Response>` type. Completion stages can be chained together using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method, and exceptions can be handled using the [hotspot=exceptionally file=0]`exceptionally()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -88,14 +88,14 @@ JAX-RS resources can also have asynchronous methods. So instead of returning a `
 `src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
 ----
 InventoryResource.java
-[source, Java, linenums, role='code_column']
+[source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[tags=**;!copyright]
+include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
 ----
 
-Similar to the synchronous approach, if we successfully get the properties from the server running at a given host name, then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs, then the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the [hotspot=42-45 file=0]`thenApplyAsync()` and [hotspot=46-52 file=0]`exceptionally()` methods.
+Similar to the synchronous approach, if we successfully get the properties from the server running at a given host name, then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs, then the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` and [hotspot=exceptionally file=0]`exceptionally()` methods.
 
-A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=42-45 file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=46-52 file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
@@ -128,14 +128,14 @@ A few tests are included for you to test the basic functionality of the microser
 
 See the following descriptions of the test cases:
 
-* [hotspot=53-65 file=0]`testEmptyInventory()` verifies that the inventory is initially empty when the server first starts up.
+* [hotspot=testEmptyInventory file=0]`testEmptyInventory()` verifies that the inventory is initially empty when the server first starts up.
 
-* [hotspot=67-87 file=0]`testHostRegistration()` verifies that a host is correctly added to the inventory.
+* [hotspot=testHostRegistration file=0]`testHostRegistration()` verifies that a host is correctly added to the inventory.
 
-* [hotspot=89-115 file=0]`testSystemPropertiesMatch()` verifies that the JVM system properties returned by the `system` service match
+* [hotspot=testSystemPropertiesMatch file=0]`testSystemPropertiesMatch()` verifies that the JVM system properties returned by the `system` service match
 the ones stored in the `inventory` service.
 
-* [hotspot=117-132 file=0]`testUnknownHost()` verifies that an unknown host or a host that does not expose their JVM system
+* [hotspot=testUnknownHost file=0]`testUnknownHost()` verifies that an unknown host or a host that does not expose their JVM system
 properties is correctly handled as an error.
 
 Finally, the [hotspot file=1]`SystemEndpointTest.java` file
@@ -143,15 +143,15 @@ is included for you to test the basic functionality of the `system` service.
 It can be found under the `src/test/java/it/io/openliberty/guides/system/` directory.
 
 InventoryEndpointTest.java
-[source, Java, linenums, role='code_column']
+[source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/src/test/java/it/io/openliberty/guides/inventory/InventoryEndpointTest.java[tags=**;!copyright;!javadoc]
+include::finish/src/test/java/it/io/openliberty/guides/inventory/InventoryEndpointTest.java[]
 ----
 
 SystemEndpointTest.java
-[source, Java, linenums, role='code_column']
+[source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/src/test/java/it/io/openliberty/guides/system/SystemEndpointTest.java[tags=**;!copyright;!javadoc]
+include::finish/src/test/java/it/io/openliberty/guides/system/SystemEndpointTest.java[]
 ----
 
 // =================================================================================================

@@ -30,6 +30,7 @@ public interface SystemClient {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    // tag::getProperties[]
     public CompletionStage<Properties> getProperties();
-
+    // end::getProperties[]
 }
