@@ -159,29 +159,4 @@ public class SystemEndpointTest {
         assertTrue("No records processed", recordsProcessed > 0);
     }
 
-    // @Test
-    // public void testConsumeJob() throws InterruptedException {
-    //     producer.send(new ProducerRecord<String,String>("job-result-topic", "{ \"jobId\": \"my-produced-job-id\", \"result\": 7 }"));
-    //     this.response = client
-    //         .target(String.format("%s/%s", BASE_URL, "my-produced-job-id"))
-    //         .request()
-    //         .get();
-
-    //     int backoff = 500;
-    //     for (int i = 0; i < RETRIES && this.response.getStatus() != 200; i++) {
-    //         this.response = client
-    //             .target(String.format("%s/%s", BASE_URL, "my-produced-job-id"))
-    //             .request()
-    //             .get();
-
-    //         Thread.sleep(backoff);
-    //         backoff *= BACKOFF_MULTIPLIER;
-    //     }
-
-    //     assertEquals(200, response.getStatus());
-
-    //     JsonObject obj = response.readEntity(JsonObject.class);
-    //     assertEquals(7, obj.getInt("result"));
-    // }
-
 }
