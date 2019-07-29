@@ -13,39 +13,80 @@
 package it.io.openliberty.guides.system;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Properties;
+import java.io.IOException;
+import java.time.Duration;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
+import org.testcontainers.containers.Network;
 
-import javax.json.JsonObject;
-import javax.ws.rs.client.WebTarget;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
 public class SystemEndpointTest {
 
-    private static String clusterUrl;
+    private final String BASE_URL = "http://localhost:9080/system/properties";
+    private final String KAFKA_SERVER = "localhost:9092";
+    private final int RETRIES = 5;
+    private final int BACKOFF_MULTIPLIER = 2;
+    private final String CONSUMER_OFFSET_RESET = "earliest";
 
     private Client client;
     private Response response;
+    private KafkaProducer<String, String> producer;
+    private KafkaConsumer<String, String> consumer;
 
-    @BeforeClass
-    public static void oneTimeSetup() {
-        String clusterIp = System.getProperty("cluster.ip");
-        String nodePort = System.getProperty("system.node.port");
-        clusterUrl = "http://" + clusterIp + ":" + nodePort + "/system/properties/";
-    }
-    
+    @Rule
+    public Network network = Network.newNetwork();
+
+    @Rule
+    public FixedHostPortGenericContainer zookeeper = new FixedHostPortGenericContainer<>("bitnami/zookeeper:3")
+        .withFixedExposedPort(2181, 2181)
+        .withNetwork(network)
+        .withNetworkAliases("zookeeper")
+        .withEnv("ALLOW_ANONYMOUS_LOGIN", "yes");
+
+    @Rule
+    public FixedHostPortGenericContainer kafka = new FixedHostPortGenericContainer<>("bitnami/kafka:2")
+        .withFixedExposedPort(9092, 9092)
+        .withNetwork(network)
+        .withNetworkAliases("kafka")
+        .withEnv("KAFKA_CFG_ZOOKEEPER_CONNECT", "zookeeper:2181")
+        .withEnv("ALLOW_PLAINTEXT_LISTENER", "yes")
+        .withEnv("KAFKA_CFG_ADVERTISED_LISTENERS", "PLAINTEXT://localhost:9092");
+
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         response = null;
         client = ClientBuilder.newBuilder()
                     .hostnameVerifier(new HostnameVerifier() {
@@ -53,62 +94,94 @@ public class SystemEndpointTest {
                             return true;
                         }
                     })
+                    .register(JsrJsonpProvider.class)
                     .build();
+
+        Properties properties = new Properties();
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        this.producer = new KafkaProducer<>(properties);
+
+        properties = new Properties();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "junit-integration-test-client");
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_RESET);
+        this.consumer = new KafkaConsumer<>(properties);
+        this.consumer.subscribe(Arrays.asList("job-result-topic"));
     }
 
     @After
     public void teardown() {
         client.close();
     }
-    
-    @Test
-    public void testPodNameNotNull() {
-        response = this.getResponse(clusterUrl);
-        this.assertResponse(clusterUrl, response);
-        String greeting = response.getHeaderString("X-Pod-Name");
-        
-        assertNotNull(
-            "Container name should not be null but it was. The service is probably not running inside a container",
-            greeting);
-    }
 
     @Test
     public void testGetProperties() {
-        Client client = ClientBuilder.newClient();
-        client.register(JsrJsonpProvider.class);
+        this.response = client
+            .target(BASE_URL)
+            .request()
+            .get();
 
-        WebTarget target = client.target(clusterUrl);
-        Response response = target.request().get();
-
-        assertEquals("Incorrect response code from " + clusterUrl, 200, response.getStatus());
-        response.close();
+        assertEquals(200, response.getStatus());
     }
 
-    /**
-     * <p>
-     * Returns response information from the specified URL.
-     * </p>
-     * 
-     * @param url
-     *          - target URL.
-     * @return Response object with the response from the specified URL.
-     */
-    private Response getResponse(String url) {
-        return client.target(url).request().get();
+    @Test
+    public void testRunJob() throws JsonParseException, JsonMappingException, IOException, InterruptedException {
+        producer.send(new ProducerRecord<String, String>("job-topic", "{ \"jobId\": \"my-job\" }"));
+
+        int recordsProcessed = 0;
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = 0;
+
+        while (recordsProcessed == 0 && elapsedTime < 30000) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
+            for (ConsumerRecord<String, String> record : records) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonFactory factory = mapper.getFactory();
+                JsonParser parser = factory.createParser(record.value());
+                JsonNode node = mapper.readTree(parser);
+                
+                int result = node.get("result").asInt();
+                String jobId = node.get("jobId").asText();
+
+                assertEquals("my-job", jobId);
+                assertTrue(String.format("Result (%s) must be between 5 and 10 (inclusive)", result), result >= 5 && result <= 10);
+                recordsProcessed++;
+            }
+
+            elapsedTime = System.currentTimeMillis() - startTime;
+            consumer.commitAsync();
+        }
+
+        assertTrue("No records processed", recordsProcessed > 0);
     }
 
-    /**
-     * <p>
-     * Asserts that the given URL has the correct response code of 200.
-     * </p>
-     * 
-     * @param url
-     *          - target URL.
-     * @param response
-     *          - response received from the target URL.
-     */
-    private void assertResponse(String url, Response response) {
-        assertEquals("Incorrect response code from " + url, 200, response.getStatus());
-    }
+    // @Test
+    // public void testConsumeJob() throws InterruptedException {
+    //     producer.send(new ProducerRecord<String,String>("job-result-topic", "{ \"jobId\": \"my-produced-job-id\", \"result\": 7 }"));
+    //     this.response = client
+    //         .target(String.format("%s/%s", BASE_URL, "my-produced-job-id"))
+    //         .request()
+    //         .get();
+
+    //     int backoff = 500;
+    //     for (int i = 0; i < RETRIES && this.response.getStatus() != 200; i++) {
+    //         this.response = client
+    //             .target(String.format("%s/%s", BASE_URL, "my-produced-job-id"))
+    //             .request()
+    //             .get();
+
+    //         Thread.sleep(backoff);
+    //         backoff *= BACKOFF_MULTIPLIER;
+    //     }
+
+    //     assertEquals(200, response.getStatus());
+
+    //     JsonObject obj = response.readEntity(JsonObject.class);
+    //     assertEquals(7, obj.getInt("result"));
+    // }
 
 }
