@@ -1,0 +1,53 @@
+#!/bin/bash
+
+docker network create reactive-app
+
+docker run -d \
+	-e ALLOW_ANONYMOUS_LOGIN=yes \
+	--name=zookeeper \
+	--network=reactive-app \
+	--rm \
+	bitnami/zookeeper:3
+
+docker run -d \
+	-e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 \
+	-e ALLOW_PLAINTEXT_LISTENER=yes \
+	-e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
+	--name=kafka \
+	--hostname=kafka \
+	--network=reactive-app \
+	--rm \
+	bitnami/kafka:2
+
+docker run -d \
+	-e KAFKA_SERVER=kafka:9092 \
+	-e GROUP_ID=system-client-group \
+	--name=system-service \
+	--network=reactive-app \
+	--rm \
+	system:1.0-SNAPSHOT
+
+docker run -d \
+	-e KAFKA_SERVER=kafka:9092 \
+	-e GROUP_ID_PREFIX=system-properties \
+	--name=inventory-service \
+	--network=reactive-app \
+	--rm \
+	inventory:1.0-SNAPSHOT
+
+docker run -d \
+	-e KAFKA_SERVER=kafka:9092 \
+	-e GROUP_ID_PREFIX=job \
+	--name=job-service \
+	--network=reactive-app \
+	--rm \
+	job:1.0-SNAPSHOT
+
+docker run -d \
+	--name=bff \
+	--hostname=bff \
+	-p 9080:9080 \
+	--network=reactive-app \
+	--rm \
+	bff:1.0-SNAPSHOT
+
