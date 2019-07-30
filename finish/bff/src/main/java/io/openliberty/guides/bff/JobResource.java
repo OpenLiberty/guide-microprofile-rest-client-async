@@ -29,9 +29,11 @@ public class JobResource {
     public CompletionStage<JobListModel> getJobs() {
         return jobClient
             .getJobs()
-            .thenApply((jobs) -> {
+            // tag::thenApplyAsync[]
+            .thenApplyAsync((jobs) -> {
                 return new JobListModel(jobs.getResults());
             });
+            // end::thenApplyAsync[]
     }
 
     @GET

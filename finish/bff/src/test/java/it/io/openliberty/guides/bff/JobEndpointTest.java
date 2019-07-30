@@ -83,6 +83,7 @@ public class JobEndpointTest {
         client.close();
     }
     
+    // tag::testCreateJob[]
     @Test
     public void testCreateJob() throws InterruptedException {
         this.response = client
@@ -96,7 +97,9 @@ public class JobEndpointTest {
         String jobId = obj.getString("jobId");
         assertEquals("my-job-id", jobId);
     }
+    // end::testCreateJob[]
 
+    // tag::testGetJobs[]
     @Test
     public void testGetJobs() {
         this.response = client
@@ -111,5 +114,6 @@ public class JobEndpointTest {
         assertEquals(6.0, obj.getJsonNumber("averageResult").doubleValue(), 0.01);
         assertEquals(2, obj.getJsonArray("results").size());
     }
+    // end::testGetJobs[]
 
 }
