@@ -66,6 +66,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-netty</artifactId>
+                <version>5.6.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.json</artifactId>
                 <version>1.1.4</version>
@@ -149,13 +155,13 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>start-server</id>
+                            <id>test-start-server</id>
                             <phase>pre-integration-test</phase>
                             <goals>
-                                <goal>start-server</goal>
+                                <goal>test-start-server</goal>
                             </goals>
                             <configuration>
-                                <serverEnv>${basedir}/src/test/resources/server.env</serverEnv>
+                                <serverEnv>${basedir}/server.env</serverEnv>
                             </configuration>
                         </execution>
                     </executions>
