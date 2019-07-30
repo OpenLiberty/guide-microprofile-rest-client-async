@@ -1,7 +1,5 @@
 package io.openliberty.guides.bff.client;
 
-import java.util.concurrent.CompletionStage;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -21,15 +19,15 @@ public interface JobClient {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobsModel> getJobs();
+    public JobsModel getJobs();
 
     @GET
     @Path("{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobResultModel> getJob(@PathParam("jobId") String jobId);
+    public JobResultModel getJob(@PathParam("jobId") String jobId);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobModel> createJob();
+    public JobModel createJob();
 
 }
