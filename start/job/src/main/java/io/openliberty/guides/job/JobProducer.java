@@ -15,9 +15,13 @@ package io.openliberty.guides.job;
 import java.util.Properties;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class JobProducer {
@@ -25,10 +29,11 @@ public class JobProducer {
   private Producer<String, String> producer;
 
   public JobProducer() {
+    String kafkaServer = System.getenv("KAFKA_SERVER");
     Properties properties = new Properties();
-    properties.put("bootstrap.servers", "kafka:9092");
-    properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-    properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
+    properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+    properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
     this.producer = new KafkaProducer<>(properties);
   }

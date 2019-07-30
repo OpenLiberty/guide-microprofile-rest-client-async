@@ -15,26 +15,14 @@ package it.io.openliberty.guides.system;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Properties;
-import java.io.IOException;
-import java.time.Duration;
 
-import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,26 +32,20 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.Network;
 
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 
-public class SystemEndpointTest {
+public class JobEndpointTest {
 
-    private final String BASE_URL = "http://localhost:9080/system/properties";
+    private final String BASE_URL = "http://localhost:9080/jobs";
     private final String KAFKA_SERVER = "localhost:9092";
-    private final String CONSUMER_OFFSET_RESET = "earliest";
-    private final long POLL_TIMEOUT = 120000;
+    private final int RETRIES = 5;
+    private final int BACKOFF_MULTIPLIER = 2;
 
     private Client client;
     private Response response;
     private KafkaProducer<String, String> producer;
-    private KafkaConsumer<String, String> consumer;
 
     @Rule
     public Network network = Network.newNetwork();
@@ -100,62 +82,62 @@ public class SystemEndpointTest {
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        this.producer = new KafkaProducer<>(properties);
 
-        properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "junit-integration-test-client");
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_RESET);
-        this.consumer = new KafkaConsumer<>(properties);
-        this.consumer.subscribe(Arrays.asList("job-result-topic"));
+        this.producer = new KafkaProducer<>(properties);
     }
 
     @After
     public void teardown() {
         client.close();
     }
-
+    
     @Test
-    public void testGetProperties() {
+    public void testCreateJob() {
         this.response = client
             .target(BASE_URL)
             .request()
-            .get();
+            .post(null);
 
         assertEquals(200, response.getStatus());
+
+        JsonObject obj = response.readEntity(JsonObject.class);
+        String jobId = obj.getString("jobId");
+        assertTrue("jobId not returned from service", jobId.matches("^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$"));
     }
 
     @Test
-    public void testRunJob() throws JsonParseException, JsonMappingException, IOException, InterruptedException {
-        producer.send(new ProducerRecord<String, String>("job-topic", "{ \"jobId\": \"my-job\" }"));
+    public void testJobNotExists() {
+        this.response = client
+            .target(String.format("%s/%s", BASE_URL, "my-job-id"))
+            .request()
+            .get();
 
-        int recordsProcessed = 0;
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
+        assertEquals(404, response.getStatus());
+    }
 
-        while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
-            for (ConsumerRecord<String, String> record : records) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonFactory factory = mapper.getFactory();
-                JsonParser parser = factory.createParser(record.value());
-                JsonNode node = mapper.readTree(parser);
-                
-                int result = node.get("result").asInt();
-                String jobId = node.get("jobId").asText();
+    @Test
+    public void testConsumeJob() throws InterruptedException {
+        producer.send(new ProducerRecord<String,String>("job-result-topic", "{ \"jobId\": \"my-produced-job-id\", \"result\": 7 }"));
+        this.response = client
+            .target(String.format("%s/%s", BASE_URL, "my-produced-job-id"))
+            .request()
+            .get();
 
-                assertEquals("my-job", jobId);
-                assertTrue(String.format("Result (%s) must be between 5 and 10 (inclusive)", result), result >= 5 && result <= 10);
-                recordsProcessed++;
-            }
+        int backoff = 500;
+        for (int i = 0; i < RETRIES && this.response.getStatus() != 200; i++) {
+            this.response = client
+                .target(String.format("%s/%s", BASE_URL, "my-produced-job-id"))
+                .request()
+                .get();
 
-            elapsedTime = System.currentTimeMillis() - startTime;
-            consumer.commitAsync();
+            Thread.sleep(backoff);
+            backoff *= BACKOFF_MULTIPLIER;
         }
 
-        assertTrue("No records processed", recordsProcessed > 0);
+        assertEquals(200, response.getStatus());
+
+        JsonObject obj = response.readEntity(JsonObject.class);
+        assertEquals(7, obj.getInt("result"));
     }
 
 }

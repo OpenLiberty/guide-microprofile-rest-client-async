@@ -15,42 +15,68 @@ package it.io.openliberty.guides.inventory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
-import javax.json.JsonObject;
-import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
+import org.testcontainers.containers.Network;
+
+import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 public class InventoryEndpointTest {
 
-    private static String invUrl;
-    private static String sysUrl;
-    private static String sysKubeService;
+    private final String BASE_URL = "http://localhost:9080/inventory/systems";
+    private final String KAFKA_SERVER = "localhost:9092";
+    private final int RETRIES = 8;
+    private final int BACKOFF_MULTIPLIER = 2;
+    private final int BASE_BACKOFF = 500;
 
     private Client client;
     private Response response;
+    private KafkaProducer<String, String> producer;
 
-    @BeforeClass
-    public static void oneTimeSetup() {
-        String clusterIp = System.getProperty("cluster.ip");
-        String invNodePort = System.getProperty("inventory.node.port");
-        String sysNodePort = System.getProperty("system.node.port");
-        
-        sysKubeService = System.getProperty("system.kube.service");
-        invUrl = "http://" + clusterIp + ":" + invNodePort + "/inventory/systems/";
-        sysUrl = "http://" + clusterIp + ":" + sysNodePort + "/system/properties/";
-    }
+    @Rule
+    public Network network = Network.newNetwork();
+
+    @Rule
+    public FixedHostPortGenericContainer zookeeper = new FixedHostPortGenericContainer<>("bitnami/zookeeper:3")
+        .withFixedExposedPort(2181, 2181)
+        .withNetwork(network)
+        .withNetworkAliases("zookeeper")
+        .withEnv("ALLOW_ANONYMOUS_LOGIN", "yes");
+
+    @Rule
+    public FixedHostPortGenericContainer kafka = new FixedHostPortGenericContainer<>("bitnami/kafka:2")
+        .withFixedExposedPort(9092, 9092)
+        .withNetwork(network)
+        .withNetworkAliases("kafka")
+        .withEnv("KAFKA_CFG_ZOOKEEPER_CONNECT", "zookeeper:2181")
+        .withEnv("ALLOW_PLAINTEXT_LISTENER", "yes")
+        .withEnv("KAFKA_CFG_ADVERTISED_LISTENERS", "PLAINTEXT://localhost:9092");
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         response = null;
         client = ClientBuilder.newBuilder()
                     .hostnameVerifier(new HostnameVerifier() {
@@ -58,190 +84,119 @@ public class InventoryEndpointTest {
                             return true;
                         }
                     })
+                    .register(JsrJsonpProvider.class)
                     .build();
 
-        client.register(JsrJsonpProvider.class);
-        client.target(invUrl + "reset").request().post(null);
+        Properties properties = new Properties();
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+
+        this.producer = new KafkaProducer<>(properties);
     }
 
     @After
     public void teardown() {
         client.close();
     }
-
-    // tag::tests[]
-    // tag::testSuite[]
+    
     @Test
-    public void testSuite() {
-        this.testEmptyInventory();
-        this.testHostRegistration();
-        this.testSystemPropertiesMatch();
-        this.testUnknownHost();
-    }
-    // end::testSuite[]
-
-    // tag::testEmptyInventory[]
-    public void testEmptyInventory() {
-        Response response = this.getResponse(invUrl);
-        this.assertResponse(invUrl, response);
-
-        JsonObject obj = response.readEntity(JsonObject.class);
-
-        int expected = 0;
-        int actual = obj.getInt("total");
-        assertEquals("The inventory should be empty on application start but it wasn't",
-                    expected, actual);
-
-        response.close();
-    }
-    // end::testEmptyInventory[]
-
-    // tag::testHostRegistration[]
-    public void testHostRegistration() {
-        this.visitSystemService();
-
-        Response response = this.getResponse(invUrl);
-        this.assertResponse(invUrl, response);
-
-        JsonObject obj = response.readEntity(JsonObject.class);
-
-        int expected = 1;
-        int actual = obj.getInt("total");
-        assertEquals("The inventory should have one entry for " + sysKubeService, expected,
-                    actual);
-
-        boolean serviceExists = obj.getJsonArray("systems").getJsonObject(0)
-                                    .get("hostname").toString()
-                                    .contains(sysKubeService);
-        assertTrue("A host was registered, but it was not " + sysKubeService,
-                serviceExists);
-
-        response.close();
-    }
-    // end::testHostRegistration[]
-
-    // tag::testSystemPropertiesMatch[]
-    public void testSystemPropertiesMatch() {
-        Response invResponse = this.getResponse(invUrl);
-        Response sysResponse = this.getResponse(sysUrl);
-
-        this.assertResponse(invUrl, invResponse);
-        this.assertResponse(sysUrl, sysResponse);
-
-        JsonObject jsonFromInventory = (JsonObject) invResponse.readEntity(JsonObject.class)
-                                                            .getJsonArray("systems")
-                                                            .getJsonObject(0)
-                                                            .get("properties");
-
-        JsonObject jsonFromSystem = sysResponse.readEntity(JsonObject.class);
-
-        String osNameFromInventory = jsonFromInventory.getString("os.name");
-        String osNameFromSystem = jsonFromSystem.getString("os.name");
-        this.assertProperty("os.name", sysKubeService, osNameFromSystem,
-                            osNameFromInventory);
-
-        String userNameFromInventory = jsonFromInventory.getString("user.name");
-        String userNameFromSystem = jsonFromSystem.getString("user.name");
-        this.assertProperty("user.name", sysKubeService, userNameFromSystem,
-                            userNameFromInventory);
-
-        invResponse.close();
-        sysResponse.close();
-    }
-    // end::testSystemPropertiesMatch[]
-
-    // tag::testUnknownHost[]
-    public void testUnknownHost() {
-        Response response = this.getResponse(invUrl);
-        this.assertResponse(invUrl, response);
-
-        Response badResponse = client.target(invUrl + "badhostname")
-            .request(MediaType.APPLICATION_JSON)
-            .get();
-
-        String obj = badResponse.readEntity(String.class);
-
-        boolean isError = obj.contains("ERROR");
-        assertTrue("badhostname is not a valid host but it didn't raise an error",
-                isError);
-
-        response.close();
-        badResponse.close();
-    }
-
-    // end::testUnknownHost[]
-    // end::tests[]
-    // tag::helpers[]
-    // tag::javadoc[]
-    /**
-     * <p>
-     * Returns response information from the specified URL.
-     * </p>
-     * 
-     * @param url
-     *          - target URL.
-     * @return Response object with the response from the specified URL.
-     */
-    // end::javadoc[]
-    private Response getResponse(String url) {
-        return client.target(url).request().get();
-    }
-
-    // tag::javadoc[]
-    /**
-     * <p>
-     * Asserts that the given URL has the correct response code of 200.
-     * </p>
-     * 
-     * @param url
-     *          - target URL.
-     * @param response
-     *          - response received from the target URL.
-     */
-    // end::javadoc[]
-    private void assertResponse(String url, Response response) {
-        assertEquals("Incorrect response code from " + url, 200,
-                    response.getStatus());
-    }
-
-    // tag::javadoc[]
-    /**
-     * Asserts that the specified JVM system property is equivalent in both the
-     * system and inventory services.
-     * 
-     * @param propertyName
-     *          - name of the system property to check.
-     * @param hostname
-     *          - name of JVM's host.
-     * @param expected
-     *          - expected name.
-     * @param actual
-     *          - actual name.
-     */
-    // end::javadoc[]
-    private void assertProperty(String propertyName, String hostname,
-        String expected, String actual) {
-        assertEquals("JVM system property [" + propertyName + "] "
-            + "in the system service does not match the one stored in "
-            + "the inventory service for " + hostname, expected, actual);
-    }
-
-    // tag::javadoc[]
-    /**
-     * Makes a simple GET request to inventory/localhost.
-     */
-    // end::javadoc[]
-    private void visitSystemService() {
-        Response response = this.getResponse(sysUrl);
-        this.assertResponse(sysUrl, response);
-        response.close();
-
-        Response targetResponse = client
-            .target(invUrl + sysKubeService)
+    public void testConsumeSystem() throws InterruptedException, IOException {
+        // Get size of inventory
+        this.response = client
+            .target(BASE_URL)
             .request()
             .get();
 
-        targetResponse.close();
+        assertEquals(200, response.getStatus());
+
+        JsonObject obj = response.readEntity(JsonObject.class);
+        int initialTotal = obj.getInt("total");
+        
+        // Add a system to the inventory via kafka
+        String props = getResource("props.json");
+        producer.send(new ProducerRecord<String,String>("system-topic", props));
+        this.response = client
+            .target(BASE_URL)
+            .request()
+            .get();
+
+
+        obj = response.readEntity(JsonObject.class);
+        int total = obj.getInt("total");
+
+        int backoff = BASE_BACKOFF;
+        for (int i = 0; i < RETRIES && (total <= initialTotal); i++) {
+            Thread.sleep(backoff);
+            backoff *= BACKOFF_MULTIPLIER;
+
+            this.response = client
+                .target(BASE_URL)
+                .request()
+                .get();
+            
+            obj = response.readEntity(JsonObject.class);
+            total = obj.getInt("total");
+        }
+
+        assertTrue(String.format("Total (%s) is not greater than inital total (%s)", total, initialTotal), total > initialTotal);
+
+        // Make system busy
+        String busyProps = getResource("props.busy.json");
+        producer.send(new ProducerRecord<String, String>("system-topic", busyProps));
+
+        this.response = client
+            .target(BASE_URL)
+            .request()
+            .get();
+
+        obj = response.readEntity(JsonObject.class);
+        JsonArray systems = obj.getJsonArray("systems");
+
+        backoff = BASE_BACKOFF;
+        for (int i = 0; i < RETRIES && !getPropertyFromJsonArray("myhost", "system.busy", systems).equals("true"); i++) {
+            Thread.sleep(backoff);
+            backoff *= BACKOFF_MULTIPLIER;
+
+            this.response = client
+                .target(BASE_URL)
+                .request()
+                .get();
+
+            obj = response.readEntity(JsonObject.class);
+            systems = obj.getJsonArray("systems");
+        }
+
+        assertEquals("true", getPropertyFromJsonArray("myhost", "system.busy", systems));
+    }
+
+    private String getResource(String filename) throws IOException {
+        ClassLoader loader = getClass().getClassLoader();
+        File file = new File(loader.getResource(filename).getFile());
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        StringBuilder builder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line).append("\n");
+        }
+
+        reader.close();
+        return builder.toString();
+    }
+
+    private String getPropertyFromJsonArray(String hostname, String property, JsonArray array) {
+        for (JsonValue v : array) {
+            JsonObject obj = v.asJsonObject();
+            String h = obj.getString("hostname");
+
+            if (h != null && h.equals(hostname)) {
+                String result = obj.getJsonObject("properties").getString(property);
+                if (result != null) return result;
+            }
+        }
+
+        return "";
     }
 
 }

@@ -52,6 +52,10 @@
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
         </dependency>
@@ -127,8 +131,6 @@
                     <bootstrapProperties>
                         <default.http.port>${http.port}</default.http.port>
                         <default.https.port>${https.port}</default.https.port>
-                        <io.openliberty.guides.bff.client.InventoryClient>http://inventory-service:9080</io.openliberty.guides.bff.client.InventoryClient>
-                        <io.openliberty.guides.bff.client.JobClient>http://job-service:9080</io.openliberty.guides.bff.client.JobClient>
                     </bootstrapProperties>
                 </configuration>
                 <executions>
@@ -145,6 +147,19 @@
                         <id>package-server</id>
                         <configuration>
                             <packageFile>${project.build.directory}/defaultServer.zip</packageFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>start-server</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start-server</goal>
+                        </goals>
+                        <configuration>
+                            <jvmOptions>
+                                <param>-Dio.openliberty.guides.bff.client.JobClient/mp-rest/url=http://localhost:9082</param>
+                                <param>-Dio.openliberty.guides.bff.client.InventoryClient/mp-rest/url=http://localhost:9082</param>
+                            </jvmOptions>
                         </configuration>
                     </execution>
                 </executions>

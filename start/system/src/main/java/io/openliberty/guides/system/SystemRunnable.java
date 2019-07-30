@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class SystemRunnable implements Runnable {
 
     private Properties getProperties(boolean isBusy) {
         Properties props = (Properties) System.getProperties().clone();
-        props.setProperty("hostname", System.getenv("HOSTNAME"));
+        props.setProperty("hostname", Optional.ofNullable(System.getenv("HOSTNAME")).orElse("localhost"));
         props.setProperty("system.busy", Boolean.toString(isBusy));
         return props;
     }

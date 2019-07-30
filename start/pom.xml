@@ -60,9 +60,21 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>1.11.3</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-netty</artifactId>
+                <version>5.6.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.json</artifactId>
-                <version>1.0.4</version>
+                <version>1.1.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -141,6 +153,18 @@
                             <type>zip</type>
                         </assemblyArtifact>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>test-start-server</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>test-start-server</goal>
+                            </goals>
+                            <configuration>
+                                <serverEnv>${basedir}/server.env</serverEnv>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.spotify</groupId>
