@@ -57,9 +57,8 @@ public class SystemEndpointTest {
 
     private final String BASE_URL = "http://localhost:9080/system/properties";
     private final String KAFKA_SERVER = "localhost:9092";
-    private final int RETRIES = 5;
-    private final int BACKOFF_MULTIPLIER = 2;
     private final String CONSUMER_OFFSET_RESET = "earliest";
+    private final long POLL_TIMEOUT = 120000;
 
     private Client client;
     private Response response;
@@ -136,7 +135,7 @@ public class SystemEndpointTest {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
 
-        while (recordsProcessed == 0 && elapsedTime < 30000) {
+        while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
             for (ConsumerRecord<String, String> record : records) {
                 ObjectMapper mapper = new ObjectMapper();
