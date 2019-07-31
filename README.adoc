@@ -20,6 +20,9 @@
 :page-related-guides: ['microprofile-rest-client']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
+:mac: Mac
+:win: Windows
+:linux: Linux
 = Consuming RESTful services asynchronously
 
 [.hidden]
@@ -39,15 +42,13 @@ Asynchronous methods allow you to perform a lengthy operation, such as IO asynch
 
 In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application that you will be working with is an `inventory` service,
-which stores the information about various JVMs that run on different systems.
-Whenever a request is made to the `inventory` service to retrieve the JVM
-system properties of a particular host, the `inventory` service communicates with the `system`
-service on that host to get these system properties. The system properties are then stored and returned.
+The application that you will be working with is a `bff` service,
+which acts as a gateway to communicate with backend microservices.
+Whenever a request is made to the `bff` service to retrieve the jobs
+the `bff` service communicates with the `jobs`
+service on that host to get the completed jobs.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
-The `system` service can be found in the `start/src/main/java/io/openliberty/guides/system` directory, 
-and the `inventory` service can be found in the `start/src/main/java/io/openliberty/guides/inventory` directory. 
 
 If you are not too familiar with MicroProfile Rest Client, then read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide to learn more about it.
 
@@ -63,103 +64,116 @@ include::{common-includes}/gitclone.adoc[]
 
 Navigate to the `start` directory to begin.
 
-First, you will replace the system client interface to make the methods asynchronous.
+First, you will replace the job client interface to make the methods asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `SystemClient` interface.#
-`src/main/java/io/openliberty/guides/inventory/client/SystemClient.java`
+#Replace the `JobClient` interface.#
+`bff/src/main/java/io/openliberty/guides/bff/client/JobClient.java`
 ----
-SystemClient.java
+JobClient.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/src/main/java/io/openliberty/guides/inventory/client/SystemClient.java[]
+include::finish/bff/src/main/java/io/openliberty/guides/bff/client/JobClient.java[]
 ----
 
-The only change is that the [hotspot=getProperties file=0]`getProperties()` method now returns `CompletionStage<Properties>` instead of `Properties`. This change makes the method asynchronous. Since the method now has a return type of `CompletionStage<Properties>`, you will not be able to directly manipulate the `Properties` object. As you will see in the next section, you will be able to indirectly use the `Properties` object by chaining callbacks.
+The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes makes the methods asynchronous. Since the methods now have a return type of `CompletionStage<T>`, you will not be able to directly manipulate the inner type. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
 
 == Responding asynchronously to an HTTP request
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you may return a `CompletionStage<Response>` type. Completion stages can be chained together using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method, and exceptions can be handled using the [hotspot=exceptionally file=0]`exceptionally()` method.
+JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsListModel` type, you may return a `CompletionStage<JobsListModel>` type. Completion stages can be chained together using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `InventoryResource` class.#
-`src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
+#Replace the `JobResource` class.#
+`bff/src/main/java/io/openliberty/guides/bff/JobResource.java`
 ----
-InventoryResource.java
+JobResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
+include::finish/bff/src/main/java/io/openliberty/guides/bff/JobResource.java[]
 ----
 
-Similar to the synchronous approach, if we successfully get the properties from the server running at a given host name, then the resource will respond with an HTTP status of 200 and the body will contain the system properties. If an exception occurs, then the response will have a 404 status and a body containing an error message. Finally, return the `CompletionStage<Response>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` and [hotspot=exceptionally file=0]`exceptionally()` methods.
+Similar to the synchronous approach, if we successfully get the completed jobs from the job microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
 
-A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
 // =================================================================================================
 
+== Building and running the application
+
+To build the application, run the Maven `package` goal from the command line in the `start` directory.
+
 [role='command']
-include::{common-includes}/mvnbuild.adoc[]
+```
+mvn clean package
+```
 
-You can find the `inventory` and `system` services at the following URLs:
+Next, use the provided script to start the application in docker container.
 
-- http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems^]
-- http://localhost:9080/inventory/systems[http://localhost:9080/inventory/systems/localhost^]
-- http://localhost:9080/system/properties[http://localhost:9080/system/properties^]
+****
+[system]#*{linux} | {mac}*#
 
-Switching to an asynchronous programming model has freed up the thread handling your request to `/inventory/systems/{hostname}`. While MicroProfile REST Client makes a request, the thread can handle other work.
+[role='command']
+```
+./scripts/start-app
+```
+
+[system]#*{win}*#
+
+[role='command']
+```
+.\scripts\start-app.bat
+```
+****
+
+You can access the application by making requests to the `bff` job endpoints.
+
+- GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
+- GET http://localhost:8080/api/jobs/{jobId}
+- POST http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
+
+Switching to an asynchronous programming model has freed up the thread handling your request to `/api/jobs`. While MicroProfile REST Client makes a request, the thread can handle other work.
 
 // =================================================================================================
 // Testing
 // =================================================================================================
 
-== Testing the inventory application
+== Testing the bff application
 
-A few tests are included for you to test the basic functionality of the microservices. If a test failure occurs, then you might have introduced a bug into the code. To run the tests, wait for all pods to be in the ready state before proceeding further. 
+A few tests are included for you to test the basic functionality of the `bff` microservice. If a test failure occurs, then you might have introduced a bug into the code.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Create the `InventoryEndpointTest` class.#
-`src/test/java/it/io/openliberty/guides/inventory/InventoryEndpointTest.java`
+#Create the `JobEndpointTest` class.#
+`bff/src/test/java/it/io/openliberty/guides/bff/JobEndpointTest.java`
 ----
 
 See the following descriptions of the test cases:
 
-* [hotspot=testEmptyInventory file=0]`testEmptyInventory()` verifies that the inventory is initially empty when the server first starts up.
+* [hotspot=testCreateJob file=0]`testCreateJob()` verifies that the bff service communicates with a backend service to create a job.
 
-* [hotspot=testHostRegistration file=0]`testHostRegistration()` verifies that a host is correctly added to the inventory.
+* [hotspot=testGetJobs file=0]`testGetJobs()` verifies that the bff service communicates with an upstream service to get all jobs and transforms them appropriately to a `JobListModel`.
 
-* [hotspot=testSystemPropertiesMatch file=0]`testSystemPropertiesMatch()` verifies that the JVM system properties returned by the `system` service match
-the ones stored in the `inventory` service.
-
-* [hotspot=testUnknownHost file=0]`testUnknownHost()` verifies that an unknown host or a host that does not expose their JVM system
-properties is correctly handled as an error.
-
-Finally, the [hotspot file=1]`SystemEndpointTest.java` file
-is included for you to test the basic functionality of the `system` service.
-It can be found under the `src/test/java/it/io/openliberty/guides/system/` directory.
-
-InventoryEndpointTest.java
+JobEndpointTest.java
 [source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/src/test/java/it/io/openliberty/guides/inventory/InventoryEndpointTest.java[]
-----
-
-SystemEndpointTest.java
-[source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
-----
-include::finish/src/test/java/it/io/openliberty/guides/system/SystemEndpointTest.java[]
+include::finish/bff/src/test/java/it/io/openliberty/guides/bff/JobEndpointTest.java[]
 ----
 
 // =================================================================================================
 // Running the tests
 // =================================================================================================
 
-[role='command']
-include::{common-includes}/mvnverify.adoc[]
+=== Running the tests
+
+Navigate to the `bff` directory, then verify that the tests pass using the Maven `verify` goal:
+
+```
+mvn verify
+```
 
 When the tests succeed you will see output similar to the following.
 
@@ -168,18 +182,41 @@ When the tests succeed you will see output similar to the following.
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running it.io.openliberty.guides.system.SystemEndpointTest
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.99 sec - in it.io.openliberty.guides.system.SystemEndpointTest
-Running it.io.openliberty.guides.inventory.InventoryEndpointTest
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.325 sec - in it.io.openliberty.guides.inventory.InventoryEndpointTest
+Running it.io.openliberty.guides.bff.InventoryEndpointTest
+Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+Defaulting to no-operation (NOP) logger implementation
+See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.bff.InventoryEndpointTest
+Running it.io.openliberty.guides.bff.JobEndpointTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.bff.JobEndpointTest
 
-Results :
+Results:
 
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 ----
+
+== Teardown
+
+Finally, use the provided script to stop the application.
+
+****
+[system]#*{linux} | {mac}*#
+
+[role='command']
+```
+./scripts/stop-app
+```
+
+[system]#*{win}*#
+
+[role='command']
+```
+.\scripts\stop-app.bat
+```
+****
 
 == Great work! You're done!
 
-You have just completed building a simple inventory application by making asynchronous HTTP requests using Open Liberty.
+You have just completed modifying an application to make asynchronous HTTP requests using Open Liberty.
 
 include::{common-includes}/attribution.adoc[subs="attributes"]
