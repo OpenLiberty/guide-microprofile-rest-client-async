@@ -150,10 +150,10 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>start-server</id>
+                        <id>test-start-server</id>
                         <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>start-server</goal>
+                            <goal>test-start-server</goal>
                         </goals>
                         <configuration>
                             <jvmOptions>
