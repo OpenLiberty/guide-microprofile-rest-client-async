@@ -42,8 +42,17 @@ Asynchronous methods allow you to perform a lengthy operation, such as IO asynch
 
 In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application that you will be working with is a `bff` service,
-which acts as a gateway to communicate with backend microservices.
+The application you will be working with is a job runner that mantains an inventory of available systems.
+It consists of four microservices `bff`, `job`, `system`, and `inventory`.
+The `job` microservices allows you to dispatch jobs that will be run by the `system` microservice.
+The job is a sleep operation that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
+publishes the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
+itself on startup with the `inventory` microservice which keeps track of all instances of the `system` microservice. Finally,
+the `bff` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^].
+It communicates with the backend `job` and `inventory` microservice on the caller's behalf.
+
+The microservice that you will modify with is the `bff` service.
+It acts as a gateway to communicate with the backend microservices.
 Whenever a request is made to the `bff` service to retrieve the jobs
 the `bff` service communicates with the `jobs`
 service on that host to get the completed jobs.
