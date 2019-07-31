@@ -40,15 +40,15 @@ Asynchronous programming can be thought of as a take-out restaurant. After order
 
 Asynchronous methods allow you to perform a lengthy operation, such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, calling the `prepareFood()` method asynchronously frees up the person at the register. Since they're free, the person can take more orders from their line as they've been freed up from the responsibility of serving the previous person until their order is ready.
 
-In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond in a timely manner. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
+In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
 The application you will be working with is a job runner that mantains an inventory of available systems.
 It consists of four microservices `bff`, `job`, `system`, and `inventory`.
 The `job` microservices allows you to dispatch jobs that will be run by the `system` microservice.
 The job is a sleep operation that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
 publishes the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
-itself on startup with the `inventory` microservice which keeps track of all instances of the `system` microservice. Finally,
-the `bff` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^].
+itself on startup with the `inventory` microservice that keeps track of all instances of the `system` microservice. Finally,
+the `bff` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for front end^].
 It communicates with the backend `job` and `inventory` microservice on the caller's behalf.
 
 The microservice that you will modify with is the `bff` service.
@@ -86,7 +86,7 @@ JobClient.java
 include::finish/bff/src/main/java/io/openliberty/guides/bff/client/JobClient.java[]
 ----
 
-The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes makes the methods asynchronous. Since the methods now have a return type of `CompletionStage<T>`, you will not be able to directly manipulate the inner type. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
+The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have a return type of `CompletionStage<T>`, you won’t be able to directly manipulate the inner type. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
 
 == Responding asynchronously to an HTTP request
 
