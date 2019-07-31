@@ -185,7 +185,7 @@ Navigate to the `bff` directory, then verify that the tests pass using the Maven
 mvn verify -Ddockerfile.skip
 ```
 
-When the tests succeed you will see output similar to the following.
+When the tests succeed, you will see output similar to the following.
 
 [source, role='no_copy']
 ----
