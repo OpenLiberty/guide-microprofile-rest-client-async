@@ -111,7 +111,7 @@ To build the application, run the Maven `package` goal from the command line in 
 mvn clean package
 ```
 
-Next, use the provided script to start the application in docker container.
+Next, use the provided script to start the application in docker containers.
 
 ****
 [system]#*{linux} | {mac}*#
@@ -171,8 +171,9 @@ include::finish/bff/src/test/java/it/io/openliberty/guides/bff/JobEndpointTest.j
 
 Navigate to the `bff` directory, then verify that the tests pass using the Maven `verify` goal:
 
+[role='command']
 ```
-mvn verify
+mvn verify -Ddockerfile.skip
 ```
 
 When the tests succeed you will see output similar to the following.
@@ -196,6 +197,8 @@ Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 ----
 
 == Teardown
+
+Navigate back to the `start` directory.
 
 Finally, use the provided script to stop the application.
 
