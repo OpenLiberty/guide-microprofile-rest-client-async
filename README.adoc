@@ -44,17 +44,17 @@ In the context of MicroProfile REST client, making HTTP requests can be a time c
 
 The application you will be working with is a job runner that mantains an inventory of available systems.
 It consists of four microservices `bff`, `job`, `system`, and `inventory`.
-The `job` microservices allows you to dispatch jobs that will be run by the `system` microservice.
-The job is a sleep operation that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
+The `job` microservice allows you to dispatch jobs that will be run by the `system` microservice.
+The job is a sleep operation used to represent a slow task that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
 publishes the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
 itself on startup with the `inventory` microservice that keeps track of all instances of the `system` microservice. Finally,
 the `bff` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for front end^].
-It communicates with the backend `job` and `inventory` microservice on the caller's behalf.
+It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
 
 The microservice that you will modify with is the `bff` service.
 It acts as a gateway to communicate with the backend microservices.
 Whenever a request is made to the `bff` service to retrieve the jobs
-the `bff` service communicates with the `jobs`
+the `bff` service communicates with the `job`
 service on that host to get the completed jobs.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
@@ -103,7 +103,7 @@ JobResource.java
 include::finish/bff/src/main/java/io/openliberty/guides/bff/JobResource.java[]
 ----
 
-Similar to the synchronous approach, if we successfully get the completed jobs from the job microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
+Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
 
 A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
