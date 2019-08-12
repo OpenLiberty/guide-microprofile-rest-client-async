@@ -9,7 +9,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
@@ -19,7 +18,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import io.openliberty.guides.models.JobModel;
+import io.openliberty.guides.models.JobResultModel;
 
 public class SystemRunnable implements Runnable {
 
@@ -64,7 +65,11 @@ public class SystemRunnable implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    producer.sendMessage("job-result-topic", jsonb.toJson(new JobResultModel(job.getJobId(), result)));
+                    JobResultModel jobResultModel = new JobResultModel();
+                    jobResultModel.setJobId(job.getJobId());
+                    jobResultModel.setResult(result);
+
+                    producer.sendMessage("job-result-topic", jsonb.toJson(jobResultModel));
                 }
 
                 producer.sendMessage("system-topic", jsonb.toJson(getProperties(false)));

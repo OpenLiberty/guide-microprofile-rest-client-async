@@ -1,6 +1,6 @@
 @echo off
 
-docker stop bff
+docker stop gateway
 docker stop job-service
 docker stop inventory-service
 docker stop system-service

@@ -47,9 +47,9 @@ docker run -d ^
 	job:1.0-SNAPSHOT
 
 docker run -d ^
-	--name=bff ^
-	--hostname=bff ^
+	--name=gateway ^
+	--hostname=gateway ^
 	-p 8080:9080 ^
 	--network=%NETWORK% ^
 	--rm ^
-	bff:1.0-SNAPSHOT
+	gateway:1.0-SNAPSHOT

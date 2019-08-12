@@ -22,7 +22,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import io.openliberty.guides.inventory.model.InventoryList;
+import io.openliberty.guides.models.InventoryList;
 import io.openliberty.guides.inventory.client.SystemClient;
 
 @RequestScoped

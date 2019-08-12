@@ -32,6 +32,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import io.openliberty.guides.models.JobModel;
+import io.openliberty.guides.models.JobResultModel;
+import io.openliberty.guides.models.JobsModel;
+
 @RequestScoped
 @Path("/jobs")
 public class JobResource {
@@ -46,7 +50,8 @@ public class JobResource {
   @Produces(MediaType.APPLICATION_JSON)
   public JobModel createJob() {
     String jobId = UUID.randomUUID().toString();
-    JobModel job = new JobModel(jobId);
+    JobModel job = new JobModel();
+    job.setJobId(jobId);
 
     Jsonb jsonb = JsonbBuilder.create();
     producer.sendMessage("job-topic", jsonb.toJson(job));
@@ -57,12 +62,15 @@ public class JobResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public JobsModel getJobResults() {
-    return new JobsModel(
-      manager.getResults()
+    List<JobResultModel> results = manager.getResults()
       .entrySet()
       .stream()
-      .map(es -> new JobResultModel(es.getKey(), es.getValue()))
-      .collect(Collectors.toList()));
+      .map(es -> creatResultModel(es.getKey(), es.getValue()))
+      .collect(Collectors.toList());
+
+    JobsModel responseModel = new JobsModel();
+    responseModel.setResults(results);
+    return responseModel;
   }
 
   @GET
@@ -71,13 +79,20 @@ public class JobResource {
   public Response getJobResult(@PathParam("jobId") String jobId) {
     Optional<JobResultModel> model = manager
       .getResult(jobId)
-      .map(r -> new JobResultModel(jobId, r));
+      .map(r -> creatResultModel(jobId, r));
 
     if (model.isPresent()) {
       return Response.ok(model.get()).build();
     }
 
     return Response.status(Status.NOT_FOUND).build();
+  }
+
+  private JobResultModel creatResultModel(String jobId, int result) {
+    JobResultModel resultModel = new JobResultModel();
+    resultModel.setJobId(jobId);
+    resultModel.setResult(result);
+    return resultModel;
   }
 
 }

@@ -258,10 +258,11 @@
     </build>
 
     <modules>
+        <module>models</module>
         <module>system</module>
         <module>inventory</module>
         <module>job</module>
-        <module>bff</module>
+        <module>gateway</module>
     </modules>
 
 </project>

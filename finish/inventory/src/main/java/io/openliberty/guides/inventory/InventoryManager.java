@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import io.openliberty.guides.inventory.model.InventoryList;
-import io.openliberty.guides.inventory.model.SystemData;
+import io.openliberty.guides.models.InventoryList;
+import io.openliberty.guides.models.SystemData;
 import javax.enterprise.context.ApplicationScoped;
 
 // tag::ApplicationScoped[]
@@ -52,7 +52,7 @@ public class InventoryManager {
   public void updateSystem(String hostname, String busy) {
     for (SystemData s : systems) {
       if (s.getHostname().equals(hostname)) {
-        s.setBusy(busy);
+        s.getProperties().setProperty("system.busy", busy);
       }
     }
   }
