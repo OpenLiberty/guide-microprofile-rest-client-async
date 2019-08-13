@@ -43,18 +43,18 @@ Asynchronous methods allow you to perform a lengthy operation, such as IO asynch
 In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
 The application you will be working with is a job runner that mantains an inventory of available systems.
-It consists of four microservices `bff`, `job`, `system`, and `inventory`.
+It consists of four microservices `gateway`, `job`, `system`, and `inventory`.
 The `job` microservice allows you to dispatch jobs that will be run by the `system` microservice.
 The job is a sleep operation used to represent a slow task that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
 publishes the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
 itself on startup with the `inventory` microservice that keeps track of all instances of the `system` microservice. Finally,
-the `bff` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for front end^].
+the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for front end^].
 It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
 
-The microservice that you will modify with is the `bff` service.
+The microservice that you will modify with is the `gateway` service.
 It acts as a gateway to communicate with the backend microservices.
-Whenever a request is made to the `bff` service to retrieve the jobs
-the `bff` service communicates with the `job`
+Whenever a request is made to the `gateway` service to retrieve the jobs
+the `gateway` service communicates with the `job`
 service on that host to get the completed jobs.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
@@ -78,12 +78,12 @@ First, you will replace the job client interface to make the methods asynchronou
 [role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `JobClient` interface.#
-`bff/src/main/java/io/openliberty/guides/bff/client/JobClient.java`
+`gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java`
 ----
 JobClient.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/bff/src/main/java/io/openliberty/guides/bff/client/JobClient.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java[]
 ----
 
 The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have a return type of `CompletionStage<T>`, you won’t be able to directly manipulate the inner type. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
@@ -95,12 +95,12 @@ JAX-RS resources can also have asynchronous methods. So instead of returning a `
 [role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `JobResource` class.#
-`bff/src/main/java/io/openliberty/guides/bff/JobResource.java`
+`gateway/src/main/java/io/openliberty/guides/gateway/JobResource.java`
 ----
 JobResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/bff/src/main/java/io/openliberty/guides/bff/JobResource.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobResource.java[]
 ----
 
 Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
@@ -138,7 +138,7 @@ Next, use the provided script to start the application in docker containers.
 ```
 ****
 
-You can access the application by making requests to the `bff` job endpoints.
+You can access the application by making requests to the `gateway` job endpoints.
 
 - GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
 - GET http://localhost:8080/api/jobs/{jobId}
@@ -150,26 +150,26 @@ Switching to an asynchronous programming model has freed up the thread handling 
 // Testing
 // =================================================================================================
 
-== Testing the bff application
+== Testing the gateway application
 
-A few tests are included for you to test the basic functionality of the `bff` microservice. If a test failure occurs, then you might have introduced a bug into the code.
+A few tests are included for you to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you might have introduced a bug into the code.
 
 [role="code_command hotspot", subs="quotes"]
 ----
 #Create the `JobEndpointTest` class.#
-`bff/src/test/java/it/io/openliberty/guides/bff/JobEndpointTest.java`
+`gateway/src/test/java/it/io/openliberty/guides/gateway/JobEndpointTest.java`
 ----
 
 See the following descriptions of the test cases:
 
-* [hotspot=testCreateJob file=0]`testCreateJob()` verifies that the bff service communicates with a backend service to create a job.
+* [hotspot=testCreateJob file=0]`testCreateJob()` verifies that the gateway service communicates with a backend service to create a job.
 
-* [hotspot=testGetJobs file=0]`testGetJobs()` verifies that the bff service communicates with an upstream service to get all jobs and transforms them appropriately to a `JobListModel`.
+* [hotspot=testGetJobs file=0]`testGetJobs()` verifies that the gateway service communicates with an upstream service to get all jobs and transforms them appropriately to a `JobListModel`.
 
 JobEndpointTest.java
 [source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/bff/src/test/java/it/io/openliberty/guides/bff/JobEndpointTest.java[]
+include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/JobEndpointTest.java[]
 ----
 
 // =================================================================================================
@@ -178,7 +178,7 @@ include::finish/bff/src/test/java/it/io/openliberty/guides/bff/JobEndpointTest.j
 
 === Running the tests
 
-Navigate to the `bff` directory, then verify that the tests pass using the Maven `verify` goal:
+Navigate to the `gateway` directory, then verify that the tests pass using the Maven `verify` goal:
 
 [role='command']
 ```
@@ -192,13 +192,13 @@ When the tests succeed, you will see output similar to the following.
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running it.io.openliberty.guides.bff.InventoryEndpointTest
+Running it.io.openliberty.guides.gateway.InventoryEndpointTest
 Failed to load class "org.slf4j.impl.StaticLoggerBinder".
 Defaulting to no-operation (NOP) logger implementation
 See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.bff.InventoryEndpointTest
-Running it.io.openliberty.guides.bff.JobEndpointTest
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.bff.JobEndpointTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.InventoryEndpointTest
+Running it.io.openliberty.guides.gateway.JobEndpointTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.JobEndpointTest
 
 Results:
 
