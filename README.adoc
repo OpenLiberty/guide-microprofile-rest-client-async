@@ -32,7 +32,7 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices over H
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update a template interface that maps to the remote service that you want to call. You'll change it to use a `CompletionStage` return type making the method asynchronous. A completion stage is a class that will allow you to use the result of your remote service call at some point in the future.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update a template interface that maps to the remote service that you want to call. You'll change it to use a `CompletionStage` return type making the method asynchronous. A `CompletionStage` is a class that will allow you to use the result of your remote service call at some point in the future.
 
 === What is asynchronous programming?
 
@@ -105,7 +105,7 @@ include::finish/bff/src/main/java/io/openliberty/guides/bff/JobResource.java[]
 
 Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
 
-A completion stage represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, which functionally behaves similar to a catch block. When you return a completion stage in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+The `CompletionStage` class represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the `exceptionally()` method, which functionally behaves similar to a catch block. When you return a `CompletionStage` in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
