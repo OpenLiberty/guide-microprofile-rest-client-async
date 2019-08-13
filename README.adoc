@@ -120,7 +120,7 @@ To build the application, run the Maven `package` goal from the command line in 
 mvn clean package
 ```
 
-Next, use the provided script to start the application in docker containers.
+Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with eachother. It also spawns containers for kafka, zookeeper, and all of the microservices in the project.
 
 ****
 [system]#*{linux} | {mac}*#
@@ -140,9 +140,24 @@ Next, use the provided script to start the application in docker containers.
 
 You can access the application by making requests to the `gateway` job endpoints.
 
-- GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
-- GET http://localhost:8080/api/jobs/{jobId}
-- POST http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
+[cols=3*,options="header"]
+|===
+|Description
+|Endpoint
+|Sample Output
+
+|Get all completed jobs
+|GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
+|`{"count":0,"results":[]}`
+
+|Create a job
+|POST http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
+|`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
+
+|Get a specific job
+|GET http://localhost:8080/api/jobs/{jobId}
+|`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
+|===
 
 Switching to an asynchronous programming model has freed up the thread handling your request to `/api/jobs`. While MicroProfile REST Client makes a request, the thread can handle other work.
 
