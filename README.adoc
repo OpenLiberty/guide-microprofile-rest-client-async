@@ -51,6 +51,8 @@ itself on startup with the `inventory` microservice that keeps track of all inst
 the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for front end^].
 It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
 
+image::guide-{projectid}/assets/reactive-inventory-system.png[]
+
 The microservice that you will modify with is the `gateway` service.
 It acts as a gateway to communicate with the backend microservices.
 Whenever a request is made to the `gateway` service to retrieve the jobs
