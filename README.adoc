@@ -209,7 +209,7 @@ Navigate to the `gateway` directory, then verify that the tests pass using the M
 
 [role='command']
 ```
-mvn verify -Ddockerfile.skip
+mvn verify
 ```
 
 When the tests succeed, you will see output similar to the following.
