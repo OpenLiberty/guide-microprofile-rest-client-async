@@ -1,13 +1,9 @@
 language: java
-services:
-  - docker
 before_script:
 - unset _JAVA_OPTIONS
 - cd finish
 script:
 - mvn -q clean install
-- chmod +x ../scripts/temporaryTest.sh
-- ../scripts/temporaryTest.sh
 - serverName=$(target/liberty/wlp/bin/server list | cut -d '.' -f2| tr -d '\n');
 - build=$(grep "Open Liberty" target/liberty/wlp/usr/servers/"$serverName"/logs/console.log
   | cut -d' ' -f5 | cut -d')' -f1 ); release=$( echo "$build" | cut -d'/' -f1); number=$(
