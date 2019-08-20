@@ -151,7 +151,7 @@
                     <execution>
                         <id>package-server</id>
                         <configuration>
-                            <packageFile>${project.build.directory}/defaultServer.zip</packageFile>
+                            <packageFile>${project.build.directory}/gateway.tar.gz</packageFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -168,10 +168,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
             </plugin>
             <!-- for tests -->
             <plugin>

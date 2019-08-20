@@ -122,6 +122,16 @@ To build the application, run the Maven `package` goal from the command line in 
 mvn clean package
 ```
 
+Run the following commands to build and containerize the application:
+
+[role='command']
+```
+docker build -t system:1.0-SNAPSHOT system/.
+docker build -t inventory:1.0-SNAPSHOT inventory/.
+docker build -t job:1.0-SNAPSHOT job/.
+docker build -t gateway:1.0-SNAPSHOT gateway/.
+```
+
 Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with eachother. It also spawns containers for kafka, zookeeper, and all of the microservices in the project.
 
 ****
@@ -199,7 +209,7 @@ Navigate to the `gateway` directory, then verify that the tests pass using the M
 
 [role='command']
 ```
-mvn verify -Ddockerfile.skip
+mvn verify
 ```
 
 When the tests succeed, you will see output similar to the following.
