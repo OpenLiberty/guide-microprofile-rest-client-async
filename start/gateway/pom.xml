@@ -151,7 +151,7 @@
                     <execution>
                         <id>package-server</id>
                         <configuration>
-                            <packageFile>${project.build.directory}/defaultServer.zip</packageFile>
+                            <packageFile>${project.build.directory}/gateway.tar.gz</packageFile>
                         </configuration>
                     </execution>
                     <execution>

@@ -147,7 +147,7 @@
                     <execution>
                         <id>package-server</id>
                         <configuration>
-                            <packageFile>${project.build.directory}/defaultServer.zip</packageFile>
+                            <packageFile>${project.build.directory}/job.tar.gz</packageFile>
                         </configuration>
                     </execution>
                 </executions>
