@@ -60,8 +60,7 @@ the `gateway` service communicates with the `job`
 service on that host to get the completed jobs.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
-This application uses the Apache Kafka and ZooKeeper services to maintain the distributed job results and system status.
-These topics will not be covered in this guide. 
+The application also uses the Apache Kafka and ZooKeeper services to distribute the job results and system status.
 
 If you want to learn more about MicroProfile Rest Client, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
@@ -160,21 +159,10 @@ You can access the application by making requests to the `gateway` job endpoints
 
 [options="header"]
 |===
-|Description
-|Endpoint
-|Sample Output
-
-|Get all completed jobs
-|GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
-|`{"count":0,"results":[]}`
-
-|Create a job
-|POST http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^]
-|`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
-
-|Get a specific job
-|GET http://localhost:8080/api/jobs/{jobId}
-|`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
+|Description |Endpoint |Sample Output
+|Get all completed jobs |GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^] |`{"count":0,"results":[]}`
+|Create a job |POST http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^] |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
+|Get a specific job |GET http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
 
 You can use `curl -X POST http://localhost:8080/api/jobs` command if available on the system to create a job. Postman application can also be used. The requests have some delay for the job results.
@@ -230,9 +218,6 @@ When the tests succeed, you will see output similar to the following.
  T E S T S
 -------------------------------------------------------
 Running it.io.openliberty.guides.gateway.InventoryEndpointTest
-Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-Defaulting to no-operation (NOP) logger implementation
-See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.InventoryEndpointTest
 Running it.io.openliberty.guides.gateway.JobEndpointTest
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.JobEndpointTest
