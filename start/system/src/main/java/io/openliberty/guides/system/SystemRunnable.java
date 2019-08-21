@@ -95,7 +95,7 @@ public class SystemRunnable implements Runnable {
         props.setProperty("system.busy", Boolean.toString(isBusy));
         return props;
     }
-
+    
     private List<String> consumeMessages() {
         List<String> result = new ArrayList<String>();
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));

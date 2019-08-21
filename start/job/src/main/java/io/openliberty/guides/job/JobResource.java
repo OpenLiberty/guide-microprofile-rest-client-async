@@ -94,4 +94,5 @@ public class JobResource {
     jobResult.setResult(result);
     return jobResult;
   }
+
 }
