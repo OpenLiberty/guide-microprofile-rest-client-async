@@ -18,7 +18,7 @@
 :page-tags: ['MicroProfile', 'Java EE']
 :page-permalink: /guides/{projectid}
 :page-related-guides: ['microprofile-rest-client']
-:common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
+:common-includes: ../guides-common/
 :source-highlighter: prettify
 :mac: Mac
 :win: Windows
@@ -36,22 +36,22 @@ You will learn how to build a MicroProfile Rest Client to access remote RESTful 
 
 === What is asynchronous programming?
 
-Asynchronous programming can be thought of as a restaurant. After being seated a waiter will take your order. At this point you will have to wait a few minutes for your food to be prepared. While your food is being prepared your waiter may take more orders or serve other tables. Once your food is ready, your waiter will be notified to bring out your food. However, in a synchronous model, the waiter would have to wait for your food to be prepared before dealing with any other customers. This method blocks other customers from placing orders or receiving their food.
+Asynchronous programming can be thought of as a restaurant. After being seated, a waiter will take your order. At this point, you will have to wait a few minutes for your food to be prepared. While your food is being prepared your waiter may take more orders or serve other tables. Once your food is ready, your waiter will be notified to bring out your food. However, in a synchronous model, the waiter would have to wait for your food to be prepared before dealing with any other customers. This method blocks other customers from placing orders or receiving their food.
 
-Asynchronous methods allow you to perform a lengthy operation, such as IO asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables. Since they’re free, the waiter can take more orders from other tables, or serve food to other tables.
+Asynchronous methods allow you to perform a lengthy operation, such as input/output (IO) asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables. Since they’re free, the waiter can take more orders from other tables, or serve food to other tables.
 
 In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application you will be working with is a job runner that mantains an inventory of available systems.
+The application you will be working with is a job manager that maintains an inventory of available systems.
 It consists of four microservices `gateway`, `job`, `system`, and `inventory`.
 The `job` microservice allows you to dispatch jobs that will be run by the `system` microservice.
 The job is a sleep operation used to represent a slow task that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
-publishes the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
+reports the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
 itself on startup with the `inventory` microservice that keeps track of all instances of the `system` microservice. Finally,
-the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for front end^].
+the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^].
 It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
 
-image::guide-{projectid}/assets/reactive-inventory-system.png[]
+image::reactive-inventory-system.png[Reactive Inventory System,width=100%]
 
 The microservice that you will modify with is the `gateway` service.
 It acts as a gateway to communicate with the backend microservices.
@@ -60,8 +60,10 @@ the `gateway` service communicates with the `job`
 service on that host to get the completed jobs.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
+This application uses the Apache Kafka and ZooKeeper services to maintain the distributed job results and system status.
+These topics will not be covered in this guide. 
 
-If you are not too familiar with MicroProfile Rest Client, then read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide to learn more about it.
+If you want to learn more about MicroProfile Rest Client, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
 
 // =================================================================================================
@@ -75,7 +77,7 @@ include::{common-includes}/gitclone.adoc[]
 
 Navigate to the `start` directory to begin.
 
-First, you will replace the job client interface to make the methods asynchronous.
+First, you will make the job client interface methods asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -115,6 +117,10 @@ The `CompletionStage` class represents a unit of computation. Once that computat
 
 == Building and running the application
 
+The `gateway`, `job`, `system`, and `inventory` microservices will be built in a Docker container. You can learn more about https://openliberty.io/guides/containerize.html[Containerizing microservices^].
+
+Install Docker by following the instructions on the https://docs.docker.com/engine/installation[official page^]. Start your Docker environment.
+
 To build the application, run the Maven `package` goal from the command line in the `start` directory.
 
 [role='command']
@@ -132,7 +138,7 @@ docker build -t job:1.0-SNAPSHOT job/.
 docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
-Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with eachother. It also spawns containers for kafka, zookeeper, and all of the microservices in the project.
+Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with each other. It also spawns containers for kafka, zookeeper, and all of the microservices in the project. The services will take some time to become available.
 
 ****
 [system]#*{linux} | {mac}*#
@@ -152,7 +158,7 @@ Next, use the provided script to start the application in docker containers. The
 
 You can access the application by making requests to the `gateway` job endpoints.
 
-[cols=3*,options="header"]
+[options="header"]
 |===
 |Description
 |Endpoint
@@ -171,6 +177,10 @@ You can access the application by making requests to the `gateway` job endpoints
 |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
 
+You can use `curl -X POST http://localhost:8080/api/jobs` command if available on the system to create a job. Postman application can also be used. The requests have some delay for the job results.
+
+The all completed jobs JSON output has `averageResult` that is the average sleep time of all the jobs, a count for the number of jobs and the list of the jobs. Each job JSON output has a job ID and a sleep time as the result for this job.
+
 Switching to an asynchronous programming model has freed up the thread handling your request to `/api/jobs`. While MicroProfile REST Client makes a request, the thread can handle other work.
 
 // =================================================================================================
@@ -179,7 +189,7 @@ Switching to an asynchronous programming model has freed up the thread handling 
 
 == Testing the gateway application
 
-A few tests are included for you to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you might have introduced a bug into the code.
+A few tests are included for you to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -236,7 +246,7 @@ Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 
 Navigate back to the `start` directory.
 
-Finally, use the provided script to stop the application.
+Finally, use the script to stop the application.
 
 ****
 [system]#*{linux} | {mac}*#
