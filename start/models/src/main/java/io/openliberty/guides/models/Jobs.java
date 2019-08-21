@@ -14,14 +14,14 @@ package io.openliberty.guides.models;
 
 import java.util.List;
 
-public class JobsModel {
-    private List<JobResultModel> results;
+public class Jobs {
+    private List<JobResult> results;
 
-    public List<JobResultModel> getResults() {
+    public List<JobResult> getResults() {
         return results;
     }
 
-    public void setResults(List<JobResultModel> results) {
+    public void setResults(List<JobResult> results) {
         this.results = results;
     }
     

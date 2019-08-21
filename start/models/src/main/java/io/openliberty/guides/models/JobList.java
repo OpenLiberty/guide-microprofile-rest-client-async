@@ -16,18 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-public class JobListModel {
-    private List<JobResultModel> results;
+public class JobList {
+    private List<JobResult> results;
     private int count;
     private OptionalDouble averageResult;
 
-    public JobListModel() {
+    public JobList() {
         results = new ArrayList<>();
         setCount(results.size());
         setAverageResult(OptionalDouble.empty());
     }
 
-    public JobListModel(List<JobResultModel> results) {
+    public JobList(List<JobResult> results) {
         this.results = results;
         setCount(results.size());
         setAverageResult(
@@ -37,11 +37,11 @@ public class JobListModel {
             .average());
    }
 
-    public List<JobResultModel> getResults() {
+    public List<JobResult> getResults() {
         return results;
     }
 
-    public void setResults(List<JobResultModel> results) {
+    public void setResults(List<JobResult> results) {
         this.results = results;
     }
 

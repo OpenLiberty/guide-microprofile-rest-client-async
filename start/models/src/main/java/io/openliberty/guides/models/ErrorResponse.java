@@ -12,24 +12,14 @@
 // end::copyright[]
 package io.openliberty.guides.models;
 
-public class JobResultModel {
-    private String jobId;
-    private Integer result;
+public class ErrorResponse {
+    private String message;
 
-    public Integer getResult() {
-        return result;
+    public String getMessage() {
+        return message;
     }
 
-    public String getJobId() {
-        return jobId;
+    public void setMessage(String message) {
+        this.message = message;
     }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
-
-    public void setResult(Integer result) {
-        this.result = result;
-    }
-
 }

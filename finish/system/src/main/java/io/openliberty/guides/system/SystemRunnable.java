@@ -77,11 +77,11 @@ public class SystemRunnable implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    JobResult jobResultModel = new JobResult();
-                    jobResultModel.setJobId(job.getJobId());
-                    jobResultModel.setResult(result);
+                    JobResult jobResult = new JobResult();
+                    jobResult.setJobId(job.getJobId());
+                    jobResult.setResult(result);
 
-                    producer.sendMessage("job-result-topic", jsonb.toJson(jobResultModel));
+                    producer.sendMessage("job-result-topic", jsonb.toJson(jobResult));
                 }
 
                 producer.sendMessage("system-topic", jsonb.toJson(getProperties(false)));

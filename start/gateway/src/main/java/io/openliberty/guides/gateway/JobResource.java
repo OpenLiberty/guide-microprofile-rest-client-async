@@ -25,9 +25,9 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import io.openliberty.guides.gateway.client.JobClient;
-import io.openliberty.guides.models.JobListModel;
-import io.openliberty.guides.models.JobModel;
-import io.openliberty.guides.models.JobResultModel;
+import io.openliberty.guides.models.JobList;
+import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.JobResult;
 
 @Path("/jobs")
 public class JobResource {
@@ -38,25 +38,25 @@ public class JobResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public JobListModel getJobs() {
+    public JobList getJobs() {
         try {
-            return new JobListModel(jobClient.getJobs().getResults());
+            return new JobList(jobClient.getJobs().getResults());
         } catch (Exception ex) {
             // Respond with empty list on error
-            return new JobListModel();
+            return new JobList();
         }
     }
 
     @GET
     @Path("{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public JobResultModel getJob(@PathParam("jobId") String jobId) {
+    public JobResult getJob(@PathParam("jobId") String jobId) {
         return jobClient.getJob(jobId);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public JobModel createJob() {
+    public Job createJob() {
         return jobClient.createJob();
     }
 }

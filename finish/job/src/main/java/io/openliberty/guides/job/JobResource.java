@@ -65,34 +65,34 @@ public class JobResource {
     List<JobResult> results = manager.getResults()
       .entrySet()
       .stream()
-      .map(es -> creatResultModel(es.getKey(), es.getValue()))
+      .map(es -> creatJobResult(es.getKey(), es.getValue()))
       .collect(Collectors.toList());
 
-    Jobs responseModel = new Jobs();
-    responseModel.setResults(results);
-    return responseModel;
+    Jobs responseJobs = new Jobs();
+    responseJobs.setResults(results);
+    return responseJobs;
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{jobId}")
   public Response getJobResult(@PathParam("jobId") String jobId) {
-    Optional<JobResult> model = manager
+    Optional<JobResult> jobResult = manager
       .getResult(jobId)
-      .map(r -> creatResultModel(jobId, r));
+      .map(r -> creatJobResult(jobId, r));
 
-    if (model.isPresent()) {
-      return Response.ok(model.get()).build();
+    if (jobResult.isPresent()) {
+      return Response.ok(jobResult.get()).build();
     }
 
     return Response.status(Status.NOT_FOUND).build();
   }
 
-  private JobResult creatResultModel(String jobId, int result) {
-    JobResult resultModel = new JobResult();
-    resultModel.setJobId(jobId);
-    resultModel.setResult(result);
-    return resultModel;
+  private JobResult creatJobResult(String jobId, int result) {
+    JobResult jobResult = new JobResult();
+    jobResult.setJobId(jobId);
+    jobResult.setResult(result);
+    return jobResult;
   }
 
 }
