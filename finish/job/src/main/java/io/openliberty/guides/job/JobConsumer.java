@@ -30,7 +30,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
-import io.openliberty.guides.models.JobResultModel;
+import io.openliberty.guides.models.JobResult;
 
 public class JobConsumer implements Runnable {
 
@@ -70,12 +70,12 @@ public class JobConsumer implements Runnable {
         Jsonb jsonb = JsonbBuilder.create();
 
         while(true) {
-            List<JobResultModel> results = consumeMessages()
+            List<JobResult> results = consumeMessages()
                 .stream()
-                .map(m -> jsonb.fromJson(m, JobResultModel.class))
+                .map(m -> jsonb.fromJson(m, JobResult.class))
                 .collect(Collectors.toList());
 
-            for (JobResultModel r : results) {
+            for (JobResult r : results) {
                 manager.addResult(r.getJobId(), r.getResult());
             }
         }

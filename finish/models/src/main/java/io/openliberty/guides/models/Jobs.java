@@ -12,14 +12,17 @@
 // end::copyright[]
 package io.openliberty.guides.models;
 
-public class ErrorResponseModel {
-    private String message;
+import java.util.List;
 
-    public String getMessage() {
-        return message;
+public class Jobs {
+    private List<JobResult> results;
+
+    public List<JobResult> getResults() {
+        return results;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setResults(List<JobResult> results) {
+        this.results = results;
     }
+    
 }

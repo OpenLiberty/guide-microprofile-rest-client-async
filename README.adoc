@@ -19,6 +19,7 @@
 :page-permalink: /guides/{projectid}
 :page-related-guides: ['microprofile-rest-client']
 :common-includes: ../guides-common/
+:imagesdir: /img/guide
 :source-highlighter: prettify
 :mac: Mac
 :win: Windows
@@ -165,7 +166,7 @@ You can access the application by making requests to the `gateway` job endpoints
 |Get a specific job |GET http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
 
-You can use `curl -X POST http://localhost:8080/api/jobs` command if available on the system to create a job. Postman application can also be used. The requests have some delay for the job results.
+You can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system to create a job. Postman application can also be used. The request has some delay for the job results.
 
 The all completed jobs JSON output has `averageResult` that is the average sleep time of all the jobs, a count for the number of jobs and the list of the jobs. Each job JSON output has a job ID and a sleep time as the result for this job.
 

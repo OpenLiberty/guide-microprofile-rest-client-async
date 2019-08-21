@@ -7,7 +7,7 @@
 
     <parent>
         <groupId>io.openliberty.guides</groupId>
-        <artifactId>kube-demo</artifactId>
+        <artifactId>reactive-demo</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -19,12 +19,6 @@
             <groupId>io.openliberty.guides</groupId>
             <artifactId>models</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.openliberty.features</groupId>
-            <artifactId>concurrent-1.0</artifactId>
-            <type>esa</type>
-            <scope>provided</scope>
         </dependency>
        <dependency>
            <groupId>io.openliberty.features</groupId>
@@ -41,12 +35,6 @@
        <dependency>
            <groupId>org.eclipse.microprofile.rest.client</groupId>
            <artifactId>microprofile-rest-client-api</artifactId>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>mpConfig-1.3</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

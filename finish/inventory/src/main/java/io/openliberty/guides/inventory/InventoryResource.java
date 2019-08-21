@@ -23,7 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.openliberty.guides.models.ErrorResponseModel;
+import io.openliberty.guides.models.ErrorResponse;
 import io.openliberty.guides.models.InventoryList;
 import io.openliberty.guides.inventory.client.SystemClient;
 
@@ -44,7 +44,7 @@ public class InventoryResource {
     // Get properties for host
     Properties props = systemClient.getProperties(hostname);
     if (props == null) {
-      ErrorResponseModel error = new ErrorResponseModel();
+      ErrorResponse error = new ErrorResponse();
       error.setMessage("ERROR: Unknown hostname or the system service may not be " 
                              + "running on " + hostname);
       return Response.status(Response.Status.NOT_FOUND)

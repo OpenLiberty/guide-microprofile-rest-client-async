@@ -23,9 +23,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import io.openliberty.guides.models.JobModel;
-import io.openliberty.guides.models.JobResultModel;
-import io.openliberty.guides.models.JobsModel;
+import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.JobResult;
+import io.openliberty.guides.models.Jobs;
 
 @RegisterRestClient(baseUri = "http://job-service:9080")
 @Path("/jobs")
@@ -34,20 +34,20 @@ public interface JobClient {
     // tag::getJobs[]
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobsModel> getJobs();
+    public CompletionStage<Jobs> getJobs();
     // end::getJobs[]
 
     // tag::getJob[]
     @GET
     @Path("{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobResultModel> getJob(@PathParam("jobId") String jobId);
+    public CompletionStage<JobResult> getJob(@PathParam("jobId") String jobId);
     // end::getJob[]
 
     // tag::createJob[]
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobModel> createJob();
+    public CompletionStage<Job> createJob();
     // end::createJob[]
 
 }

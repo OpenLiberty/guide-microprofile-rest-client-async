@@ -31,8 +31,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
-import io.openliberty.guides.models.JobModel;
-import io.openliberty.guides.models.JobResultModel;
+import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.JobResult;
 
 public class SystemRunnable implements Runnable {
 
@@ -63,10 +63,10 @@ public class SystemRunnable implements Runnable {
         producer.sendMessage("system-topic", jsonb.toJson(getProperties(false)));
 
         while (true) {
-            List<JobModel> jobs = consumeMessages().stream().map(m -> jsonb.fromJson(m, JobModel.class))
+            List<Job> jobs = consumeMessages().stream().map(m -> jsonb.fromJson(m, Job.class))
                     .collect(Collectors.toList());
 
-            for (JobModel job : jobs) {
+            for (Job job : jobs) {
                 producer.sendMessage("system-topic", jsonb.toJson(getProperties(true)));
 
                 int sleepTimeSeconds = rand.nextInt(5) + 5; // 5 to 10
@@ -77,7 +77,7 @@ public class SystemRunnable implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    JobResultModel jobResultModel = new JobResultModel();
+                    JobResult jobResultModel = new JobResult();
                     jobResultModel.setJobId(job.getJobId());
                     jobResultModel.setResult(result);
 

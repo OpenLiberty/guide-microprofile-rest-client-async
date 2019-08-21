@@ -32,9 +32,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import io.openliberty.guides.models.JobModel;
-import io.openliberty.guides.models.JobResultModel;
-import io.openliberty.guides.models.JobsModel;
+import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.JobResult;
+import io.openliberty.guides.models.Jobs;
 
 @RequestScoped
 @Path("/jobs")
@@ -48,9 +48,9 @@ public class JobResource {
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  public JobModel createJob() {
+  public Job createJob() {
     String jobId = UUID.randomUUID().toString();
-    JobModel job = new JobModel();
+    Job job = new Job();
     job.setJobId(jobId);
 
     Jsonb jsonb = JsonbBuilder.create();
@@ -61,14 +61,14 @@ public class JobResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public JobsModel getJobResults() {
-    List<JobResultModel> results = manager.getResults()
+  public Jobs getJobResults() {
+    List<JobResult> results = manager.getResults()
       .entrySet()
       .stream()
       .map(es -> creatResultModel(es.getKey(), es.getValue()))
       .collect(Collectors.toList());
 
-    JobsModel responseModel = new JobsModel();
+    Jobs responseModel = new Jobs();
     responseModel.setResults(results);
     return responseModel;
   }
@@ -77,7 +77,7 @@ public class JobResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{jobId}")
   public Response getJobResult(@PathParam("jobId") String jobId) {
-    Optional<JobResultModel> model = manager
+    Optional<JobResult> model = manager
       .getResult(jobId)
       .map(r -> creatResultModel(jobId, r));
 
@@ -88,8 +88,8 @@ public class JobResource {
     return Response.status(Status.NOT_FOUND).build();
   }
 
-  private JobResultModel creatResultModel(String jobId, int result) {
-    JobResultModel resultModel = new JobResultModel();
+  private JobResult creatResultModel(String jobId, int result) {
+    JobResult resultModel = new JobResult();
     resultModel.setJobId(jobId);
     resultModel.setResult(result);
     return resultModel;

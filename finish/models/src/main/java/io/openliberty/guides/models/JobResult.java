@@ -12,7 +12,7 @@
 // end::copyright[]
 package io.openliberty.guides.models;
 
-public class JobResultModel {
+public class JobResult {
     private String jobId;
     private Integer result;
 
