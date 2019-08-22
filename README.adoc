@@ -8,7 +8,7 @@
 :projectid: microprofile-rest-client-async
 :page-layout: guide-multipane
 :page-duration: 15 minutes
-:page-releasedate: 2019-07-05
+:page-releasedate: 2019-09-13
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
@@ -138,7 +138,7 @@ docker build -t job:1.0-SNAPSHOT job/.
 docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
-Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with each other. It also spawns containers for kafka, zookeeper, and all of the microservices in the project. The services will take some time to become available.
+Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project. The services will take some time to become available.
 
 ****
 [system]#*{linux} | {mac}*#
