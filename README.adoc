@@ -33,7 +33,7 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices over H
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update a template interface that maps to the remote service that you want to call. You'll change it to use a `CompletionStage` return type making the method asynchronous. A `CompletionStage` is a class that will allow you to use the result of your remote service call at some point in the future.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update a template interface that maps to the remote service that you want to call. You'll change it to use a `CompletionStage` return type making the method asynchronous. A `CompletionStage` is an interface that will allow you to use the result of your remote service call at some point in the future.
 
 === What is asynchronous programming?
 
@@ -109,7 +109,7 @@ include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobResource.
 
 Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
 
-The `CompletionStage` class represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a `CompletionStage` in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+The `CompletionStage` interface represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a `CompletionStage` in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
@@ -166,7 +166,7 @@ You can access the application by making requests to the `gateway` job endpoints
 |Get a specific job |GET http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
 
-You can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system to create a job. The Postman application can also be used. The request has some delay for the job results to return.
+You can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system to create a job. The Postman application can also be used. The request will take some time for the job results to return.
 
 The completed jobs JSON output has `averageResult` that is the average sleep time of all the jobs, a count for the number of jobs and the list of the jobs. Each job JSON output has a job ID and a sleep time as the result for this job.
 
