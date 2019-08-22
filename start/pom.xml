@@ -30,11 +30,6 @@
         <version.openliberty-runtime>RELEASE</version.openliberty-runtime>
         <http.port>9080</http.port>
         <https.port>9443</https.port>
-        <!-- Default test properties -->
-        <cluster.ip>localhost</cluster.ip>
-        <system.kube.service>system-service</system.kube.service>
-        <system.node.port>31000</system.node.port>
-        <inventory.node.port>32000</inventory.node.port>
     </properties>
 
     <dependencyManagement>
@@ -120,27 +115,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>windowsExtension</id>
-            <activation>
-                <os><family>Windows</family></os>
-            </activation>
-            <properties>
-                <kubectl.extension>.cmd</kubectl.extension>
-            </properties>
-        </profile>
-        <profile>
-            <id>nonWindowsExtension</id>
-            <activation>
-                <os><family>!Windows</family></os>
-            </activation>
-            <properties>
-                <kubectl.extension></kubectl.extension>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -213,22 +187,6 @@
                                 <includes>
                                     <include>**/it/**</include>
                                 </includes>
-                                <systemPropertyVariables>
-                                    <cluster.ip>${cluster.ip}</cluster.ip>
-                                    <system.ingress.path>
-                                        ${system.ingress.path}
-                                    </system.ingress.path>
-                                    <system.node.port>
-                                        ${system.node.port}
-                                    </system.node.port>
-                                    <system.kube.service>
-                                        ${system.kube.service}
-                                    </system.kube.service>
-                                    <inventory.ingress.path>
-                                        ${inventory.ingress.path}
-                                    </inventory.ingress.path>
-                                    <inventory.node.port>${inventory.node.port}</inventory.node.port>
-                                </systemPropertyVariables>
                             </configuration>
                         </execution>
                         <execution>
