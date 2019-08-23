@@ -14,10 +14,6 @@ package it.io.openliberty.guides.gateway;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Collections;
-
 import javax.json.JsonObject;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -25,6 +21,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +30,6 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 
 public class InventoryEndpointTest {
 
