@@ -158,7 +158,7 @@ Next, use the provided script to start the application in docker containers. The
 
 You can access the application by making requests to the `gateway` job endpoints.
 
-[options="header"]
+[options="header", role="wrap_table"]
 |===
 |Description |Endpoint |Sample Output
 |Get completed jobs |GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^] |`{"count":0,"results":[]}`
