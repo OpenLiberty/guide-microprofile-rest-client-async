@@ -81,13 +81,13 @@ First, you will make the job client interface methods asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `JobClient` interface.#
-`gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java`
+#Replace the `JobGatewayClient` interface.#
+`gateway/src/main/java/io/openliberty/guides/gateway/client/JobGatewayClient.java`
 ----
-JobClient.java
+JobGatewayClient.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobGatewayClient.java[]
 ----
 
 The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have a return type of `CompletionStage<T>`, you won’t be able to directly manipulate the inner type. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
@@ -98,13 +98,13 @@ JAX-RS resources can also have asynchronous methods. So instead of returning a `
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `JobResource` class.#
-`gateway/src/main/java/io/openliberty/guides/gateway/JobResource.java`
+#Replace the `JobGatewayResource` class.#
+`gateway/src/main/java/io/openliberty/guides/gateway/JobGatewayResource.java`
 ----
-JobResource.java
+JobGatewayResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobResource.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobGatewayResource.java[]
 ----
 
 Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
@@ -182,8 +182,8 @@ A few tests are included for you to test the basic functionality of the `gateway
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Create the `JobEndpointTest` class.#
-`gateway/src/test/java/it/io/openliberty/guides/gateway/JobEndpointTest.java`
+#Create the `JobGatewayEndpointTest` class.#
+`gateway/src/test/java/it/io/openliberty/guides/gateway/JobGatewayEndpointTest.java`
 ----
 
 See the following descriptions of the test cases:
@@ -192,10 +192,10 @@ See the following descriptions of the test cases:
 
 * [hotspot=testGetJobs file=0]`testGetJobs()` verifies that the gateway service communicates with an upstream service to get all jobs and transforms them appropriately to a `JobListModel`.
 
-JobEndpointTest.java
+JobGatewayEndpointTest.java
 [source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/JobEndpointTest.java[]
+include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/JobGatewayEndpointTest.java[]
 ----
 
 // =================================================================================================
@@ -219,9 +219,9 @@ When the tests succeed, you will see output similar to the following.
  T E S T S
 -------------------------------------------------------
 Running it.io.openliberty.guides.gateway.InventoryEndpointTest
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.InventoryEndpointTest
-Running it.io.openliberty.guides.gateway.JobEndpointTest
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.JobEndpointTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.InventoryGatewayEndpointTest
+Running it.io.openliberty.guides.gateway.JobGatewayEndpointTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.JobGatewayEndpointTest
 
 Results:
 
