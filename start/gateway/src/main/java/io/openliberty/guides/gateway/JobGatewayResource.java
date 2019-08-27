@@ -10,8 +10,11 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway.client;
+package io.openliberty.guides.gateway;
 
+import java.util.concurrent.CompletionStage;
+
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,27 +22,41 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import io.openliberty.guides.gateway.client.JobGatewayClient;
+import io.openliberty.guides.models.JobList;
 import io.openliberty.guides.models.Job;
 import io.openliberty.guides.models.JobResult;
-import io.openliberty.guides.models.Jobs;
 
-@RegisterRestClient(baseUri = "http://job-service:9080")
 @Path("/jobs")
-public interface JobClient {
+public class JobGatewayResource {
+
+    @Inject
+    @RestClient
+    private JobGatewayClient jobClient;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Jobs getJobs();
+    public JobList getJobs() {
+        try {
+            return new JobList(jobClient.getJobs().getResults());
+        } catch (Exception ex) {
+            // Respond with empty list on error
+            return new JobList();
+        }
+    }
 
     @GET
     @Path("{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public JobResult getJob(@PathParam("jobId") String jobId);
+    public JobResult getJob(@PathParam("jobId") String jobId) {
+        return jobClient.getJob(jobId);
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Job createJob();
-
+    public Job createJob() {
+        return jobClient.createJob();
+    }
 }

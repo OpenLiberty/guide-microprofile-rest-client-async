@@ -31,9 +31,9 @@ import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
-public class JobEndpointTest {
+public class InventoryGatewayEndpointTest {
 
-    private final String BASE_URL = "http://localhost:9080/api/jobs";
+    private final String BASE_URL = "http://localhost:9080/api/systems";
 
     private Client client;
     private Response response;
@@ -58,19 +58,19 @@ public class JobEndpointTest {
         mockServerClient
                     .when(HttpRequest.request()
                         .withMethod("GET")
-                        .withPath("/jobs"))
+                        .withPath("/inventory/systems"))
                     .respond(HttpResponse.response()
                         .withStatusCode(200)
-                        .withBody("{ \"results\": [ { \"jobId\": \"my-job-1\", \"result\": 7 }, { \"jobId\": \"my-job-2\", \"result\": 5 } ] } ")
+                        .withBody("{ \"systems\": [ { \"hostname\": \"banana\", \"properties\": { \"java.vendor\": \"you\", \"system.busy\": \"false\" } } ], \"total\": 1 }")
                         .withHeader("Content-Type", "application/json"));
 
         mockServerClient
                     .when(HttpRequest.request()
-                        .withMethod("POST")
-                        .withPath("/jobs"))
+                        .withMethod("GET")
+                        .withPath("/inventory/systems/coconut"))
                     .respond(HttpResponse.response()
                         .withStatusCode(200)
-                        .withBody("{ \"jobId\": \"my-job-id\" }")
+                        .withBody("{ \"hostname\": \"coconut\", \"properties\": { \"java.vendor\": \"me\" } }")
                         .withHeader("Content-Type", "application/json"));
     }
 
@@ -79,25 +79,21 @@ public class JobEndpointTest {
         client.close();
     }
     
-    // tag::testCreateJob[]
     @Test
-    public void testCreateJob() throws InterruptedException {
+    public void testAddSystem() throws InterruptedException {
         this.response = client
-            .target(BASE_URL)
+            .target(BASE_URL + "/coconut")
             .request()
-            .post(null);
+            .get();
 
         assertEquals(200, response.getStatus());
 
         JsonObject obj = response.readEntity(JsonObject.class);
-        String jobId = obj.getString("jobId");
-        assertEquals("my-job-id", jobId);
+        assertEquals("coconut", obj.getString("hostname"));
     }
-    // end::testCreateJob[]
 
-    // tag::testGetJobs[]
     @Test
-    public void testGetJobs() {
+    public void testGetSystems() {
         this.response = client
             .target(BASE_URL)
             .request()
@@ -106,10 +102,8 @@ public class JobEndpointTest {
         assertEquals(200, response.getStatus());
 
         JsonObject obj = response.readEntity(JsonObject.class);
-        assertEquals(2, obj.getInt("count"));
-        assertEquals(6.0, obj.getJsonNumber("averageResult").doubleValue(), 0.01);
-        assertEquals(2, obj.getJsonArray("results").size());
+        assertEquals(1, obj.getInt("total"));
+        assertEquals(1, obj.getJsonArray("systems").size());
     }
-    // end::testGetJobs[]
 
 }

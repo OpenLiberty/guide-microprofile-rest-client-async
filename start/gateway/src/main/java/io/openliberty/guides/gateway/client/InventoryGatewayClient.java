@@ -10,44 +10,32 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway;
+package io.openliberty.guides.gateway.client;
 
 import java.util.Properties;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import io.openliberty.guides.gateway.client.InventoryClient;
 import io.openliberty.guides.models.InventoryList;
-import io.openliberty.guides.models.SystemData;
 
-@RequestScoped
-@Path("/systems")
-public class InventoryResource {
-
-    @Inject
-    @RestClient
-    private InventoryClient inventoryClient;
+@RegisterRestClient(baseUri = "http://inventory-service:9080")
+@Path("/inventory")
+public interface InventoryGatewayClient {
 
     @GET
+    @Path("systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public InventoryList getSystems() {
-        return inventoryClient.getInventory();
-    }
+    public InventoryList getInventory();
 
     @GET
-    @Path("{hostname}")
+    @Path("systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public SystemData getSystem(@PathParam("hostname") String hostname) {
-        Properties properties = inventoryClient.getProperties(hostname);
-        return new SystemData(hostname, properties);
-    }
+    public Properties getProperties(@PathParam("hostname") String hostname);
 
 }
