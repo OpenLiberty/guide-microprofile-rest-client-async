@@ -17,13 +17,13 @@
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Java EE']
 :page-permalink: /guides/{projectid}
-:page-related-guides: ['microprofile-rest-client']
+:page-related-guides: ['microprofile-rest-client', 'jaxrs-reactive-client']
 :common-includes: ../guides-common/
 :imagesdir: /img/guide
 :source-highlighter: prettify
-:mac: Mac
-:win: Windows
-:linux: Linux
+:mac: MAC
+:win: WINDOWS
+:linux: LINUX
 = Consuming RESTful services asynchronously
 
 [.hidden]
@@ -138,7 +138,7 @@ docker build -t job:1.0-SNAPSHOT job/.
 docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
-Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project. The services will take some time to become available.
+Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
 
 ****
 [system]#*{linux} | {mac}*#
@@ -156,14 +156,15 @@ Next, use the provided script to start the application in docker containers. The
 ```
 ****
 
+The services will take some time to become available.
 You can access the application by making requests to the `gateway` job endpoints.
 
 [options="header", role="wrap_table"]
 |===
 |Description |Endpoint |Sample Output
 |Get completed jobs |GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^] |`{"count":0,"results":[]}`
-|Create a job |POST http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^] |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
-|Get a specific job |GET http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
+|Create a job |POST \http://localhost:8080/api/jobs |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
+|Get a specific job |GET \http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
 
 You can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system to create a job. The Postman application can also be used. The request will take some time for the job results to return.
