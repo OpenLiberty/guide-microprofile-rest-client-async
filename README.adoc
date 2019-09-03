@@ -125,7 +125,7 @@ To build the application, run the Maven `package` goal from the command line in 
 
 [role='command']
 ```
-mvn clean package
+mvn clean install
 ```
 
 Run the following commands to build and containerize the application:
