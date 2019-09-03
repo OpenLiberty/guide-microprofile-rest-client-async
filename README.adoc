@@ -121,7 +121,7 @@ The `gateway`, `job`, `system`, and `inventory` microservices will be built in a
 
 Install Docker by following the instructions on the https://docs.docker.com/engine/installation[official page^]. Start your Docker environment.
 
-To build the application, run the Maven `package` goal from the command line in the `start` directory.
+To build the application, run the Maven `install` goal from the command line in the `start` directory.
 
 [role='command']
 ```
