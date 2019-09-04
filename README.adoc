@@ -219,7 +219,7 @@ When the tests succeed, you will see output similar to the following.
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running it.io.openliberty.guides.gateway.InventoryEndpointTest
+Running it.io.openliberty.guides.gateway.InventoryGatewayEndpointTest
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.InventoryGatewayEndpointTest
 Running it.io.openliberty.guides.gateway.JobGatewayEndpointTest
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.JobGatewayEndpointTest
