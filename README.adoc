@@ -12,7 +12,7 @@
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
-:page-seo-title: Consuming REST services asynchronously
+:page-seo-title: Consuming REST services asynchronously with template interfaces
 :page-seo-description: A tutorial on how to consume REST services asynchronously using MicroProfile Rest Client with CompletionStage interface.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile']
@@ -24,7 +24,7 @@
 :mac: MAC
 :win: WINDOWS
 :linux: LINUX
-= Consuming RESTful services asynchronously
+= Consuming RESTful services asynchronously with template interfaces
 
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
