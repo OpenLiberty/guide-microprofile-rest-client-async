@@ -13,9 +13,9 @@
 :page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
 :page-seo-title: Consuming REST services asynchronously
-:page-seo-description: A tutorial on how to consume REST services asynchronously with MicroProfile Rest Client.
+:page-seo-description: A tutorial on how to consume REST services asynchronously using MicroProfile Rest Client with CompletionStage interface.
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile', 'Java EE']
+:page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
 :page-related-guides: ['microprofile-rest-client', 'jaxrs-reactive-client']
 :common-includes: ../guides-common/
@@ -38,22 +38,22 @@ You will learn how to build a MicroProfile Rest Client to access remote RESTful 
 *What is asynchronous programming?* +
 Asynchronous programming can be thought of as a restaurant. After being seated, a waiter will take your order. At this point, you will have to wait a few minutes for your food to be prepared. While your food is being prepared your waiter may take more orders or serve other tables. Once your food is ready, your waiter will be notified to bring out your food. However, in a synchronous model, the waiter would have to wait for your food to be prepared before dealing with any other customers. This method blocks other customers from placing orders or receiving their food.
 
-Asynchronous methods allow you to perform a lengthy operation, such as input/output (IO) asynchronously. This means that the IO occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on IO to complete. Going back to the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables. Since they’re free, the waiter can take more orders from other tables, or serve food to other tables.
+Asynchronous methods allow you to perform a lengthy operation, such as input/output (I/O) asynchronously. This means that the I/O occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on I/O to complete. Going back to the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables. Since they’re free, the waiter can take more orders from other tables, or serve food to other tables.
 
-In the context of MicroProfile REST client, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
+In the context of REST clients, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
 The application you will be working with is a job manager that maintains an inventory of available systems.
-It consists of four microservices `gateway`, `job`, `system`, and `inventory`.
+It consists of four microservices, `gateway`, `job`, `system`, and `inventory`.
 The `job` microservice allows you to dispatch jobs that will be run by the `system` microservice.
 The job is a sleep operation used to represent a slow task that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
 reports the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
 itself on startup with the `inventory` microservice that keeps track of all instances of the `system` microservice. Finally,
-the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^].
+the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
 
 image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
 
-The microservice that you will modify with is the `gateway` service.
+The microservice that you will modify is the `gateway` service.
 It acts as a gateway to communicate with the backend microservices.
 Whenever a request is made to the `gateway` service to retrieve the jobs
 the `gateway` service communicates with the `job`
@@ -106,9 +106,9 @@ JobGatewayResource.java
 include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobGatewayResource.java[]
 ----
 
-Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()`.
+Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` result you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
-The `CompletionStage` interface represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a `CompletionStage` in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+The `CompletionStage` interface represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
 
 // =================================================================================================
 // Building the application
@@ -137,7 +137,7 @@ docker build -t job:1.0-SNAPSHOT job/.
 docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
-Next, use the provided script to start the application in docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
+Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
 
 ****
 [system]#*{linux} | {mac}*#
@@ -168,9 +168,9 @@ You can access the application by making requests to the `gateway` job endpoints
 
 You can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system to create a job. The Postman application can also be used. The request will take some time for the job results to return.
 
-The completed jobs JSON output has `averageResult` that is the average sleep time of all the jobs, a count for the number of jobs and the list of the jobs. Each job JSON output has a job ID and a sleep time as the result for this job.
+The completed jobs JSON output has an `averageResult` attribute that is the average sleep time of all the jobs, a count for the number of jobs and the list of the jobs. The JSON output for each job has a job ID and a sleep time as the result for this job.
 
-Switching to an asynchronous programming model has freed up the thread handling your request to `/api/jobs`. While MicroProfile REST Client makes a request, the thread can handle other work.
+Switching to an asynchronous programming model has freed up the thread handling your request to `/api/jobs`. While the request is handled, the thread can handle other work.
 
 // =================================================================================================
 // Testing
@@ -252,6 +252,6 @@ Finally, use the script to stop the application.
 
 == Great work! You're done!
 
-You have just completed modifying an application to make asynchronous HTTP requests using Open Liberty.
+You have just modified an application to make asynchronous HTTP requests using Open Liberty and MicroProfile Rest Client.
 
 include::{common-includes}/attribution.adoc[subs="attributes"]
