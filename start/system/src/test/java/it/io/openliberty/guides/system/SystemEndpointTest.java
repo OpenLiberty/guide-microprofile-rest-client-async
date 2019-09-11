@@ -28,7 +28,7 @@ import org.junit.Test;
 
 public class SystemEndpointTest {
 
-	private static final String port = System.getProperty("test.http.port");
+    private static final String port = System.getProperty("test.http.port");
     private static final String BASE_URL = "http://localhost:" + port + "/system/properties";
     
     private Client client;
