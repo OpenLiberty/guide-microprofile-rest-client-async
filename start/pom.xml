@@ -187,6 +187,9 @@
                                 <includes>
                                     <include>**/it/**</include>
                                 </includes>
+                                <systemPropertyVariables>
+                                    <test.http.port>${http.port}</test.http.port>
+                                </systemPropertyVariables>
                             </configuration>
                         </execution>
                         <execution>
