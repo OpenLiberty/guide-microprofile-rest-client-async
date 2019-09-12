@@ -65,7 +65,7 @@ public class InventoryEndpointTest {
         .withEnv("ALLOW_ANONYMOUS_LOGIN", "yes");
 
     @Rule
-    public FixedHostPortGenericContainer kafka = new FixedHostPortGenericContainer<>("bitnami/kafka:2")
+    public FixedHostPortGenericContainer kafka = new FixedHostPortGenericContainer<>("bitnami/kafka:2.3.0-debian-9-r68")
         .withFixedExposedPort(9092, 9092)
         .withNetwork(network)
         .withNetworkAliases("kafka")
@@ -97,7 +97,7 @@ public class InventoryEndpointTest {
     public void teardown() {
         client.close();
     }
-    
+
     @Test
     public void testConsumeSystem() throws InterruptedException, IOException {
         // Get size of inventory
@@ -110,7 +110,7 @@ public class InventoryEndpointTest {
 
         JsonObject obj = response.readEntity(JsonObject.class);
         int initialTotal = obj.getInt("total");
-        
+
         // Add a system to the inventory via kafka
         String props = getResource("props.json");
         producer.send(new ProducerRecord<String,String>("system-topic", props));
@@ -132,7 +132,7 @@ public class InventoryEndpointTest {
                 .target(BASE_URL)
                 .request()
                 .get();
-            
+
             obj = response.readEntity(JsonObject.class);
             total = obj.getInt("total");
         }

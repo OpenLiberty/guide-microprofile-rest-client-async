@@ -73,7 +73,7 @@ public class SystemEndpointTest {
         .withEnv("ALLOW_ANONYMOUS_LOGIN", "yes");
 
     @Rule
-    public FixedHostPortGenericContainer kafka = new FixedHostPortGenericContainer<>("bitnami/kafka:2")
+    public FixedHostPortGenericContainer kafka = new FixedHostPortGenericContainer<>("bitnami/kafka:2.3.0-debian-9-r68")
         .withFixedExposedPort(9092, 9092)
         .withNetwork(network)
         .withNetworkAliases("kafka")
@@ -139,7 +139,7 @@ public class SystemEndpointTest {
                 JsonFactory factory = mapper.getFactory();
                 JsonParser parser = factory.createParser(record.value());
                 JsonNode node = mapper.readTree(parser);
-                
+
                 int result = node.get("result").asInt();
                 String jobId = node.get("jobId").asText();
 
