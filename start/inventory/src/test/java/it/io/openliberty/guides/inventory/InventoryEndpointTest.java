@@ -63,7 +63,6 @@ public class InventoryEndpointTest {
         assertEquals(200, response.getStatus());
 
         JsonObject obj = response.readEntity(JsonObject.class);
-        System.out.println(obj);
         int initialTotal = obj.getInt("total");
         assertEquals(0,initialTotal);
         JsonArray systems = obj.getJsonArray("systems");
