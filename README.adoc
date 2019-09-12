@@ -11,7 +11,7 @@
 :page-releasedate: 2019-09-13
 :page-guide-category: microprofile
 :page-essential: false
-:page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
+:page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP.
 :page-seo-title: Consuming REST services asynchronously with template interfaces
 :page-seo-description: A tutorial on how to consume REST services asynchronously using MicroProfile Rest Client with CompletionStage interface.
 :guide-author: Open Liberty
@@ -29,25 +29,25 @@
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
 
-Learn how to use MicroProfile Rest Client to invoke RESTful microservices over HTTP asynchronously.
+Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP.
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update a template interface that maps to the remote service that you want to call. You'll change it to use a `CompletionStage` return type making the method asynchronous. A `CompletionStage` is an interface that will allow you to use the result of your remote service call at some point in the future.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll also update a template interface that maps to the remote service that you want to call. You'll change the template interface to use a `CompletionStage` return type, which makes the method asynchronous. A `CompletionStage` interface will allow you to use the result of your remote service call.
 
 *What is asynchronous programming?* +
-Asynchronous programming can be thought of as a restaurant. After being seated, a waiter will take your order. At this point, you will have to wait a few minutes for your food to be prepared. While your food is being prepared your waiter may take more orders or serve other tables. Once your food is ready, your waiter will be notified to bring out your food. However, in a synchronous model, the waiter would have to wait for your food to be prepared before dealing with any other customers. This method blocks other customers from placing orders or receiving their food.
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-Asynchronous methods allow you to perform a lengthy operation, such as input/output (I/O) asynchronously. This means that the I/O occurs in the background and the caller is notified via a callback to continue with their computation once it’s complete. The benefit is that this frees up the original thread to handle other work rather than waiting on I/O to complete. Going back to the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables. Since they’re free, the waiter can take more orders from other tables, or serve food to other tables.
+Asynchronous methods allow lengthy operations, such as input/output (I/O) asynchronously, to perform asynchronously. As the I/O occurs in the background, a callback notifies the caller to continue its computation after the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables. Since they’re free, the waiter can take more orders from other tables, or serve food to other tables.
 
-In the context of REST clients, making HTTP requests can be a time consuming process. The network may be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
+In the context of REST clients, making HTTP requests can be a time-consuming process. The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application you will be working with is a job manager that maintains an inventory of available systems.
+The application that you'll be working with is a job manager that maintains an inventory of available systems.
 It consists of four microservices, `gateway`, `job`, `system`, and `inventory`.
 The `job` microservice allows you to dispatch jobs that will be run by the `system` microservice.
-The job is a sleep operation used to represent a slow task that lasts for a duration of 5 to 10 seconds. When it completes, the `system` microservice
-reports the sleep time as the result of this job. In addition to running jobs, the `system` microservice also registers
-itself on startup with the `inventory` microservice that keeps track of all instances of the `system` microservice. Finally,
+A job is a sleep operation that is used to represent a slow task that lasts for a duration of 5 to 10 seconds. When a job completes, the `system` microservice
+reports the sleep time that results from the job. In addition to running jobs, the `system` microservice also registers
+itself at startup with the `inventory` microservice, which keeps track of all instances of the `system` microservice. Finally,
 the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
 
@@ -55,7 +55,7 @@ image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
 
 The microservice that you will modify is the `gateway` service.
 It acts as a gateway to communicate with the backend microservices.
-Whenever a request is made to the `gateway` service to retrieve the jobs
+Whenever a request is made to the `gateway` service to retrieve the jobs,
 the `gateway` service communicates with the `job`
 service on that host to get the completed jobs.
 
@@ -76,7 +76,7 @@ include::{common-includes}/gitclone.adoc[]
 
 Navigate to the `start` directory to begin.
 
-First, you will make the job client interface methods asynchronous.
+First, make the job client interface methods asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -89,11 +89,11 @@ JobGatewayClient.java
 include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobGatewayClient.java[]
 ----
 
-The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have a return type of `CompletionStage<T>`, you won’t be able to directly manipulate the inner type. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
+The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have return type of `CompletionStage<T>`, you aren't able to directly manipulate the inner types. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
 
 == Responding asynchronously to an HTTP request
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsListModel` type, you may return a `CompletionStage<JobsListModel>` type. Completion stages can be chained together using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
+JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsListModel` type, you can return a `CompletionStage<JobsListModel>` type. Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -106,9 +106,9 @@ JobGatewayResource.java
 include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobGatewayResource.java[]
 ----
 
-Similar to the synchronous approach, if we successfully get the completed jobs from the `job` microservice, then the resource will respond with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` result you built up using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
+Similar to the synchronous approach, if completed jobs are successfully obtained from the `job` microservice, the resource responds with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsListModel>` result you built by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
-The `CompletionStage` interface represents a unit of computation. Once that computation completes, it can either be finished or chained with more completion stages using [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which functionally behaves similar to a catch block. When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation has completed and the response has been built. JAX-RS will respond to the caller once the `CompletionStage` has completed.
+The `CompletionStage` interface represents a unit of computation. After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves similar to a catch block. When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built. JAX-RS will respond to the caller after the `CompletionStage` completes.
 
 // =================================================================================================
 // Building the application
@@ -116,11 +116,11 @@ The `CompletionStage` interface represents a unit of computation. Once that comp
 
 == Building and running the application
 
-The `gateway`, `job`, `system`, and `inventory` microservices will be built in a Docker container. You can learn more about https://openliberty.io/guides/containerize.html[Containerizing microservices^].
+The `gateway`, `job`, `system`, and `inventory` microservices will be built in a Docker container. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
-Install Docker by following the instructions on the https://docs.docker.com/engine/installation[official page^]. Start your Docker environment.
+Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-To build the application, run the Maven `install` goal from the command line in the `start` directory.
+To build the application, run the Maven `install` goal from the command line in the `start` directory:
 
 [role='command']
 ```
@@ -155,8 +155,8 @@ Next, use the provided script to start the application in Docker containers. The
 ```
 ****
 
-The services will take some time to become available.
-You can access the application by making requests to the `gateway` job endpoints.
+The services take some time to become available.
+You can access the application by making requests to the `gateway` job endpoints:
 
 [options="header", role="wrap_table"]
 |===
@@ -166,11 +166,11 @@ You can access the application by making requests to the `gateway` job endpoints
 |Get a specific job |GET \http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
 
-You can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system to create a job. The Postman application can also be used. The request will take some time for the job results to return.
+To create a job, you can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system. The Postman application can also be used. The request take some time for the job results to return.
 
-The completed jobs JSON output has an `averageResult` attribute that is the average sleep time of all the jobs, a count for the number of jobs and the list of the jobs. The JSON output for each job has a job ID and a sleep time as the result for this job.
+The completed jobs JSON output has an `averageResult` attribute that is the average sleep time of all the jobs, a count for the number of jobs, and the list of the jobs. The JSON output for each job has a job ID and a sleep time as the result for the job.
 
-Switching to an asynchronous programming model has freed up the thread handling your request to `/api/jobs`. While the request is handled, the thread can handle other work.
+Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/jobs`. While the request is processed, the thread can handle other work.
 
 // =================================================================================================
 // Testing
@@ -178,7 +178,7 @@ Switching to an asynchronous programming model has freed up the thread handling 
 
 == Testing the gateway application
 
-A few tests are included for you to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
+You will create an endpoint test to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -186,11 +186,11 @@ A few tests are included for you to test the basic functionality of the `gateway
 `gateway/src/test/java/it/io/openliberty/guides/gateway/JobGatewayEndpointTest.java`
 ----
 
-See the following descriptions of the test cases:
+The following descriptions explain what the test cases verify:
 
-* [hotspot=testCreateJob file=0]`testCreateJob()` verifies that the gateway service communicates with a backend service to create a job.
+* The [hotspot=testCreateJob file=0]`testCreateJob()` test case verifies that the gateway service communicates with a backend service to create a job.
 
-* [hotspot=testGetJobs file=0]`testGetJobs()` verifies that the gateway service communicates with an upstream service to get all jobs and transforms them appropriately to a `JobListModel`.
+* The [hotspot=testGetJobs file=0]`testGetJobs()` test case verifies that the gateway service communicates with an upstream service to get all jobs and transforms them to a `JobListModel` type.
 
 JobGatewayEndpointTest.java
 [source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
@@ -204,14 +204,14 @@ include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/JobGatewa
 
 === Running the tests
 
-Navigate to the `gateway` directory, then verify that the tests pass using the Maven `verify` goal:
+Navigate to the `gateway` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 [role='command']
 ```
 mvn verify
 ```
 
-When the tests succeed, you will see output similar to the following.
+When the tests succeed, you see output similar to the following example:
 
 [source, role='no_copy']
 ----
@@ -228,11 +228,11 @@ Results:
 Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 ----
 
-== Teardown
+== Tearing down the environment
 
 Navigate back to the `start` directory.
 
-Finally, use the script to stop the application.
+Finally, use the following script to stop the application:
 
 ****
 [system]#*{linux} | {mac}*#
