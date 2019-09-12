@@ -56,12 +56,10 @@ public class SystemEndpointTest {
             .target(BASE_URL)
             .request()
             .get();
-
         assertEquals(200, response.getStatus());
         
         String json = response.readEntity(String.class);
-        
-        assertTrue("The system property for the local and remote JVM should match",
+        assertTrue("The system property shuld contain os.name.",
         		json.contains("os.name"));
         
         response.close();

@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class JobEndpointTest {
 
-	private static final String port = System.getProperty("test.http.port");
+    private static final String port = System.getProperty("test.http.port");
     private static final String BASE_URL = "http://localhost:" + port + "/jobs";
 
     private Client client;
