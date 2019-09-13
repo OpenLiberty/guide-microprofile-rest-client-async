@@ -33,7 +33,7 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynch
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll also update a template interface that maps to the remote service that you want to call. You'll change the template interface to use a `CompletionStage` return type, which makes the method asynchronous. A `CompletionStage` interface will allow you to use the result of your remote service call.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll also update a template interface that maps to the remote service that you want to call. You'll change the template interface to use a `CompletionStage` return type, which makes the method asynchronous. A `CompletionStage` is an interface that will allow you to use the result of your remote service call at some point in the future.
 
 *What is asynchronous programming?* +
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
