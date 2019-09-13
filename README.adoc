@@ -33,7 +33,7 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynch
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update the template interface for a MicroProfile Rest Client, which maps to the remote service that you want to call, to use the `CompletionStage` return type. A `CompletionStage` interface will allow you to work with the result of your remote service call asynchronously.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update the template interface for a MicroProfile Rest Client, which maps to the remote service that you want to call, to use the `CompletionStage` return type. A `CompletionStage` interface allows you to work with the result of your remote service call asynchronously.
 
 *What is asynchronous programming?* +
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
@@ -76,7 +76,7 @@ include::{common-includes}/gitclone.adoc[]
 
 Navigate to the `start` directory to begin.
 
-The `gateway` service uses MicroProfile Rest Client to access the `job` service.
+The `gateway` service uses a MicroProfile Rest Client to access the `job` service.
 You will update the methods in the template interface for this client to be asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
