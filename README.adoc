@@ -13,7 +13,7 @@
 :page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP.
 :page-seo-title: Consuming REST services asynchronously with template interfaces
-:page-seo-description: A tutorial on how to consume REST services asynchronously using MicroProfile Rest Client with CompletionStage interface.
+:page-seo-description: A tutorial and an example on how to consume REST services asynchronously using MicroProfile Rest Client with CompletionStage interface.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
@@ -33,14 +33,14 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynch
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll also update a template interface that maps to the remote service that you want to call. You'll change the template interface to use a `CompletionStage` return type, which makes the method asynchronous. A `CompletionStage` is an interface that will allow you to use the result of your remote service call at some point in the future.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update the template interface for a MicroProfile Rest Client, which maps to the remote service that you want to call, to use the `CompletionStage` return type. A `CompletionStage` interface will allow you to work with the result of your remote service call asynchronously.
 
 *What is asynchronous programming?* +
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-Asynchronous methods allow lengthy operations, such as input/output (I/O) asynchronously, to perform asynchronously. As the I/O occurs in the background, a callback notifies the caller to continue its computation after the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
+You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
 
-In the context of REST clients, making HTTP requests can be a time-consuming process. The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
+In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
 The application that you'll be working with is a job manager that maintains an inventory of available systems.
 It consists of four microservices, `gateway`, `job`, `system`, and `inventory`.
@@ -76,8 +76,8 @@ include::{common-includes}/gitclone.adoc[]
 
 Navigate to the `start` directory to begin.
 
-The job client methods in the `gateway` service return the data model types.
-You will make the job client interface methods asynchronous.
+The `gateway` service uses MicroProfile Rest Client to access the `job` service.
+You will update the methods in the template interface for this client to be asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -117,7 +117,7 @@ The `CompletionStage` interface represents a unit of computation. After that com
 
 == Building and running the application
 
-The `gateway`, `job`, `system`, and `inventory` microservices will be built in a Docker container. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+You will build and run the `gateway`, `job`, `system`, and `inventory` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
@@ -189,9 +189,9 @@ You will create an endpoint test to test the basic functionality of the `gateway
 
 The following descriptions explain what the test cases verify:
 
-* The [hotspot=testCreateJob file=0]`testCreateJob()` test case verifies that the gateway service communicates with a backend service to create a job.
+* The [hotspot=testCreateJob file=0]`testCreateJob()` test case verifies that the `gateway` service communicates with a backend service to create a job.
 
-* The [hotspot=testGetJobs file=0]`testGetJobs()` test case verifies that the gateway service communicates with an upstream service to get all jobs and transforms them to a `JobList` model type.
+* The [hotspot=testGetJobs file=0]`testGetJobs()` test case verifies that the `gateway` service communicates with an upstream service to get all jobs and transforms them to a `JobList` model type.
 
 JobGatewayEndpointTest.java
 [source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
