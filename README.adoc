@@ -72,7 +72,7 @@ If you want to learn more about MicroProfile Rest Client, you can read the https
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
-== Changing the template interface to use asynchronous methods
+== Client Definition - Changing the template interface to use asynchronous methods
 
 Navigate to the `start` directory to begin.
 
@@ -92,7 +92,7 @@ include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobGa
 
 The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have return type of `CompletionStage<T>`, you aren't able to directly manipulate the inner types. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
 
-== Responding asynchronously to an HTTP request
+== Service Definition - Responding asynchronously to an HTTP request
 
 JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsList` model type, you can return a `CompletionStage<JobsList>` type. Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
@@ -166,6 +166,8 @@ You can access the application by making requests to the `gateway` job endpoints
 |Create a job |POST \http://localhost:8080/api/jobs |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
 |Get a specific job |GET \http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
 |===
+
+Before any jobs have been created, the JSON output will be this `{"count":0,"results":[]}`. The `count` attribute is 0 because there are no jobs yet, and the `results` attribute is empty for the same reason.
 
 To create a job, you can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system. The Postman application can also be used. The request take some time for the job results to return.
 
