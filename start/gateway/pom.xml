@@ -124,8 +124,8 @@
                         </goals>
                         <configuration>
                             <jvmOptions>
-                                <param>-Dio.openliberty.guides.gateway.client.JobGatewayClient/mp-rest/url=http://localhost:9082</param>
-                                <param>-Dio.openliberty.guides.gateway.client.InventoryGatewayClient/mp-rest/url=http://localhost:9082</param>
+                                <param>-Dio.openliberty.guides.gateway.client.JobClient/mp-rest/url=http://localhost:9082</param>
+                                <param>-Dio.openliberty.guides.gateway.client.InventoryClient/mp-rest/url=http://localhost:9082</param>
                             </jvmOptions>
                         </configuration>
                     </execution>

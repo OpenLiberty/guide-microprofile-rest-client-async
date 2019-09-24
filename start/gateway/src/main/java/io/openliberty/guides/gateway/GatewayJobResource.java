@@ -24,46 +24,39 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import io.openliberty.guides.gateway.client.JobGatewayClient;
+import io.openliberty.guides.gateway.client.JobClient;
 import io.openliberty.guides.models.JobList;
 import io.openliberty.guides.models.Job;
 import io.openliberty.guides.models.JobResult;
 
 @Path("/jobs")
-public class JobGatewayResource {
+public class GatewayJobResource {
 
     @Inject
     @RestClient
-    private JobGatewayClient jobClient;
+    private JobClient jobClient;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobList> getJobs() {
-        return jobClient
-            .getJobs()
-            // tag::thenApplyAsync[]
-            .thenApplyAsync((jobs) -> {
-                return new JobList(jobs.getResults());
-            })
-            // end::thenApplyAsync[]
-            // tag::exceptionally[]
-            .exceptionally((ex) -> {
-                // Respond with empty list on error
-                return new JobList();
-            });
-            // end::exceptionally[]
+    public JobList getJobs() {
+        try {
+            return new JobList(jobClient.getJobs().getResults());
+        } catch (Exception ex) {
+            // Respond with empty list on error
+            return new JobList();
+        }
     }
 
     @GET
     @Path("{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<JobResult> getJob(@PathParam("jobId") String jobId) {
+    public JobResult getJob(@PathParam("jobId") String jobId) {
         return jobClient.getJob(jobId);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<Job> createJob() {
+    public Job createJob() {
         return jobClient.createJob();
     }
 }
