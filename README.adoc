@@ -98,13 +98,13 @@ JAX-RS resources can also have asynchronous methods. So instead of returning a `
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `JobResource` class.#
-`gateway/src/main/java/io/openliberty/guides/gateway/JobResource.java`
+#Replace the `GatewayJobResource` class.#
+`gateway/src/main/java/io/openliberty/guides/gateway/GatewayJobResource.java`
 ----
-JobResource.java
+GatewayJobResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/JobResource.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayJobResource.java[]
 ----
 
 Similar to the synchronous approach, if completed jobs are successfully obtained from the `job` microservice, the resource responds with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsList>` result you built by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
