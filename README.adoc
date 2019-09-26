@@ -18,7 +18,7 @@
 :page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
 :page-related-guides: ['microprofile-rest-client', 'jaxrs-reactive-client']
-:common-includes: ../guides-common/
+:common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :imagesdir: /img/guide
 :source-highlighter: prettify
 :mac: MAC
