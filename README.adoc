@@ -92,7 +92,7 @@ include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobCl
 
 The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have return type of `CompletionStage<T>`, you aren't able to directly manipulate the inner types. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
 
-== Updating REST resource to handle HTTP requests asynchronously
+== Updating the REST resource to asynchronously handle HTTP requests
 
 JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsList` model type, you can return a `CompletionStage<JobsList>` type. Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
@@ -172,7 +172,8 @@ To create a job, you can use `curl -X POST \http://localhost:8080/api/jobs` comm
 
 The completed jobs JSON output with a created job looks like `{"averageResult":5.0,"count":1,"results":[{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}]}`. The `averageResult` attribute is the average sleep time of all the jobs. The `count` attribute is the number of jobs, and the `results` attribute contains the list of the jobs. The JSON output for each job has a job ID and a sleep time as the result for the job.
 
-If no jobs have been created, the JSON output will be this `{"count":0,"results":[]}`. The `count` attribute is 0 because there are no jobs yet, and the `results` attribute is empty for the same reason.
+If no jobs are created, the JSON output will be `{"count":0,"results":[]}`. The `count` attribute is 0 and the `results` attribute is empty.
+
 
 Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/jobs`. While the request is processed, the thread can handle other work.
 
