@@ -24,17 +24,17 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import io.openliberty.guides.gateway.client.InventoryGatewayClient;
+import io.openliberty.guides.gateway.client.InventoryClient;
 import io.openliberty.guides.models.InventoryList;
 import io.openliberty.guides.models.SystemData;
 
 @RequestScoped
 @Path("/systems")
-public class InventoryGatewayResource {
+public class GatewayInventoryResource {
 
     @Inject
     @RestClient
-    private InventoryGatewayClient inventoryClient;
+    private InventoryClient inventoryClient;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
