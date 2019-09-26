@@ -92,7 +92,7 @@ include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobCl
 
 The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have return type of `CompletionStage<T>`, you aren't able to directly manipulate the inner types. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
 
-== Updating the REST resource to asynchronously handle HTTP requests
+== Updating a REST resource to asynchronously handle HTTP requests
 
 JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsList` model type, you can return a `CompletionStage<JobsList>` type. Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
