@@ -72,7 +72,7 @@ If you want to learn more about MicroProfile Rest Client, you can read the https
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
-== Updating template interface of REST client to use asynchronous methods
+== Updating the template interface of a REST client to use asynchronous methods
 
 Navigate to the `start` directory to begin.
 
