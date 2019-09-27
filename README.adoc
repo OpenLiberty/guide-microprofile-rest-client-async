@@ -239,21 +239,23 @@ Navigate back to the `start` directory.
 
 Finally, use the following script to stop the application:
 
-****
-[system]#*{linux} | {mac}*#
+include::{common-includes}/os-tabs.adoc[]
 
+[.tab_content.mac_section.linux_section]
+--
 [role='command']
 ```
 ./scripts/stop-app
 ```
+--
 
-[system]#*{win}*#
-
+[.tab_content.windows]
+--
 [role='command']
 ```
 .\scripts\stop-app.bat
 ```
-****
+--
 
 == Great work! You're done!
 
