@@ -249,7 +249,7 @@ include::{common-includes}/os-tabs.adoc[]
 ```
 --
 
-[.tab_content.windows]
+[.tab_content.windows_section]
 --
 [role='command']
 ```
