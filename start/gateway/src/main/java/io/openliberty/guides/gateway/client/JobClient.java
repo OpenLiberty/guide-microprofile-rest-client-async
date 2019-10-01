@@ -12,9 +12,8 @@
 // end::copyright[]
 package io.openliberty.guides.gateway.client;
 
-import java.util.Properties;
-
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -22,20 +21,25 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import io.openliberty.guides.models.InventoryList;
+import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.JobResult;
+import io.openliberty.guides.models.Jobs;
 
-@RegisterRestClient(baseUri = "http://inventory-service:9080")
-@Path("/inventory")
-public interface InventoryGatewayClient {
-
-    @GET
-    @Path("systems")
-    @Produces(MediaType.APPLICATION_JSON)
-    public InventoryList getInventory();
+@RegisterRestClient(baseUri = "http://job-service:9080")
+@Path("/jobs")
+public interface JobClient {
 
     @GET
-    @Path("systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Properties getProperties(@PathParam("hostname") String hostname);
+    public Jobs getJobs();
+
+    @GET
+    @Path("{jobId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JobResult getJob(@PathParam("jobId") String jobId);
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Job createJob();
 
 }

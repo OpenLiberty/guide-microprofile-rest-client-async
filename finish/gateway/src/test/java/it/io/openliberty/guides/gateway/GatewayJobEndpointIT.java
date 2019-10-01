@@ -31,7 +31,7 @@ import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
-public class JobGatewayEndpointTest {
+public class GatewayJobEndpointIT {
 
     private final String BASE_URL = "http://localhost:9080/api/jobs";
 

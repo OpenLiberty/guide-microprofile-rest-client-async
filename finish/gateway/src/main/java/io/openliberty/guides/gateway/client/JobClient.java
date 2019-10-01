@@ -12,9 +12,10 @@
 // end::copyright[]
 package io.openliberty.guides.gateway.client;
 
-import java.util.Properties;
+import java.util.concurrent.CompletionStage;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -22,20 +23,31 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import io.openliberty.guides.models.InventoryList;
+import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.JobResult;
+import io.openliberty.guides.models.Jobs;
 
-@RegisterRestClient(baseUri = "http://inventory-service:9080")
-@Path("/inventory")
-public interface InventoryGatewayClient {
+@RegisterRestClient(baseUri = "http://job-service:9080")
+@Path("/jobs")
+public interface JobClient {
 
+    // tag::getJobs[]
     @GET
-    @Path("systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public InventoryList getInventory();
+    public CompletionStage<Jobs> getJobs();
+    // end::getJobs[]
 
+    // tag::getJob[]
     @GET
-    @Path("systems/{hostname}")
+    @Path("{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Properties getProperties(@PathParam("hostname") String hostname);
+    public CompletionStage<JobResult> getJob(@PathParam("jobId") String jobId);
+    // end::getJob[]
+
+    // tag::createJob[]
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public CompletionStage<Job> createJob();
+    // end::createJob[]
 
 }
