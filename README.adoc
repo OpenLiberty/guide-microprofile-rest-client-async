@@ -140,21 +140,23 @@ docker build -t gateway:1.0-SNAPSHOT gateway/.
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
 
-****
-[system]#*{linux} | {mac}*#
+include::{common-includes}/os-tabs.adoc[]
 
+[.tab_content.mac_section.linux_section]
+--
 [role='command']
 ```
 ./scripts/start-app
 ```
+--
 
-[system]#*{win}*#
-
+[.tab_content.windows_section]
+--
 [role='command']
 ```
 .\scripts\start-app.bat
 ```
-****
+--
 
 The services take some time to become available.
 You can access the application by making requests to the `gateway` job endpoints:
