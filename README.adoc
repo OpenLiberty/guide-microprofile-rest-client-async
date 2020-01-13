@@ -12,8 +12,8 @@
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP.
-:page-seo-title: Consuming RESTful microservices asynchronously using Eclipse MicroProfile Rest Client
-:page-seo-description: A tutorial on how to consume RESTful Java microservices with asynchronous method calls using the CompletionStage interface and MicroProfile Rest Client.
+:page-seo-title: Consuming RESTful Java microservices asynchronously using Eclipse MicroProfile Rest Client
+:page-seo-description: A getting started tutorial and an example on how to consume RESTful Java microservices with asynchronous method calls using the CompletionStage interface and MicroProfile Rest Client.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
