@@ -12,7 +12,10 @@
 // end::copyright[]
 package io.openliberty.guides.openlibertycafe;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -85,19 +88,43 @@ public class OpenLibertyCafeOrderResource {
 
         String tableId = orderRequest.getTableId();
 
-        //Send individual order requests to the Order service through the client
+        final Holder<List<String>> holder = new Holder<List<String>>();
+        CountDownLatch countdownLatch = new CountDownLatch(orderRequest.getFoodList().size() + 
+                                                           orderRequest.getBeverageList().size());
+
+        // Send individual food order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
             Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
-            orderClient.createOrder(order);
+            orderClient.createOrder(order).thenAcceptAsync(r -> {
+            	holder.value.add(r.readEntity(Order.class).getOrderId());
+            	countdownLatch.countDown();
+            });
         }
 
+        // Send individual beverage order requests to the Order service through the client
         for (String beverageItem : orderRequest.getBeverageList()) {
             Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
-            orderClient.createOrder(order);
+            orderClient.createOrder(order).thenAcceptAsync(r -> {
+            	holder.value.add(r.readEntity(Order.class).getOrderId());
+            	countdownLatch.countDown();
+            });
+        }
+
+        // wait all asynchronous orderClient.createOrder to be completed
+        try {
+            countdownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         return Response
                 .status(Response.Status.OK)
+                .entity(holder.value)
                 .build();
+    }
+
+    private class Holder<T> {
+        @SuppressWarnings("unchecked")
+		public volatile T value = (T) new ArrayList<String>();
     }
 }
