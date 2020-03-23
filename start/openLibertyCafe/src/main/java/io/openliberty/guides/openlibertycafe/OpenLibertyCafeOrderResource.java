@@ -12,6 +12,8 @@
 // end::copyright[]
 package io.openliberty.guides.openlibertycafe;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -84,20 +86,27 @@ public class OpenLibertyCafeOrderResource {
         }
 
         String tableId = orderRequest.getTableId();
+        List<String> orderIds = new ArrayList<String>();
 
-        //Send individual order requests to the Order service through the client
+        // Send individual food order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
             Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
-            orderClient.createOrder(order);
+            orderIds.add(
+                orderClient.createOrder(order).readEntity(Order.class).getOrderId()
+            );
         }
 
+        // Send individual beverage order requests to the Order service through the client
         for (String beverageItem : orderRequest.getBeverageList()) {
             Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
-            orderClient.createOrder(order);
+            orderIds.add(
+                orderClient.createOrder(order).readEntity(Order.class).getOrderId()
+            );
         }
 
         return Response
                 .status(Response.Status.OK)
+                .entity(orderIds)
                 .build();
     }
 }
