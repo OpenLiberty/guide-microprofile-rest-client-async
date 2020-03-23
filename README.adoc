@@ -42,29 +42,32 @@ You can perform lengthy operations, such as input/output (I/O), without blocking
 
 In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application that you'll be working with is a job manager that maintains an inventory of available systems.
-It consists of four microservices, `gateway`, `job`, `system`, and `inventory`.
-The `job` microservice allows you to dispatch jobs that will be run by the `system` microservice.
-A job is a sleep operation that is used to represent a slow task that lasts for a duration of 5 to 10 seconds. When a job completes, the `system` microservice
-reports the sleep time that results from the job. In addition to running jobs, the `system` microservice also registers
-itself at startup with the `inventory` microservice, which keeps track of all instances of the `system` microservice. Finally,
-the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
-It communicates with the backend `job` and `inventory` microservices on the caller's behalf.
+The OpenLiberty Cafe application is designed with reactive architecture. 
+The application that you'll be working with consists of six microservices : 
+`Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status`. 
+It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
+image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The microservice that you will modify is the `gateway` service.
-It acts as a gateway to communicate with the backend microservices.
-Whenever a request is made to the `gateway` service to retrieve the jobs,
-the `gateway` service communicates with the `job`
-service on that host to get the completed jobs.
+The microservice that you will modify is the `OpenLibertyCafe` service.
+The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backends for frontends^] service.
+It communicates with the backend microservices on the caller's behalf.
+
+The waitstaff places a request using the `OpenLibertyCafe` microservice.
+
+The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type. 
+
+An order begins with a `NEW` status. The `Bar` and `Kitchen` microservices illustrate how to handle the orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Status` microservice via reactive messages on the Kafka.
+
+The `ServingWindow` microservice illustrates when the food and beverages are ready to be served. It consumes the `READY` order from the `Kitchen` and `Bar` microservices. Once the order is served, the waitstaff can mark the order as `COMPLETED` and the status is sent back to the `Status` microservice as a message.
+
+The `Status` microservice receives status updates and provides queries for the waitstaff. All the orders are persisted here. Because persisting data is not the focus of this guide, the `Status` microservice simply uses a Map object to store the data.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
-The application also uses the Apache Kafka and ZooKeeper services to distribute the job results and system status.
 
 If you want to learn more about MicroProfile Rest Client, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
-
+ENDED HERE SO FAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // =================================================================================================
 // Getting started
 // =================================================================================================
@@ -178,62 +181,6 @@ If no jobs are created, the JSON output will be `{"count":0,"results":[]}`. The 
 
 
 Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/jobs`. While the request is processed, the thread can handle other work.
-
-// =================================================================================================
-// Testing
-// =================================================================================================
-
-== Testing the gateway application
-
-You will create an endpoint test to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
-
-[role="code_command hotspot", subs="quotes"]
-----
-#Create the `GatewayJobEndpointIT` class.#
-`gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayJobEndpointIT.java`
-----
-
-The following descriptions explain what the test cases verify:
-
-* The [hotspot=testCreateJob file=0]`testCreateJob()` test case verifies that the `gateway` service communicates with a backend service to create a job.
-
-* The [hotspot=testGetJobs file=0]`testGetJobs()` test case verifies that the `gateway` service communicates with an upstream service to get all jobs and transforms them to a `JobList` model type.
-
-GatewayJobEndpointIT.java
-[source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
-----
-include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayJobEndpointIT.java[]
-----
-
-// =================================================================================================
-// Running the tests
-// =================================================================================================
-
-=== Running the tests
-
-Navigate to the `gateway` directory, then verify that the tests pass by using the Maven `verify` goal:
-
-[role='command']
-```
-mvn verify
-```
-
-When the tests succeed, you see output similar to the following example:
-
-[source, role='no_copy']
-----
--------------------------------------------------------
- T E S T S
--------------------------------------------------------
-Running it.io.openliberty.guides.gateway.GatewayInventoryEndpointIT
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.GatewayInventoryEndpointIT
-Running it.io.openliberty.guides.gateway.GatewayJobEndpointIT
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.GatewayJobEndpointIT
-
-Results:
-
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
-----
 
 == Tearing down the environment
 
