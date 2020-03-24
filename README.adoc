@@ -206,7 +206,7 @@ Copy the following example input into the text box, and then click the `Execute`
 
 Each food and beverage order is given an order ID.
 The [hotspot fiile=0]`OpenLibertyCafeOrderResource.java` class iterates through each food and beverage in the
-[hotspot=loopFoodList file=0]`foodList` and [hotspot=loopBeverageList file=0]`beverageList` and [hotspot=add fil=0]`adds`
+[hotspot=loopFoodList file=0]`foodList` and [hotspot=loopBeverageList file=0]`beverageList` and [hotspot=add1 hotspot=add2 fil=0]`adds`
 the order ID for each order into the list [hotspot=orderIDs]`orderIds`. The order IDs are listed 
 in the sequence in which they were processed, starting from the first food order to the last beverage order.
 
@@ -256,7 +256,7 @@ include::start/openLibertyCafe/src/main/java/io/openliberty/guides/openlibertyca
 The `OpenLibertyCafe` service uses a MicroProfile Rest Client to access the `Order` service.
 You will update the [hotspot=createOrder file=0]`createOrder` method in the template interface for this client to be asynchronous.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=1", subs="quotes"]
 ----
 #Replace the `OrderClient` interface.#
 `openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/client/OrderClient.java`
@@ -287,7 +287,7 @@ As you will see in the next section, you will be able to indirectly use the inne
 
 JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, 
 you can return a `CompletionStage<Respone>` type. Completion stages can be chained together by using the 
-[hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
+[hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`thenAcceptAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -305,12 +305,12 @@ the resource responds with an HTTP status of 200 and the body will contain a lis
 However, the order requests are not blocked and do not wait for other requests to complete.
 
 The `CompletionStage` interface represents a unit of computation. After that computation completes, it can either be finished or chained 
-with more completion stages by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method to perform more computations.
-The [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method accepts and consumes the result of the previous `CompletionStage`.
+with more completion stages by using the `thenAcceptAsync()` method to perform more computations.
+The `thenAcceptAsync()` method accepts and consumes the result of the previous `CompletionStage`.
 
 The returned `CompletionStage<Response>` from the
-[hotspot=thenAcceptAsync file=0]`orderClient.createOrder(order)` method is consumed asynchronously by the 
-[hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method and adds processed order IDs to a list.
+[hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`orderClient.createOrder(order)` method is consumed asynchronously by the 
+[hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`thenAcceptAsync()` method and adds processed order IDs to a list.
 
 // =================================================================================================
 // Building and running the application
@@ -405,7 +405,7 @@ The returned order IDs are listed in the sequence in which they were processed, 
 ]
 ----
 
-Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/jobs`. 
+Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/orders`. 
 While the request is processed, the thread can handle other work.
 
 == Tearing down the environment

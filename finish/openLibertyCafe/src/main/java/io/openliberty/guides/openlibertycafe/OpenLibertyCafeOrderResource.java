@@ -89,29 +89,31 @@ public class OpenLibertyCafeOrderResource {
         String tableId = orderRequest.getTableId();
 
         final Holder<List<String>> holder = new Holder<List<String>>();
-        CountDownLatch countdownLatch = new CountDownLatch(orderRequest.getFoodList().size() + 
-                                                           orderRequest.getBeverageList().size());
+        CountDownLatch countdownLatch = new CountDownLatch(orderRequest.getFoodList().size()
+                                                + orderRequest.getBeverageList().size());
 
         // Send individual food order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
-            Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
-            // tag::thenAcceptAsync[]
+            Order order = new Order().setTableId(tableId)
+                                     .setItem(foodItem).setType(Type.FOOD);
+            // tag::thenAcceptAsync1[]
             orderClient.createOrder(order).thenAcceptAsync(r -> {
             	holder.value.add(r.readEntity(Order.class).getOrderId());
             	countdownLatch.countDown();
             });
-            // end::thenAcceptAsync[]
+            // end::thenAcceptAsync1[]
         }
 
         // Send individual beverage order requests to the Order service through the client
         for (String beverageItem : orderRequest.getBeverageList()) {
-            Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
-            // tag::thenAcceptAsync[]
+            Order order = new Order().setTableId(tableId)
+                                     .setItem(beverageItem).setType(Type.BEVERAGE);
+            // tag::thenAcceptAsync2[]
             orderClient.createOrder(order).thenAcceptAsync(r -> {
             	holder.value.add(r.readEntity(Order.class).getOrderId());
             	countdownLatch.countDown();
             });
-            // end::thenAcceptAsync[]
+            // end::thenAcceptAsync2[]
         }
 
         // wait all asynchronous orderClient.createOrder to be completed
