@@ -95,19 +95,23 @@ public class OpenLibertyCafeOrderResource {
         // Send individual food order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
             Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
+            // tag::thenAcceptAsync[]
             orderClient.createOrder(order).thenAcceptAsync(r -> {
             	holder.value.add(r.readEntity(Order.class).getOrderId());
             	countdownLatch.countDown();
             });
+            // end::thenAcceptAsync[]
         }
 
         // Send individual beverage order requests to the Order service through the client
         for (String beverageItem : orderRequest.getBeverageList()) {
             Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
+            // tag::thenAcceptAsync[]
             orderClient.createOrder(order).thenAcceptAsync(r -> {
             	holder.value.add(r.readEntity(Order.class).getOrderId());
             	countdownLatch.countDown();
             });
+            // end::thenAcceptAsync[]
         }
 
         // wait all asynchronous orderClient.createOrder to be completed

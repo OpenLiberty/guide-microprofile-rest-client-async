@@ -86,23 +86,33 @@ public class OpenLibertyCafeOrderResource {
         }
 
         String tableId = orderRequest.getTableId();
+        // tag::orderIDs[]
         List<String> orderIds = new ArrayList<String>();
+        // end::orderIDs[]
 
         // Send individual food order requests to the Order service through the client
+        // tag::loopFoodList[]
         for (String foodItem : orderRequest.getFoodList()) {
             Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
+            // tag::add[]
             orderIds.add(
                 orderClient.createOrder(order).readEntity(Order.class).getOrderId()
             );
+            // end::add[]
         }
+        // end::loopFoodList[]
 
         // Send individual beverage order requests to the Order service through the client
+        // tag::loopBeverageList[]
         for (String beverageItem : orderRequest.getBeverageList()) {
             Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
+            // tag::add[]
             orderIds.add(
                 orderClient.createOrder(order).readEntity(Order.class).getOrderId()
             );
+            // end::add[]
         }
+        // end::loopBeverageList[]
 
         return Response
                 .status(Response.Status.OK)

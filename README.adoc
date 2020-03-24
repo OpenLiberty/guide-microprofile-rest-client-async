@@ -33,41 +33,75 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynch
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update the template interface for a MicroProfile Rest Client, which maps to the remote service that you want to call, to use the `CompletionStage` return type. A `CompletionStage` interface allows you to work with the result of your remote service call asynchronously.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls.
+You'll update the template interface for a MicroProfile Rest Client, which maps to the remote service that you want to call,
+to use the `CompletionStage` return type. A `CompletionStage` interface allows you to work with the result of your remote
+service call asynchronously.
 
 *What is asynchronous programming?* +
-Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order.
+Then, you must wait a few minutes for your food to be prepared. While your food is being prepared,
+your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table.
+However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers.
+This method blocks other customers from placing orders or receiving their food.
 
-You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
+You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods.
+The I/O operation can occur in the background and a callback notifies the caller to continue its computation
+when the original request is complete. As a result, the original thread frees up so it can handle other work
+rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in
+the kitchen and your waiter is freed up to attend to other tables.
 
-In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
+In the context of REST clients, HTTP request calls can be time consuming.
+The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly.
+These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The OpenLiberty Cafe application is designed with reactive architecture. 
-The application that you'll be working with consists of six microservices : 
-`Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status`. 
+The OpenLiberty Cafe application is designed with reactive architecture.
+The application that you'll be working with consists of six microservices:
+`Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status`.
 It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+If you want to learn more about reactive messaging,
+you can read the https://openliberty.io/guides/microprofile-reactive-messaging.html[Creating asynchronous reactive microservices using MicroProfile Reactive Messaging^] guide.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
 The microservice that you will modify is the `OpenLibertyCafe` service.
-The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backends for frontends^] service.
+The `OpenLibertyCafe` microservice is a
+https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backends for frontends^] service.
 It communicates with the backend microservices on the caller's behalf.
 
 The waitstaff places a request using the `OpenLibertyCafe` microservice.
 
-The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type. 
+The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the
+`food` or `beverage`channel depending on the type.
 
-An order begins with a `NEW` status. The `Bar` and `Kitchen` microservices illustrate how to handle the orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Status` microservice via reactive messages on the Kafka.
+An order begins with a `NEW` status. The `Bar` and `Kitchen` microservices illustrate how to handle the orders as a real cafe.
+They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively.
+There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported
+back to the `Status` microservice via reactive messages on the Kafka.
 
-The `ServingWindow` microservice illustrates when the food and beverages are ready to be served. It consumes the `READY` order from the `Kitchen` and `Bar` microservices. Once the order is served, the waitstaff can mark the order as `COMPLETED` and the status is sent back to the `Status` microservice as a message.
+The `ServingWindow` microservice illustrates when the food and beverages are ready to be served.
+It consumes the `READY` order from the `Kitchen` and `Bar` microservices.
+Once the order is served, the waitstaff can mark the order as `COMPLETED` and the status is sent back to the `Status` microservice as a message.
 
-The `Status` microservice receives status updates and provides queries for the waitstaff. All the orders are persisted here. Because persisting data is not the focus of this guide, the `Status` microservice simply uses a Map object to store the data.
+The `Status` microservice receives status updates and provides queries for the waitstaff.
+All the orders are persisted here. Because persisting data is not the focus of this guide,
+the `Status` microservice simply uses a Map object to store the data.
 
-The implementations of the application and its services are provided for you in the `start/src` directory.
+If you want to learn more about MicroProfile Rest Client,
+you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
-If you want to learn more about MicroProfile Rest Client, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
-ENDED HERE SO FAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// =================================================================================================
+// Prerequisites
+// =================================================================================================
+== Additional prerequisites
+
+You will build and run the microservices in Docker containers. 
+You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+
+Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. 
+Start your Docker environment.
+
 // =================================================================================================
 // Getting started
 // =================================================================================================
@@ -75,73 +109,52 @@ ENDED HERE SO FAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
-== Updating the template interface of a REST client to use asynchronous methods
+// =================================================================================================
+// Sending order requests synchronously
+// =================================================================================================
+
+== Sending order requests synchronously
 
 Navigate to the `start` directory to begin.
 
-The `gateway` service uses a MicroProfile Rest Client to access the `job` service.
-You will update the methods in the template interface for this client to be asynchronous.
+The synchronous implementation of the application is provided for you in the `start` directory.
 
-[role="code_command hotspot", subs="quotes"]
-----
-#Replace the `JobClient` interface.#
-`gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java`
-----
-JobClient.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java[]
-----
+You will place food and beverage orders and observe that the order requests are processed in the same sequence that they are
+sent to the `Order` service through the REST client.
 
-The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have return type of `CompletionStage<T>`, you aren't able to directly manipulate the inner types. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
+=== Running the synchronous application
 
-== Updating a REST resource to asynchronously handle HTTP requests
+You will build and run the `OpenLibertyCafe`, `Order`, `Bar`, `Kitchen`, `ServingWindow`, and `Status` microservices in Docker containers. 
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `JobsList` model type, you can return a `CompletionStage<JobsList>` type. Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
-
-[role="code_command hotspot", subs="quotes"]
-----
-#Replace the `GatewayJobResource` class.#
-`gateway/src/main/java/io/openliberty/guides/gateway/GatewayJobResource.java`
-----
-GatewayJobResource.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayJobResource.java[]
-----
-
-Similar to the synchronous approach, if completed jobs are successfully obtained from the `job` microservice, the resource responds with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsList>` result you built by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
-
-The `CompletionStage` interface represents a unit of computation. After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves similar to a catch block. When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built. JAX-RS will respond to the caller after the `CompletionStage` completes.
-
-// =================================================================================================
-// Building the application
-// =================================================================================================
-
-== Building and running the application
-
-You will build and run the `gateway`, `job`, `system`, and `inventory` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
-
-Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
-
-To build the application, run the Maven `install` goal from the command line in the `start` directory:
+To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
 
 [role='command']
 ```
-mvn clean install
+mvn -pl models install
+mvn package
 ```
 
-Run the following commands to build and containerize the application:
+Run the following command to download or update the `open-liberty` Docker image to the latest.
+[role='command']
+```
+docker pull open-liberty
+```
+
+Run the following commands to containerize the microservices:
 
 [role='command']
 ```
-docker build -t system:1.0-SNAPSHOT system/.
-docker build -t inventory:1.0-SNAPSHOT inventory/.
-docker build -t job:1.0-SNAPSHOT job/.
-docker build -t gateway:1.0-SNAPSHOT gateway/.
+docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
+docker build -t order:1.0-SNAPSHOT order/.
+docker build -t bar:1.0-SNAPSHOT bar/.
+docker build -t kitchen:1.0-SNAPSHOT kitchen/.
+docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
+docker build -t status:1.0-SNAPSHOT status/.
 ```
 
-Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
+Next, use the provided script to start the application in Docker containers. 
+The script creates a network for the containers to communicate with each other. 
+It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -149,7 +162,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-./scripts/start-app
+./scripts/startContainers.sh
 ```
 --
 
@@ -157,34 +170,245 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-.\scripts\start-app.bat
+.\scripts\startContainers.bat
 ```
 --
 
 The services take some time to become available.
-You can access the application by making requests to the `gateway` job endpoints:
 
-[options="header", role="wrap_table"]
-|===
-|Description |Endpoint |Sample Output
-|Get completed jobs |GET http://localhost:8080/api/jobs[http://localhost:8080/api/jobs^] |`{"count":0,"results":[]}`
-|Create a job |POST \http://localhost:8080/api/jobs |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964"}`
-|Get a specific job |GET \http://localhost:8080/api/jobs/{jobId} |`{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}`
-|===
+Once the application is up and running, you can access the application by making requests to the `OpenLibertyCafe` endpoint using OpenAPI.
+Check out the service that you created at the http://localhost:9080/openapi/ui[^] URL.
 
+Place food and beverage orders by making a `POST` request to the `/api/orders` endpoint.
+To make this request, expand the `POST` endpoint on the UI, click the *Try it out button*.
+Copy the following example input into the text box, and then click the `Execute` button.
 
-To create a job, you can use `curl -X POST \http://localhost:8080/api/jobs` command if available on the system. The Postman application can also be used. The request take some time for the job results to return.
+[source, role='command']
+----
+{
+  "tableId": "1",
+  "foodList": [
+    "f1",
+    "f2",
+    "f3",
+    "f4",
+    "f5"
+  ],
+  "beverageList": [
+    "b1",
+    "b2",
+    "b3",
+    "b4",
+    "b5"
+  ]
+}
+----
 
-The completed jobs JSON output with a created job looks like `{"averageResult":5.0,"count":1,"results":[{"jobId":"661891cb-ad36-4ef4-9bb3-641f973f2964","result":5}]}`. The `averageResult` attribute is the average sleep time of all the jobs. The `count` attribute is the number of jobs, and the `results` attribute contains the list of the jobs. The JSON output for each job has a job ID and a sleep time as the result for the job.
+Each food and beverage order is given an order ID.
+The [hotspot fiile=0]`OpenLibertyCafeOrderResource.java` class iterates through each food and beverage in the
+[hotspot=loopFoodList file=0]`foodList` and [hotspot=loopBeverageList file=0]`beverageList` and [hotspot=add fil=0]`adds`
+the order ID for each order into the list [hotspot=orderIDs]`orderIds`. The order IDs are listed 
+in the sequence in which they were processed, starting from the first food order to the last beverage order.
 
-If no jobs are created, the JSON output will be `{"count":0,"results":[]}`. The `count` attribute is 0 and the `results` attribute is empty.
+The `POST` request adds new `food` and `beverage` orders, and returns the list [hotspot=orderIDs]`orderIds`:
 
+[source, role="no_copy"]
+----
+[
+  "0001",
+  "0002",
+  "0003",
+  "0004",
+  "0005",
+  "0006",
+  "0007",
+  "0008",
+  "0009",
+  "0010"
+]
+----
 
-Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/jobs`. While the request is processed, the thread can handle other work.
+OpenLibertyCafeOrderResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::start/openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/OpenLibertyCafeOrderResource.java[]
+----
+
+In this synchronous approach, order requests are blocked until the previous order request is completed.
+So, the returned order IDs are in numerical order.
+
+Later, you will update the application to place order requests asynchronously.
+
+// =================================================================================================
+// Updating the template interface of a REST client to use asynchronous methods
+// =================================================================================================
+
+== Updating the template interface of a REST client to use asynchronous methods
+
+Navigate to the `start` directory to begin.
+
+OrderClient.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::start/openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/client/OrderClient.java[]
+----
+
+The `OpenLibertyCafe` service uses a MicroProfile Rest Client to access the `Order` service.
+You will update the [hotspot=createOrder file=0]`createOrder` method in the template interface for this client to be asynchronous.
+
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `OrderClient` interface.#
+`openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/client/OrderClient.java`
+----
+OrderClient.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/client/OrderClient.java[]
+----
+
+Add the [hotspot=async file=1]`@Asynchronous` annotation to the [hotspot=createOrder file=1]`createOrder` method.
+When a method marked with the `@Asynchronous` annotation is called from one thread, the method call is
+intercepted, and execution of the method is submitted to run asynchronously on another thread.
+A method annotated with the `@Asynchronous` annotation must return either a `CompletionStage` type or `Future` type
+from the `java.util.concurrent` package.
+
+The [hotspot=createOrder file=1]`createOrder` method now returns a [hotspot=createOrder file=1]`CompletionStage<Response>` type
+instead of a `Response` type.
+
+Since the method now has return type of `CompletionStage<Response>`, you aren't able to directly manipulate the inner type. 
+As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
+
+// =================================================================================================
+// Updating a REST resource to asynchronously handle HTTP requests
+// =================================================================================================
+
+== Updating a REST resource to asynchronously handle HTTP requests
+
+JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, 
+you can return a `CompletionStage<Respone>` type. Completion stages can be chained together by using the 
+[hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
+
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `OpenLibertyCafeOrderResource` class.#
+`openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/OpenLibertyCafeOrderResource.java`
+----
+OpenLibertyCafeOrderResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/openLibertyCafe/src/main/java/io/openliberty/guides/openlibertycafe/OpenLibertyCafeOrderResource.java[]
+----
+
+Similar to the synchronous approach, if completed orders are successfully obtained from the `Order` microservice, 
+the resource responds with an HTTP status of 200 and the body will contain a list of order IDs. 
+However, the order requests are not blocked and do not wait for other requests to complete.
+
+The `CompletionStage` interface represents a unit of computation. After that computation completes, it can either be finished or chained 
+with more completion stages by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method to perform more computations.
+The [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method accepts and consumes the result of the previous `CompletionStage`.
+
+The returned `CompletionStage<Response>` from the
+[hotspot=thenAcceptAsync file=0]`orderClient.createOrder(order)` method is consumed asynchronously by the 
+[hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method and adds processed order IDs to a list.
+
+// =================================================================================================
+// Building and running the application
+// =================================================================================================
+
+== Building and running the application
+
+To build your asynchronous application, run the Maven `install` and `package` goals again:
+
+[role='command']
+```
+mvn -pl models install
+mvn package
+```
+
+Run the following commands to containerize the microservices:
+
+[role='command']
+```
+docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
+docker build -t order:1.0-SNAPSHOT order/.
+docker build -t bar:1.0-SNAPSHOT bar/.
+docker build -t kitchen:1.0-SNAPSHOT kitchen/.
+docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
+docker build -t status:1.0-SNAPSHOT status/.
+```
+
+Next, use the provided script to start the application in Docker containers.
+
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/startContainers.sh
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\startContainers.bat
+```
+--
+
+The services take some time to become available.
+Check out the service that you created at the http://localhost:9080/openapi/ui[^] URL.
+
+Place food and beverage orders by making a `POST` request to the `/api/orders` endpoint.
+To make this request, expand the `POST` endpoint on the UI, click the *Try it out button*.
+Copy the following example input into the text box, and then click the `Execute` button.
+
+[source, role='command']
+----
+{
+  "tableId": "1",
+  "foodList": [
+    "f1",
+    "f2",
+    "f3",
+    "f4",
+    "f5"
+  ],
+  "beverageList": [
+    "b1",
+    "b2",
+    "b3",
+    "b4",
+    "b5"
+  ]
+}
+----
+
+The order requests are processed asynchronously and do not wait for other requests to be completed.
+The returned order IDs are listed in the sequence in which they were processed, which will not be in numerical order.
+
+[source, role="no_copy"]
+----
+[
+  "0005",
+  "0008",
+  "0004",
+  "0003",
+  "0010",
+  "0006",
+  "0001",
+  "0002",
+  "0009",
+  "0007"
+]
+----
+
+Switching to an asynchronous programming model freed up the thread that was handling your request to `/api/jobs`. 
+While the request is processed, the thread can handle other work.
 
 == Tearing down the environment
-
-Navigate back to the `start` directory.
 
 Finally, use the following script to stop the application:
 
@@ -194,7 +418,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-./scripts/stop-app
+./scripts/stopContainers.sh
 ```
 --
 
@@ -202,7 +426,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-.\scripts\stop-app.bat
+.\scripts\stopContainers.bat
 ```
 --
 

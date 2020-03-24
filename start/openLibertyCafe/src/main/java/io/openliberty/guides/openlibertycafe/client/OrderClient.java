@@ -31,9 +31,9 @@ public interface OrderClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    //@Asynchronous
-    //CompletionStage<Response> createOrder(Order order);
+    // tag::createOrder[]
     Response createOrder(Order order);
+    // end::createOrder[]
 
     //Get list of Order objects, processed from the new order JSON by the Order API
     @GET
