@@ -17,7 +17,7 @@
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
-:page-related-guides: ['microprofile-rest-client', microprofile-reactive-messaging, reactive-service-testing, reactive-messaging-sse, microprofile-reactive-messaging-acknowledgement]
+:page-related-guides: ['microprofile-rest-client', 'microprofile-reactive-messaging', 'reactive-service-testing', 'reactive-messaging-sse', 'microprofile-reactive-messaging-acknowledgement']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :imagesdir: /img/guide/{projectid}
 :source-highlighter: prettify
