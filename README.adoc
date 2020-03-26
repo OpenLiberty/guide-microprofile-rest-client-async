@@ -230,6 +230,26 @@ So, the returned order IDs are in numerical order.
 
 Later, you will update the application to place order requests asynchronously.
 
+After you are done checking out the application, stop the application using the provided script:
+
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/stopContainers.sh
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\stopContainers.bat
+```
+--
+
 // =================================================================================================
 // Updating the template interface of a REST client to use asynchronous methods
 // =================================================================================================

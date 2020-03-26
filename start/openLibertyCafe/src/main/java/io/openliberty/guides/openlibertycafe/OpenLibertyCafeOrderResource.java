@@ -74,7 +74,7 @@ public class OpenLibertyCafeOrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(operationId = "createOrder",
                summary = "Create orders",
-               description = "This operation creates orders by using " + 
+               description = "This operation creates orders by using " +
                    "an OrderRequest and sends them to the Bar and Kitchen services.")
     @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest) {
