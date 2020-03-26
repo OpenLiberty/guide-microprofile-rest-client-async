@@ -89,8 +89,10 @@ public class OpenLibertyCafeOrderResource {
         String tableId = orderRequest.getTableId();
 
         final Holder<List<String>> holder = new Holder<List<String>>();
+        // tag::countDownLatch[]
         CountDownLatch countdownLatch = new CountDownLatch(orderRequest.getFoodList().size()
                                                 + orderRequest.getBeverageList().size());
+        // end::countDownLatch[]
 
         // Send individual food order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
@@ -98,8 +100,10 @@ public class OpenLibertyCafeOrderResource {
                                      .setItem(foodItem).setType(Type.FOOD);
             // tag::thenAcceptAsync1[]
             orderClient.createOrder(order).thenAcceptAsync(r -> {
-            	holder.value.add(r.readEntity(Order.class).getOrderId());
-            	countdownLatch.countDown();
+                holder.value.add(r.readEntity(Order.class).getOrderId());
+                // tag::countDown1[]
+                countdownLatch.countDown();
+                // end::countDown1[]
             });
             // end::thenAcceptAsync1[]
         }
@@ -110,15 +114,19 @@ public class OpenLibertyCafeOrderResource {
                                      .setItem(beverageItem).setType(Type.BEVERAGE);
             // tag::thenAcceptAsync2[]
             orderClient.createOrder(order).thenAcceptAsync(r -> {
-            	holder.value.add(r.readEntity(Order.class).getOrderId());
-            	countdownLatch.countDown();
+                holder.value.add(r.readEntity(Order.class).getOrderId());
+                // tag::countDown2[]
+                countdownLatch.countDown();
+                // end::countDown2[]
             });
             // end::thenAcceptAsync2[]
         }
 
         // wait all asynchronous orderClient.createOrder to be completed
         try {
+            // tag::await[]
             countdownLatch.await();
+            // end::await[]
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

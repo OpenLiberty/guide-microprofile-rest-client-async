@@ -17,7 +17,7 @@
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
-:page-related-guides: ['microprofile-rest-client']
+:page-related-guides: ['microprofile-rest-client', microprofile-reactive-messaging, reactive-service-testing, reactive-messaging-sse, microprofile-reactive-messaging-acknowledgement]
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :imagesdir: /img/guide/{projectid}
 :source-highlighter: prettify
@@ -62,30 +62,19 @@ It also uses Kafka to enable reactive messaging communication between the Produc
 If you want to learn more about reactive messaging,
 you can read the https://openliberty.io/guides/microprofile-reactive-messaging.html[Creating asynchronous reactive microservices using MicroProfile Reactive Messaging^] guide.
 
-image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
-
-The microservice that you will modify is the `OpenLibertyCafe` service.
 The `OpenLibertyCafe` microservice is a
-https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backends for frontends^] service.
+https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
 The waitstaff places a request using the `OpenLibertyCafe` microservice.
 
 The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the
-`food` or `beverage`channel depending on the type.
+`food` or `beverage` channel depending on the type.
 
-An order begins with a `NEW` status. The `Bar` and `Kitchen` microservices illustrate how to handle the orders as a real cafe.
-They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively.
-There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported
-back to the `Status` microservice via reactive messages on the Kafka.
-
-The `ServingWindow` microservice illustrates when the food and beverages are ready to be served.
-It consumes the `READY` order from the `Kitchen` and `Bar` microservices.
-Once the order is served, the waitstaff can mark the order as `COMPLETED` and the status is sent back to the `Status` microservice as a message.
-
-The `Status` microservice receives status updates and provides queries for the waitstaff.
-All the orders are persisted here. Because persisting data is not the focus of this guide,
-the `Status` microservice simply uses a Map object to store the data.
+First, you will place order requests and observe that the requests are processed synchronously.
+To convert the application to use an asynchronous model, you will modify the `OpenLibertyCafe` service.
+The MicroProfile Rest Client and JAX-RS resources in the `OpenLibertyCafe` microservice will be updated
+to use asynchronous methods and asynchronously handle HTTP requests.
 
 If you want to learn more about MicroProfile Rest Client,
 you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
@@ -122,9 +111,9 @@ The synchronous implementation of the application is provided for you in the `st
 You will place food and beverage orders and observe that the order requests are processed in the same sequence that they are
 sent to the `Order` service through the REST client.
 
-=== Running the synchronous application
+=== Running the application
 
-You will build and run the `OpenLibertyCafe`, `Order`, `Bar`, `Kitchen`, `ServingWindow`, and `Status` microservices in Docker containers. 
+You will build and run the `Bar`, `Kitchen`, `OpenLibertyCafe`, `Order`, `ServingWindow`, and `Status` microservices in Docker containers. 
 
 To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
 
@@ -144,10 +133,10 @@ Run the following commands to containerize the microservices:
 
 [role='command']
 ```
-docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
-docker build -t order:1.0-SNAPSHOT order/.
 docker build -t bar:1.0-SNAPSHOT bar/.
 docker build -t kitchen:1.0-SNAPSHOT kitchen/.
+docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
+docker build -t order:1.0-SNAPSHOT order/.
 docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
 docker build -t status:1.0-SNAPSHOT status/.
 ```
@@ -175,6 +164,8 @@ include::{common-includes}/os-tabs.adoc[]
 --
 
 The services take some time to become available.
+
+=== Trying the application
 
 Once the application is up and running, you can access the application by making requests to the `OpenLibertyCafe` endpoint using OpenAPI.
 Check out the service that you created at the http://localhost:9080/openapi/ui[^] URL.
@@ -312,30 +303,37 @@ The returned `CompletionStage<Response>` from the
 [hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`orderClient.createOrder(order)` method is consumed asynchronously by the 
 [hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`thenAcceptAsync()` method and adds processed order IDs to a list.
 
+This asynchronous approach also uses a [hotspot=countDownLatch file=0]`CountDownLatch`
+that allows a thread to wait until other threads complete a set of operations.
+The [hotspot=countDownLatch file=0]`CountDownLatch` is initialized with a count,
+which is equal to the total number of food orders and beverage orders.
+In the [hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`thenAcceptAsync()` method, every time an order is processed,
+the [hotspot=countDownLatch file=0]`CountDownLatch` decrements its count by calling the 
+[hotspot=countDown1 hotspot=countDown2 file=0]`countdownLatch.countDown()` method.
+The thread calling the [hotspot=await file=0]`countdownLatch.await()` method is blocked until the count reaches zero.
+So, the [hotspot=await file=0]`countdownLatch.await()` method waits until all of the asynchronous 
+[hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`orderClient.createOrder(order)` method executions are completed,
+and then returns the list of order IDs.
+
+
 // =================================================================================================
 // Building and running the application
 // =================================================================================================
 
 == Building and running the application
 
-To build your asynchronous application, run the Maven `install` and `package` goals again:
+To build your asynchronous application, repackage the `OpenLibertyCafe` microservice:
 
 [role='command']
 ```
-mvn -pl models install
-mvn package
+mvn -pl openLibertyCafe package
 ```
 
-Run the following commands to containerize the microservices:
+Run the following command to rebuild the Docker image for the `OpenLibertyCafe` microservice:
 
 [role='command']
 ```
 docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
-docker build -t order:1.0-SNAPSHOT order/.
-docker build -t bar:1.0-SNAPSHOT bar/.
-docker build -t kitchen:1.0-SNAPSHOT kitchen/.
-docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
-docker build -t status:1.0-SNAPSHOT status/.
 ```
 
 Next, use the provided script to start the application in Docker containers.
