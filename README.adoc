@@ -333,7 +333,7 @@ the [hotspot=countDownLatch file=0]`CountDownLatch` decrements its count by call
 The thread calling the [hotspot=await file=0]`countdownLatch.await()` method is blocked until the count reaches zero.
 So, the [hotspot=await file=0]`countdownLatch.await()` method waits until all of the asynchronous 
 [hotspot=thenAcceptAsync1 hotspot=thenAcceptAsync2 file=0]`orderClient.createOrder(order)` method executions are completed,
-and then returns the list of order IDs.
+and then the thread is free to return the list of order IDs.
 
 
 // =================================================================================================
