@@ -39,17 +39,17 @@ to use the `CompletionStage` return type. A `CompletionStage` interface allows y
 service call asynchronously.
 
 *What is asynchronous programming?* +
-Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order.
+Imagine asynchronous programming as a restaurant. After you're seated, the waitstaff takes your order.
 Then, you must wait a few minutes for your food to be prepared. While your food is being prepared,
-your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table.
-However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers.
+the waitstaff may take more orders or serve other tables. After your food is ready, the waitstaff brings out the food to your table.
+However, in a synchronous model, the waitstaff must wait for your food to be prepared before serving any other customers.
 This method blocks other customers from placing orders or receiving their food.
 
 You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods.
 The I/O operation can occur in the background and a callback notifies the caller to continue its computation
 when the original request is complete. As a result, the original thread frees up so it can handle other work
 rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in
-the kitchen and your waiter is freed up to attend to other tables.
+the kitchen and the waitstaff is freed up to attend to other tables.
 
 In the context of REST clients, HTTP request calls can be time consuming.
 The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly.
