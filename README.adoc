@@ -128,6 +128,9 @@ To build the application, run the Maven `install` goal from the command line in 
 mvn clean install
 ```
 
+[role='command']
+include::{common-includes}/ol-kernel-docker-pull.adoc[]
+
 Run the following commands to build and containerize the application:
 
 [role='command']
