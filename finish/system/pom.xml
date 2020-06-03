@@ -15,42 +15,44 @@
     <packaging>war</packaging>
 
     <dependencies>
-       <dependency>
-           <groupId>io.openliberty.guides</groupId>
-           <artifactId>models</artifactId>
-           <version>1.0-SNAPSHOT</version>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>concurrent-1.0</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>jaxrs-2.1</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>cdi-2.0</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
-       <dependency>
-           <groupId>org.eclipse.microprofile.rest.client</groupId>
-           <artifactId>microprofile-rest-client-api</artifactId>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>mpConfig-1.4</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>io.openliberty.guides</groupId>
+            <artifactId>models</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.openliberty.features</groupId>
+            <artifactId>concurrent-1.0</artifactId>
+            <type>esa</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openliberty.features</groupId>
+            <artifactId>jaxrs-2.1</artifactId>
+            <type>esa</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openliberty.features</groupId>
+            <artifactId>cdi-2.0</artifactId>
+            <type>esa</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.rest.client</groupId>
+            <artifactId>microprofile-rest-client-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.openliberty.features</groupId>
+            <artifactId>mpConfig-1.4</artifactId>
+            <type>esa</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.6.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -86,6 +88,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
             </plugin>
             <plugin>
                 <groupId>net.wasdev.wlp.maven.plugins</groupId>
@@ -120,10 +123,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
             </plugin>
         </plugins>
     </build>
