@@ -10,13 +10,11 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.job;
+package it.io.openliberty.guides.system;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import javax.ws.rs.client.Client;
@@ -28,11 +26,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JobEndpointTest {
+public class SystemEndpointIT {
 
     private static final String port = System.getProperty("test.http.port");
-    private static final String BASE_URL = "http://localhost:" + port + "/jobs";
-
+    private static final String BASE_URL = "http://localhost:" + port + "/system/properties";
+    
     private Client client;
 
     @Before
@@ -53,23 +51,18 @@ public class JobEndpointTest {
     }
 
     @Test
-    public void testGetJobs() {
-        Response response = client
+    public void testGetProperties() {
+    	Response response = client
             .target(BASE_URL)
             .request()
             .get();
         assertEquals(200, response.getStatus());
-        JsonObject obj = response.readEntity(JsonObject.class);
-        JsonArray jobs = obj.getJsonArray("results");
-        assertTrue("jobId not returned from service", jobs.isEmpty());
+        
+        String json = response.readEntity(String.class);
+        assertTrue("The system property shuld contain os.name.",
+        		json.contains("os.name"));
+        
+        response.close();
     }
 
-    @Test
-    public void testJobNotExists() {
-        Response response = client
-            .target(String.format("%s/%s", BASE_URL, "my-job-id"))
-            .request()
-            .get();
-        assertEquals(404, response.getStatus());
-    }
 }
