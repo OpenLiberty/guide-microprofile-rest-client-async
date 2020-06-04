@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2019 IBM Corporation and others.
+ * Copyright (c) 2019, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 // end::copyright[]
 package it.io.openliberty.guides.inventory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.assertEquals;
 
 import java.io.IOException;
 
@@ -25,9 +25,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.After;
+import org.junit.jupiter.api.Before;
+import org.junit.jupiter.api.Test;
 
 public class InventoryEndpointIT {
 
@@ -36,7 +37,7 @@ public class InventoryEndpointIT {
 
     private Client client;
 
-    @Before
+    @BeforeEach
     public void setup() throws InterruptedException {
         client = ClientBuilder.newBuilder()
                     .hostnameVerifier(new HostnameVerifier() {
@@ -48,7 +49,7 @@ public class InventoryEndpointIT {
                     .build();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         client.close();
     }
@@ -64,9 +65,9 @@ public class InventoryEndpointIT {
 
         JsonObject obj = response.readEntity(JsonObject.class);
         int initialTotal = obj.getInt("total");
-        assertEquals(0,initialTotal);
+        assertEquals(0, initialTotal);
         JsonArray systems = obj.getJsonArray("systems");
-        assertEquals(0,systems.size());
+        assertEquals(0, systems.size());
     }
 
 }

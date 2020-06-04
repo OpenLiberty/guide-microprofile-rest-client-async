@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2019 IBM Corporation and others.
+ * Copyright (c) 2019, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,9 @@
 // end::copyright[]
 package it.io.openliberty.guides.system;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.assertEquals;
+import static org.junit.jupiter.api.assertTrue;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -22,9 +23,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SystemEndpointIT {
 
@@ -33,7 +35,7 @@ public class SystemEndpointIT {
     
     private Client client;
 
-    @Before
+    @BeforeEach
     public void setup() throws InterruptedException {
         client = ClientBuilder.newBuilder()
                     .hostnameVerifier(new HostnameVerifier() {
@@ -45,7 +47,7 @@ public class SystemEndpointIT {
                     .build();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         client.close();
     }
@@ -59,8 +61,8 @@ public class SystemEndpointIT {
         assertEquals(200, response.getStatus());
         
         String json = response.readEntity(String.class);
-        assertTrue("The system property shuld contain os.name.",
-        		json.contains("os.name"));
+        assertTrue(json.contains("os.name"),
+        		   "The system property should contain os.name.");
         
         response.close();
     }

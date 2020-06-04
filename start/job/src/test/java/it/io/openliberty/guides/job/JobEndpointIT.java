@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2019 IBM Corporation and others.
+ * Copyright (c) 2019, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,8 @@
 // end::copyright[]
 package it.io.openliberty.guides.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.assertEquals;
+import static org.junit.jupiter.api.assertTrue;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -24,9 +24,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JobEndpointIT {
 
@@ -35,7 +36,7 @@ public class JobEndpointIT {
 
     private Client client;
 
-    @Before
+    @BeforeEach
     public void setup() throws InterruptedException {
         client = ClientBuilder.newBuilder()
                     .hostnameVerifier(new HostnameVerifier() {
@@ -47,7 +48,7 @@ public class JobEndpointIT {
                     .build();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         client.close();
     }
@@ -61,7 +62,7 @@ public class JobEndpointIT {
         assertEquals(200, response.getStatus());
         JsonObject obj = response.readEntity(JsonObject.class);
         JsonArray jobs = obj.getJsonArray("results");
-        assertTrue("jobId not returned from service", jobs.isEmpty());
+        assertTrue(jobs.isEmpty(), "jobId not returned from service");
     }
 
     @Test
