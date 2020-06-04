@@ -12,9 +12,8 @@
 // end::copyright[]
 package it.io.openliberty.guides.system;
 
-
-import static org.junit.jupiter.api.assertEquals;
-import static org.junit.jupiter.api.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;

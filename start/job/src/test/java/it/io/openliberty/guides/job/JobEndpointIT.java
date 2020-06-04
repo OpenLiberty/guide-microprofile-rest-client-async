@@ -12,8 +12,8 @@
 // end::copyright[]
 package it.io.openliberty.guides.job;
 
-import static org.junit.jupiter.api.assertEquals;
-import static org.junit.jupiter.api.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
