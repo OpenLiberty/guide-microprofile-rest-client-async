@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.inventory;
+package it.io.openliberty.guides.gateway;
 
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
@@ -21,7 +21,7 @@ import org.testcontainers.junit.jupiter.Container;
 public class AppContainerConfig implements SharedContainerConfiguration {
 
     private static Network network = Network.newNetwork();
-    
+
     @Container
     public static KafkaContainer kafka = new KafkaContainer()
         .withNetwork(network);
@@ -29,7 +29,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
     @Container
     public static ApplicationContainer app = new ApplicationContainer()
                     .withAppContextRoot("/")
-                    .withExposedPorts(9085)
+                    .withExposedPorts(9087)
                     .withReadinessPath("/health/ready")
                     .withNetwork(network)
                     .dependsOn(kafka);

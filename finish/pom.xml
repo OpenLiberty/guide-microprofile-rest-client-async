@@ -13,5 +13,6 @@
         <module>models</module>
         <module>system</module>
         <module>inventory</module>
+        <module>gateway</module>
     </modules>
 </project>
