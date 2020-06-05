@@ -57,7 +57,7 @@ public class SystemEndpointIT {
             .target(BASE_URL)
             .request()
             .get();
-        assertEquals(200, response.getStatus());
+        assertEquals(200, response.getStatus(), response.readEntity(String.class));
         
         String json = response.readEntity(String.class);
         assertTrue(json.contains("os.name"),

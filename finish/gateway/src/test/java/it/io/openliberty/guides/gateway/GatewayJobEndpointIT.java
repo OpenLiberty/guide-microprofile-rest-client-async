@@ -26,25 +26,25 @@ import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.mockserver.junit.jupiter.MockServerExtension;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
+@ExtendWith(MockServerExtension.class)
 public class GatewayJobEndpointIT {
 
     private final String BASE_URL = "http://localhost:9080/api/jobs";
 
     private Client client;
+
+    private MockServerClient mockServerClient;
     private Response response;
 
-    @Rule
-    public MockServerRule mockServerRule = new MockServerRule(this, 9082);
-    
-    private MockServerClient mockServerClient = mockServerRule.getClient();
-
-    @Before
-    public void setup() throws InterruptedException {
+    @BeforeEach
+    public void setup(MockServerClient mockServerClient) throws InterruptedException {
         response = null;
         client = ClientBuilder.newBuilder()
                     .hostnameVerifier(new HostnameVerifier() {
@@ -55,6 +55,8 @@ public class GatewayJobEndpointIT {
                     .register(JsrJsonpProvider.class)
                     .build();
 
+        this.mockServerClient = mockServerClient;
+        
         mockServerClient
                     .when(HttpRequest.request()
                         .withMethod("GET")
@@ -74,7 +76,7 @@ public class GatewayJobEndpointIT {
                         .withHeader("Content-Type", "application/json"));
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         client.close();
     }
@@ -82,7 +84,7 @@ public class GatewayJobEndpointIT {
     // tag::testCreateJob[]
     @Test
     public void testCreateJob() throws InterruptedException {
-        this.response = client
+        response = client
             .target(BASE_URL)
             .request()
             .post(null);
@@ -98,7 +100,7 @@ public class GatewayJobEndpointIT {
     // tag::testGetJobs[]
     @Test
     public void testGetJobs() {
-        this.response = client
+        response = client
             .target(BASE_URL)
             .request()
             .get();
