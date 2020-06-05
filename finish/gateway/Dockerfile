@@ -13,7 +13,7 @@ LABEL \
   vendor="Open Liberty" \
   name="gateway" \
   version="$VERSION-$REVISION" \
-  summary="The gateway microservice from the 'Trigger messages in reactive Java microservice by a RESTful endpoint' guide" \
+  summary="The gateway microservice from the 'Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP' guide" \
   description="This image contains the gateway microservice running with the Open Liberty runtime."
 
 COPY --chown=1001:0 src/main/liberty/config /config/
