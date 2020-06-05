@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2019 IBM Corporation and others.
+ * Copyright (c) 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,56 +12,64 @@
 // end::copyright[]
 package io.openliberty.guides.inventory;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
 
-import io.openliberty.guides.models.InventoryList;
-import io.openliberty.guides.models.SystemData;
 import javax.enterprise.context.ApplicationScoped;
 
-// tag::ApplicationScoped[]
 @ApplicationScoped
-// end::ApplicationScoped[]
 public class InventoryManager {
 
-  private List<SystemData> systems = Collections.synchronizedList(new ArrayList<>());
+    private Map<String, Properties> systems = Collections.synchronizedMap(new TreeMap<String, Properties>());
 
-  public void add(String hostname, Properties systemProps) {
-    Properties props = new Properties();
-    props.setProperty("os.name", systemProps.getProperty("os.name"));
-    props.setProperty("user.name", systemProps.getProperty("user.name"));
-    props.setProperty("system.busy", systemProps.getProperty("system.busy"));
-
-    SystemData system = new SystemData(hostname, props);
-    if (!systems.contains(system)) {
-      systems.add(system);
+    public void addSystem(String hostname, Double systemLoad) {
+        if (!systems.containsKey(hostname)) {
+            Properties p = new Properties();
+            p.put("hostname", hostname);
+            p.put("systemLoad", systemLoad);
+            systems.put(hostname, p);
+        }
     }
-  }
 
-  public boolean containsHostname(String hostname) {
-    return systems
-      .stream()
-      .filter(s -> s.getHostname().equals(hostname))
-      .collect(Collectors.toList())
-      .size() > 0;
-  }
-
-  public void updateSystem(String hostname, String busy) {
-    for (SystemData s : systems) {
-      if (s.getHostname().equals(hostname)) {
-        s.getProperties().setProperty("system.busy", busy);
-      }
+    public void addSystem(String hostname, String key, String value) {
+        if (!systems.containsKey(hostname)) {
+            Properties p = new Properties();
+            p.put("hostname", hostname);
+            p.put("key", value);
+            systems.put(hostname, p);
+        }
     }
-  }
 
-  public void reset() {
-    systems.clear();
-  }
+    public void updateCpuStatus(String hostname, Double systemLoad) {
+        Optional<Properties> p = getSystem(hostname);
+        if (p.isPresent()) {
+            if (p.get().getProperty(hostname) == null && hostname != null)
+                p.get().put("systemLoad", systemLoad);
+        }
+    }
 
-  public InventoryList list() {
-    return new InventoryList(systems);
-  }
+    public void updatePropertyMessage(String hostname, String key, String value) {
+        Optional<Properties> p = getSystem(hostname);
+        if (p.isPresent()) {
+            if (p.get().getProperty(hostname) == null && hostname != null) {
+                p.get().put(key, value);
+            }
+        }
+    }
+
+    public Optional<Properties> getSystem(String hostname) {
+        Properties p = systems.get(hostname);
+        return Optional.ofNullable(p);
+    }
+
+    public Map<String, Properties> getSystems() {
+        return new TreeMap<>(systems);
+    }
+
+    public void resetSystems() {
+        systems.clear();
+    }
 }
