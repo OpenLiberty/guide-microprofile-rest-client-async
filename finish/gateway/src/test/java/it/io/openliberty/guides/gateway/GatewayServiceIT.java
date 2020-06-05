@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jupiter.MicroShedTest;
 
-@MicroshedTest
+@MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 public class GatewayServiceIT {
     
