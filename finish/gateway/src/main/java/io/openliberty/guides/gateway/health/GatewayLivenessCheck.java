@@ -20,7 +20,7 @@ import org.eclipse.microprofile.health.Liveness;
 
 @Liveness
 @ApplicationScoped
-public class InventoryLivenessCheck implements HealthCheck {
+public class GatewayLivenessCheck implements HealthCheck {
 
     private boolean isAlive() {
         return true;
