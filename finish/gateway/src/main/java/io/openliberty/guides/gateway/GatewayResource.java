@@ -13,6 +13,7 @@
 package io.openliberty.guides.gateway;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -42,14 +43,21 @@ public class GatewayResource {
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystems() {
-        return inventoryClient.getSystems();
+    public CompletionStage<Response> getSystems() {
+        return inventoryClient.getSystems()
+                              .thenApplyAsync((systems) -> {
+                                  return systems;
+                              })
+                              .exceptionally((exception) -> {
+                                  // when error return empty result
+                                  return Response.noContent().build();
+                              });
     }
 
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getSystem(@PathParam("hostname") String hostname) {
+    public CompletionStage<Response> getSystem(@PathParam("hostname") String hostname) {
         return inventoryClient.getSystem(hostname);
     }
 
