@@ -22,7 +22,7 @@ docker run -d \
   --rm \
   bitnami/kafka:2 &
   
-sleep 15
+sleep 20
 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
@@ -39,5 +39,14 @@ docker run -d \
   --name=inventory \
   --rm \
   inventory:1.0-SNAPSHOT &
+
+docker run -d \
+  -e InventoryClient_mp_rest_url=http://inventory:9085 \
+  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
+  -p 9080:9080 \
+  --network=$NETWORK \
+  --name=gateway \
+  --rm \
+  gateway:1.0-SNAPSHOT &
   
 wait
