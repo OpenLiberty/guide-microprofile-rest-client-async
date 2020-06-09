@@ -35,11 +35,13 @@ public interface InventoryClient {
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
     public CompletionStage<Response> getSystems();
 
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
     public CompletionStage<Response> getSystem(@PathParam("hostname") String hostname);
 
     @POST
@@ -51,5 +53,6 @@ public interface InventoryClient {
 
     @DELETE
     @Path("/")
-    Response resetSystems();
+    @Asynchronous
+    public CompletionStage<Response> resetSystems();
 }

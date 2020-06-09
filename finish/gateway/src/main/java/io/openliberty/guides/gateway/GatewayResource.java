@@ -70,13 +70,15 @@ public class GatewayResource {
             inventoryClient.addProperty(property);
         }
 
-        return Response.status(Response.Status.OK).build();
+        return Response.status(Response.Status.OK)
+                       .entity("Added properties " + properties)
+                       .build();
     }
 
     @DELETE
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    Response resetSystems() {
+    public CompletionStage<Response> resetSystems() {
         return inventoryClient.resetSystems();
     }
 }
