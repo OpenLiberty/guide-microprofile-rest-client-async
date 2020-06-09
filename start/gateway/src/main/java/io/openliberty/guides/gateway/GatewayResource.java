@@ -13,7 +13,6 @@
 package io.openliberty.guides.gateway;
 
 import java.util.ArrayList;
-import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

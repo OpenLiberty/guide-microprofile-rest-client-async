@@ -15,8 +15,6 @@ package io.openliberty.guides.gateway.client;
 import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import java.util.concurrent.CompletionStage;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -45,7 +43,6 @@ public interface InventoryClient extends AutoCloseable {
     @Path("/data")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    @Asynchronous
-    public CompletionStage<Response> addProperty(String propertyName);
+    public Response addProperty(String propertyName);
 
 }
