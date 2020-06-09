@@ -14,13 +14,22 @@ package it.io.openliberty.guides.gateway;
 
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
+import org.mockserver.client.MockServerClient;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 
 public class AppContainerConfig implements SharedContainerConfiguration {
 
     private static Network network = Network.newNetwork();
+
+    @Container
+    public static MockServerContainer mockServer = new MockServerContainer()
+                    .withNetworkAliases("mock-server")
+                    .withNetwork(network);
+
+    public static MockServerClient mockClient;
 
     @Container
     public static KafkaContainer kafka = new KafkaContainer()
@@ -33,4 +42,13 @@ public class AppContainerConfig implements SharedContainerConfiguration {
                     .withReadinessPath("/health/ready")
                     .withNetwork(network)
                     .dependsOn(kafka);
+    
+    @Override
+    public void startContainers() {
+        mockServer.start();
+        mockClient = new MockServerClient(
+                mockServer.getContainerIpAddress(),
+                mockServer.getServerPort());
+    }
+                
 }
