@@ -33,7 +33,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import io.openliberty.guides.gateway.client.InventoryClient;
 
 @ApplicationScoped
-@Path("/inventory")
+@Path("/gateway")
 public class GatewayResource {
 
     @Inject
@@ -43,26 +43,19 @@ public class GatewayResource {
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<Response> getSystems() {
-        return inventoryClient.getSystems()
-                              .thenApplyAsync((systems) -> {
-                                  return systems;
-                              })
-                              .exceptionally((exception) -> {
-                                  // when error return empty result
-                                  return Response.noContent().build();
-                              });
+    public Response getSystems() {
+        return inventoryClient.getSystems();
     }
 
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<Response> getSystem(@PathParam("hostname") String hostname) {
+    public Response getSystem(@PathParam("hostname") String hostname) {
         return inventoryClient.getSystem(hostname);
     }
 
     @POST
-    @Path("/systems/properties")
+    @Path("/data")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addProperties(ArrayList<String> properties) {
@@ -75,10 +68,4 @@ public class GatewayResource {
                        .build();
     }
 
-    @DELETE
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<Response> resetSystems() {
-        return inventoryClient.resetSystems();
-    }
 }
