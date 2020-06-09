@@ -81,13 +81,13 @@ You will update the methods in the template interface for this client to be asyn
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `JobClient` interface.#
-`gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java`
+#Replace the `InventoryClient` interface.#
+`gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java`
 ----
-JobClient.java
+InventoryClient.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/JobClient.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java[]
 ----
 
 The changes involve changing the return types of the [hotspot=getJobs file=0]`getJobs`, [hotspot=getJob file=0]`getJob`, and [hotspot=createJob file=0]`createJob` methods to return `CompletionStage<T>` types. These changes make the methods asynchronous. Since the methods now have return type of `CompletionStage<T>`, you aren't able to directly manipulate the inner types. As you will see in the next section, you will be able to indirectly use the inner object by chaining callbacks.
@@ -98,13 +98,13 @@ JAX-RS resources can also have asynchronous methods. So instead of returning a `
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `GatewayJobResource` class.#
-`gateway/src/main/java/io/openliberty/guides/gateway/GatewayJobResource.java`
+#Replace the `GatewayResource` class.#
+`gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java`
 ----
-GatewayJobResource.java
+GatewayResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayJobResource.java[]
+include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java[]
 ----
 
 Similar to the synchronous approach, if completed jobs are successfully obtained from the `job` microservice, the resource responds with an HTTP status of 200 and the body will contain a list of jobs. Finally, return the `CompletionStage<JobsList>` result you built by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
@@ -192,8 +192,8 @@ You will create an endpoint test to test the basic functionality of the `gateway
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Create the `GatewayJobEndpointIT` class.#
-`gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayJobEndpointIT.java`
+#Create the `GatewayServiceIT` class.#
+`gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java`
 ----
 
 The following descriptions explain what the test cases verify:
@@ -202,10 +202,10 @@ The following descriptions explain what the test cases verify:
 
 * The [hotspot=testGetJobs file=0]`testGetJobs()` test case verifies that the `gateway` service communicates with an upstream service to get all jobs and transforms them to a `JobList` model type.
 
-GatewayJobEndpointIT.java
+GatewayServiceIT.java
 [source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayJobEndpointIT.java[]
+include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java[]
 ----
 
 // =================================================================================================
@@ -228,14 +228,12 @@ When the tests succeed, you see output similar to the following example:
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running it.io.openliberty.guides.gateway.GatewayInventoryEndpointIT
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.88 s - in it.io.openliberty.guides.gateway.GatewayInventoryEndpointIT
-Running it.io.openliberty.guides.gateway.GatewayJobEndpointIT
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.GatewayJobEndpointIT
+Running it.io.openliberty.guides.gateway.GatewayServiceIT
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.455 s - in it.io.openliberty.guides.gateway.GatewayServiceIT
 
 Results:
 
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 ----
 
 == Tearing down the environment
