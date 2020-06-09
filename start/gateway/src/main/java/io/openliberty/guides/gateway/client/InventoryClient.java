@@ -26,7 +26,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.CompletionStage;
 
 @Path("/inventory")
 @RegisterRestClient(configKey = "InventoryClient", baseUri = "http://localhost:9085")
