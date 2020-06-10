@@ -12,20 +12,20 @@
 // end::copyright[]
 package io.openliberty.guides.gateway.client;
 
-import org.eclipse.microprofile.faulttolerance.Asynchronous;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("/inventory")
 @RegisterRestClient(configKey = "InventoryClient", baseUri = "http://localhost:9085")
@@ -48,4 +48,9 @@ public interface InventoryClient extends AutoCloseable {
     @Asynchronous
     public CompletionStage<Response> addProperty(String propertyName);
 
+    @GET
+    @Path("/data/{propertyName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
+    public CompletionStage<List<String>> getProperty(@PathParam("propertyName") String propertyName);
 }
