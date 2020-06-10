@@ -12,6 +12,7 @@
 // end::copyright[]
 package io.openliberty.guides.inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -105,6 +106,24 @@ public class InventoryResource {
     }
     // end::updateSystemProperty[]
 
+    @GET
+    @Path("/data/{propertyName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> getSystemProperty(@PathParam("propertyName") String propertyName) {
+    	logger.info("getSystemProperty: " + propertyName);
+        List<Properties> systems = manager.getSystems()
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+        List<String> properties = new ArrayList<String>();
+        for (Properties s : systems) {
+        	String h = s.getProperty("hostname");
+        	String p = s.getProperty(propertyName, "not avaliable");
+        	properties.add(h + ":" + propertyName + "=" + p);
+        }
+        return properties;
+    }
+    
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response resetSystems() {
