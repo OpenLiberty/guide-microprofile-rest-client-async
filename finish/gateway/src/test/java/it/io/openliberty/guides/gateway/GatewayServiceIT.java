@@ -13,7 +13,9 @@
 package it.io.openliberty.guides.gateway;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.core.Response;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -34,21 +36,20 @@ import io.openliberty.guides.gateway.GatewayResource;
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 public class GatewayServiceIT {
-    private final String BASE_URL = "http://localhost:9080/api/inventory";
+
+    Response response;
 
     @RESTClient
     public static GatewayResource gatewayResource;
 
     @BeforeAll
     public static void setup() throws InterruptedException {
-        AppContainerConfig.mockClient
-                              .when(HttpRequest.request()
-                                  .withMethod("GET")
-                                  .withPath("inventory/systems"))
-                              .respond(HttpResponse.response()
-                                  .withStatusCode(200)
-                                  .withBody("{}")
-                                  .withHeader("Content-Type", "application/json")
-                              );
     }
+
+    @Test
+    public void testGetSystems() {
+        response = gatewayResource.getSystems();
+        assertEquals(200, response.getStatus());
+    }
+
 }

@@ -15,17 +15,21 @@ package it.io.openliberty.guides.gateway;
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
 import org.mockserver.client.MockServerClient;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
+
+import io.openliberty.guides.gateway.client.InventoryClient;
 
 public class AppContainerConfig implements SharedContainerConfiguration {
 
     private static Network network = Network.newNetwork();
 
     @Container
-    public static MockServerContainer mockServer = new MockServerContainer()
+    public static MockServerContainer mockServer = new MockServerContainer("5.10.0")
                     .withNetworkAliases("mock-server")
                     .withNetwork(network);
 
@@ -36,12 +40,13 @@ public class AppContainerConfig implements SharedContainerConfiguration {
         .withNetwork(network);
     
     @Container
-    public static ApplicationContainer app = new ApplicationContainer()
+    public static ApplicationContainer gateway = new ApplicationContainer()
                     .withAppContextRoot("/")
-                    .withExposedPorts(9087)
                     .withReadinessPath("/health/ready")
                     .withNetwork(network)
-                    .dependsOn(kafka);
+                    .dependsOn(kafka)
+                    .withMpRestClient(InventoryClient.class, "http://mock-server:" + MockServerContainer.PORT)
+                    .withEnv("GATEWAY_JOB_BASE_URI", "http://mock-server:" + MockServerContainer.PORT);;
     
     @Override
     public void startContainers() {
@@ -49,6 +54,15 @@ public class AppContainerConfig implements SharedContainerConfiguration {
         mockClient = new MockServerClient(
                 mockServer.getContainerIpAddress(),
                 mockServer.getServerPort());
+        
+        mockClient.when(HttpRequest.request()
+                            .withMethod("GET")
+                            .withPath("gateway/systems"))
+                        .respond(HttpResponse.response()
+                            .withStatusCode(200)
+                            .withBody("{'hostname' : 'test'}")
+                            .withHeader("Content-Type", "application/json"));
+        gateway.start();
     }
                 
 }
