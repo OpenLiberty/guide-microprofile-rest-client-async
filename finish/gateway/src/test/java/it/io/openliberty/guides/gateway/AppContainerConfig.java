@@ -54,14 +54,6 @@ public class AppContainerConfig implements SharedContainerConfiguration {
         mockClient = new MockServerClient(
                 mockServer.getContainerIpAddress(),
                 mockServer.getServerPort());
-        
-        mockClient.when(HttpRequest.request()
-                            .withMethod("GET")
-                            .withPath("/inventory/systems"))
-                        .respond(HttpResponse.response()
-                            .withStatusCode(200)
-                            .withBody("{'hostname' : 'test'}")
-                            .withHeader("Content-Type", "application/json"));
         gateway.start();
     }
                 
