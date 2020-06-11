@@ -71,34 +71,49 @@ public class GatewayResource {
     public Response getOSProperties() {
         final String[] osProperties = new String[] {"os.name", "os.arch", "os.version"};
         final Holder<List<List<String>>> holder = new Holder<List<List<String>>>();
+        // tag::countdown[]
         CountDownLatch countdownLatch = new CountDownLatch(osProperties.length);
+        // end::countdown[]
 
         for (String osProperty : osProperties) {
             inventoryClient
                 .getProperty(osProperty)
+                // tag::thenApplyAsync[]
                 .thenAcceptAsync(r->{
                     holder.value.add(r);
+                    // tag::countdown[]
                     countdownLatch.countDown();
+                    // end::countdown[]
                 })
-                .exceptionally((ex) -> {
+                // end::thenApplyAsync[]
+                // tag::exceptionally[]
+                .exceptionally(ex -> {
+                    // tag::countdown[]
                     countdownLatch.countDown();
+                    // end::countdown[]
+                    return null;
                 });
+                // end::exceptionally[]
         }
         
+        // tag::countdown[]
         // Wait for all asynchronous inventoryClient.getProperty to be completed
         try {
             countdownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        // end::countdown[]
             
         return Response.status(Response.Status.OK)
                        .entity(holder.value)
                        .build();
     }
 
+    // tag::holder[]
     private class Holder<T> {
         @SuppressWarnings("unchecked")
         public volatile T value = (T) new ArrayList<List<String>>();
     }
+    // end::holder[]
 }

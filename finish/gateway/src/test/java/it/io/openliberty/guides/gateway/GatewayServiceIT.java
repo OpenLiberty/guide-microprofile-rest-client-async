@@ -112,6 +112,7 @@ public class GatewayServiceIT {
                                         .withHeader("Content-Type", "application/json"));
     }
 
+    // tag::getSystems[]
     @Test
     public void testGetSystems() {
         response = gatewayResource.getSystems();
@@ -124,7 +125,9 @@ public class GatewayServiceIT {
         assertTrue(contents.contains("testHost2"),
             "testHost2 not returned");
     }
+    // end::getSystems[]
 
+    // tag::getSystem[]
     @Test
     public void testGetSystem() {
         response = gatewayResource.getSystem("testHost1");
@@ -135,14 +138,18 @@ public class GatewayServiceIT {
         assertTrue(contents.contains("testHost1"),
             "testHost1 not returned");
     }
+    // end::getSystem[]
 
+    // tag::badSystem[]
     @Test
     public void testBadSystem() {
         response = gatewayResource.getSystem("badhost");
         assertEquals(404, response.getStatus(), 
             "request for badhost should have failed but did not");
     }
+    // end::badSystem[]
 
+    // tag::osInfo[]
     @Test
     @Timeout(value = 5, unit = TimeUnit.SECONDS)
     public void testOsInfo() {
@@ -164,5 +171,6 @@ public class GatewayServiceIT {
         assertTrue(contents.contains("testHost2:os.version=not available"),
             "Did not properly get testHost2 OS version");
     }
+    // end::osInfo[]
 
 }
