@@ -74,13 +74,18 @@ public class GatewayResource {
         CountDownLatch countdownLatch = new CountDownLatch(osProperties.length);
 
         for (String osProperty : osProperties) {
-           inventoryClient.getProperty(osProperty).thenAcceptAsync(r->{
-               holder.value.add(r);
-               countdownLatch.countDown();
-           });
+            inventoryClient
+                .getProperty(osProperty)
+                .thenAcceptAsync(r->{
+                    holder.value.add(r);
+                    countdownLatch.countDown();
+                })
+                .exceptionally((ex) -> {
+                    countdownLatch.countDown();
+                });
         }
         
-        // wait all asynchronous inventoryClient.getProperty to be completed
+        // Wait for all asynchronous inventoryClient.getProperty to be completed
         try {
             countdownLatch.await();
         } catch (InterruptedException e) {
