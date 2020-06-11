@@ -117,12 +117,23 @@ public class GatewayServiceIT {
         response = gatewayResource.getSystems();
         assertEquals(200, response.getStatus());
 
+        String contents = response.readEntity(String.class);
+
+        assertTrue(contents.contains("testHost1"),
+            "testHost1 not returned");
+        assertTrue(contents.contains("testHost2"),
+            "testHost2 not returned");
     }
 
     @Test
     public void testGetSystem() {
         response = gatewayResource.getSystem("testHost1");
         assertEquals(200, response.getStatus());
+
+        String contents = response.readEntity(String.class);
+        
+        assertTrue(contents.contains("testHost1"),
+            "testHost1 not returned");
     }
 
     @Test
@@ -137,6 +148,21 @@ public class GatewayServiceIT {
     public void testOsInfo() {
         response = gatewayResource.getOSProperties();
         assertEquals(200, response.getStatus());
+
+        String contents = response.readEntity(String.class);
+
+        assertTrue(contents.contains("testHost1:os.name=Windows"),
+            "Did not properly get testHost1 OS name");
+        assertTrue(contents.contains("testHost1:os.arch=x86"),
+            "Did not properly get testHost1 OS architecture");
+        assertTrue(contents.contains("testHost1:os.version=not available"),
+            "Did not properly get testHost1 OS version");
+        assertTrue(contents.contains("testHost2:os.name=Linux"),
+            "Did not properly get testHost2 OS name");
+        assertTrue(contents.contains("testHost2:os.arch=amd64"),
+            "Did not properly get testHost2 OS architecture");
+        assertTrue(contents.contains("testHost2:os.version=not available"),
+            "Did not properly get testHost2 OS version");
     }
 
 }
