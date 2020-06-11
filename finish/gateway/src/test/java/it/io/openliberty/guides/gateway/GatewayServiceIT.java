@@ -15,6 +15,7 @@ package it.io.openliberty.guides.gateway;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -25,6 +26,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.SharedContainerConfig;
@@ -49,14 +51,14 @@ public class GatewayServiceIT {
             "'systemLoad' : 1.23" +
             "'os.name' : 'Windows'" + 
             "'os.arch' : 'x86'" +
-        "}"
+        "}";
     private static String testHost2 = 
         "{" + 
             "'hostname' : 'testHost2'," +
             "'systemLoad' : 3.21," +
             "'os.name' : 'Linux'" + 
             "'os.arch' : 'amd64'" +
-        "}"
+        "}";
 
     @BeforeAll
     public static void setup() throws InterruptedException {
@@ -78,7 +80,7 @@ public class GatewayServiceIT {
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
                                         .withMethod("GET")
-                                        .withPath("inventory/data/os.name"))
+                                        .withPath("/inventory/data/os.name"))
                                     .respond(HttpResponse.response()
                                         .withStatusCode(200)
                                         .withBody("[" + 
@@ -89,7 +91,7 @@ public class GatewayServiceIT {
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
                                         .withMethod("GET")
-                                        .withPath("inventory/data/os.arch"))
+                                        .withPath("/inventory/data/os.arch"))
                                     .respond(HttpResponse.response()
                                         .withStatusCode(200)
                                         .withBody("[" + 
@@ -100,7 +102,7 @@ public class GatewayServiceIT {
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
                                         .withMethod("GET")
-                                        .withPath("inventory/data/os.version"))
+                                        .withPath("/inventory/data/os.version"))
                                     .respond(HttpResponse.response()
                                         .withStatusCode(200)
                                         .withBody("[" + 
@@ -128,6 +130,13 @@ public class GatewayServiceIT {
         response = gatewayResource.getSystem("badhost");
         assertEquals(404, response.getStatus(), 
             "request for badhost should have failed but did not");
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    public void testOsInfo() {
+        response = gatewayResource.getOSProperties();
+        assertEquals(200, response.getStatus());
     }
 
 }
