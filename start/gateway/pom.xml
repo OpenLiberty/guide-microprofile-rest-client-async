@@ -150,9 +150,6 @@
                         <goals>
                             <goal>integration-test</goal>
                         </goals>
-                        <configuration>
-                            <trimStackTrace>false</trimStackTrace>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>verify</id>
