@@ -75,7 +75,7 @@ public class SystemServiceIT {
         propertyProducer.send(new ProducerRecord<String, String>("requestSystemPropertyTopic", "os.name"));
 
         int recordsProcessed = 0;
-        ConsumerRecords<String, PropertyMessage> records = propertyConsumer.poll(Duration.ofMillis(3000));
+        ConsumerRecords<String, PropertyMessage> records = propertyConsumer.poll(Duration.ofMillis(30 * 1000));
         System.out.println("Polled " + records.count() + " records from Kafka:");
         for (ConsumerRecord<String, PropertyMessage> record : records) {
             PropertyMessage pm = record.value();
