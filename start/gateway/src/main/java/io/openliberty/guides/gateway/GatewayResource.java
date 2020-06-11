@@ -70,30 +70,15 @@ public class GatewayResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOSProperties() {
         final String[] osProperties = new String[] {"os.name", "os.arch", "os.version"};
-        final Holder<List<List<String>>> holder = new Holder<List<List<String>>>();
-        CountDownLatch countdownLatch = new CountDownLatch(osProperties.length);
+        final List<List<String>> holder = new ArrayList<List<String>>();
 
         for (String osProperty : osProperties) {
-           inventoryClient.getProperty(osProperty).thenAcceptAsync(r->{
-               holder.value.add(r);
-               countdownLatch.countDown();
-           });
+            holder.add(inventoryClient.getProperty(osProperty)
+                                      .readEntity(List.class));
         }
-        
-        // wait all asynchronous inventoryClient.getProperty to be completed
-        try {
-            countdownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-            
-        return Response.status(Response.Status.OK)
-                       .entity(holder.value)
-                       .build();
-    }
 
-    private class Holder<T> {
-        @SuppressWarnings("unchecked")
-        public volatile T value = (T) new ArrayList<List<String>>();
+        return Response.status(Response.Status.OK)
+                       .entity(holder)
+                       .build();
     }
 }
