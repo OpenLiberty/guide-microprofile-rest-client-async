@@ -7,7 +7,7 @@ set -euxo pipefail
 ##
 ##############################################################################
 
-./scripts/pacakageApps.sh
+./scripts/packageApps.sh
 
 mvn -pl system verify
 mvn -pl inventory verify
