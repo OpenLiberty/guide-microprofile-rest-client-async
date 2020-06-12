@@ -121,19 +121,6 @@ public class GatewayServiceIT {
     }
     // end::getSystems[]
 
-    // tag::getSystem[]
-    @Test
-    public void testGetSystem() {
-        response = gatewayResource.getSystem("testHost1");
-        assertEquals(200, response.getStatus());
-
-        String contents = response.readEntity(String.class);
-        
-        assertTrue(contents.contains("testHost1"),
-            "testHost1 not returned");
-    }
-    // end::getSystem[]
-
     // tag::badSystem[]
     @Test
     public void testBadSystem() {
