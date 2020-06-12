@@ -145,7 +145,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-./scripts/packageApps.bat
+./scripts/packageApps.sh
 ```
 --
 
@@ -165,7 +165,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-./scripts/buildImages.bat
+./scripts/buildImages.sh
 ```
 --
 
