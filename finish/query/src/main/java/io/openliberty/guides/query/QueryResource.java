@@ -14,7 +14,9 @@ package io.openliberty.guides.query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -30,7 +32,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import io.openliberty.guides.gateway.client.InventoryClient;
+import io.openliberty.guides.query.client.InventoryClient;
 
 @ApplicationScoped
 @Path("/query")
@@ -52,12 +54,17 @@ public class QueryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystem(@PathParam("hostname") String hostname) {
         return inventoryClient.getSystem(hostname)
-                              .thenAcceptAsync(r -> {
+                              // tag::thenApplyAsync[]
+                              .thenApplyAsync(r -> {
                                   return r;
                               })
+                              // end::thenApplyAsync[]
+                              // tag::exceptionally[]
                               .exceptionally(ex -> {
-                                  return null;
+                                  return Response.status(Response.Status.NOT_FOUND)
+                                                 .build();
                               });
+                              // end::exceptionally[]
     }
 
     @PUT
@@ -73,37 +80,36 @@ public class QueryResource {
     }
 
     @GET
-    @PATH("/systemLoad")
+    @Path("/systemLoad")
     @Produces(MediaType.APPLICATION_JSON)
     public Response systemLoad() {
-        List<String> systems = inventoryClient.getSystems();
+        List<String> systems = inventoryClient.getSystems().readEntity(List.class);
         // tag::countdown[]
-        CountDownLatch remainingSystems = new CountdownLatch(systems.length);
+        CountDownLatch remainingSystems = new CountDownLatch(systems.size());
         // end::countdown[]
-        volatile Map<Map<String, Properties> systemLoads = new ConcurrentHashMap(2);
+        final Holder<Map<Map<String, Properties>>> systemLoads = new Holder<Map<Map<String, Properties>>>();
+        systemLoads.value = new ConcurrentHashMap<Map<String, Properties>>();
 
         for (String system : systems) {
             inventoryClient.getSystem(system)
                            // tag::thenApplyAsync[]
-                           .thenApplyAsync(r -> {
-                                Properties p = r.readEntity(Properties.class());
-                                if (systemLoads.containsKey("highest")) {
-                                    if (systemLoads.get("highest")
-                                                    .getProperty("systemLoad") 
-                                                    < p.getProperty("systemLoad")) {
-                                        systemLoads.put("highest", p);
+                           .thenAcceptAsync(r -> {
+                                Properties p = r.readEntity(Properties.class);
+                                if (systemLoads.value.containsKey("highest")) {
+                                    if (systemLoads.value.get("highest")
+                                                    .getProperty("systemLoad") < p.getProperty("systemLoad")) {
+                                        systemLoads.value.put("highest", p);
                                     }
                                 } else {
-                                    systemLoads.put("highest", p);
+                                    systemLoads.value.put("highest", p);
                                 }
-                                if (systemLoads.containsKey("lowest")) {
-                                    if (systemLoads.get("lowest")
-                                                    .getProperty("systemLoad") 
-                                                    > p.getProperty("systemLoad")) {
-                                        systemLoads.put("lowest", p);
+                                if (systemLoads.value.containsKey("lowest")) {
+                                    if (systemLoads.value.get("lowest")
+                                                    .getProperty("systemLoad") > p.getProperty("systemLoad")) {
+                                        systemLoads.value.put("lowest", p);
                                     }
                                 } else {
-                                    systemLoads.put("lowest", p);
+                                    systemLoads.value.put("lowest", p);
                                 }
                                 // tag::countdown[]
                                 remainingSystems.countDown();
@@ -128,59 +134,14 @@ public class QueryResource {
         }
 
         return Response.status(Response.Status.OK)
-                       .entity(systemLoads)
-                       .build();
-    }
-
-    @GET
-    @Path("/data/os")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOSProperties() {
-        final String[] osProperties = new String[] {"os.name", "os.arch", "os.version"};
-        final Holder<List<List<String>>> holder = new Holder<List<List<String>>>();
-        // tag::countdown[]
-        CountDownLatch countdownLatch = new CountDownLatch(osProperties.length);
-        // end::countdown[]
-
-        for (String osProperty : osProperties) {
-            inventoryClient
-                .getProperty(osProperty)
-                // tag::thenApplyAsync[]
-                .thenAcceptAsync(r->{
-                    holder.value.add(r);
-                    // tag::countdown[]
-                    countdownLatch.countDown();
-                    // end::countdown[]
-                })
-                // end::thenApplyAsync[]
-                // tag::exceptionally[]
-                .exceptionally(ex -> {
-                    // tag::countdown[]
-                    countdownLatch.countDown();
-                    // end::countdown[]
-                    return null;
-                });
-                // end::exceptionally[]
-        }
-        
-        // tag::countdown[]
-        // Wait for all asynchronous inventoryClient.getProperty to be completed
-        try {
-            countdownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // end::countdown[]
-            
-        return Response.status(Response.Status.OK)
-                       .entity(holder.value)
+                       .entity(systemLoads.value)
                        .build();
     }
 
     // tag::holder[]
     private class Holder<T> {
         @SuppressWarnings("unchecked")
-        public volatile T value = (T) new ArrayList<List<String>>();
+        public volatile T value;
     }
     // end::holder[]
 }
