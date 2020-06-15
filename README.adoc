@@ -90,7 +90,7 @@ Navigate to the `start` directory to begin.
 The `gateway` service uses a MicroProfile Rest Client to access the `inventory` service.
 You will update the methods in the template interface for this client to be asynchronous.
 
-[role="code_command hotspot file=0", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `InventoryClient` interface.#
 `gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java`
@@ -110,9 +110,9 @@ As you will see in the next section, you will be able to indirectly use the `Res
 == Updating a REST resource to asynchronously handle HTTP requests
 
 JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you can return a `CompletionStage<Response>` type. 
-Completion stages can be chained together by using the [hotspot=thenApplyAsync file=1]`thenApplyAsync()` method.
+Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
 
-[role="code_command hotspot file=1", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `GatewayResource` class.#
 `gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java`
@@ -126,8 +126,8 @@ include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayResou
 
 Similar to the synchronous approach, if properties are successfully added or retrieved from the `inventory` microservice, the resource responds with an HTTP status of 200. 
 The user receives either a confirmation message of the addition or the properties retrieved.
-If properties are received as a `List<String>` they are added to a `Holder` using the [hotspot=thenApplyAsync file=1]`thenApplyAsync()` method.
-A [hotspot=countdown file=1]`CountDownLatch` keeps track of our asynchronous requests to know when they're all finished.
+If properties are received as a `List<String>` they are added to a `Holder` using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
+A [hotspot=countdown file=0]`CountDownLatch` keeps track of our asynchronous requests to know when they're all finished.
 
 The `CompletionStage` interface represents a unit of computation. After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves similar to a catch block. When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built. JAX-RS will respond to the caller after the `CompletionStage` completes.
 
@@ -227,7 +227,7 @@ While requests process, the thread can handle other work or requests such as in 
 
 You will create an endpoint test to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
 
-[role="code_command hotspot file=2", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Create the `GatewayServiceIT` class.#
 `gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java`
@@ -235,9 +235,9 @@ You will create an endpoint test to test the basic functionality of the `gateway
 
 The following descriptions explain what the test cases verify:
 
-* The [hotspot=getSystems file=2]`testGetSystems()` test case verifies that the `gateway` service communicates with a backend service to get all system info.
-* The [hotspot=badSystem file=2]`testBadSystem()` test case verifies that the `gateway` service properly handles a bad system request.
-* The [hotspot=osInfo file=2]`testOsInfo()` test case verifies that the `gateway` service asynchronously communicates with the backend service.
+* The [hotspot=getSystems file=0]`testGetSystems()` test case verifies that the `gateway` service communicates with a backend service to get all system info.
+* The [hotspot=badSystem file=0]`testBadSystem()` test case verifies that the `gateway` service properly handles a bad system request.
+* The [hotspot=osInfo file=0]`testOsInfo()` test case verifies that the `gateway` service asynchronously communicates with the backend service.
 
 GatewayServiceIT.java
 [source, java, linenums, role='code_column hide_tags=copyright,javadoc']
