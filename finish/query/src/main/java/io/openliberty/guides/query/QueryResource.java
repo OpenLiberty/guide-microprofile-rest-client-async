@@ -14,6 +14,7 @@ package io.openliberty.guides.query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -50,7 +51,13 @@ public class QueryResource {
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystem(@PathParam("hostname") String hostname) {
-        return inventoryClient.getSystem(hostname);
+        return inventoryClient.getSystem(hostname)
+                              .thenAcceptAsync(r -> {
+                                  return r;
+                              })
+                              .exceptionally(ex -> {
+                                  return null;
+                              });
     }
 
     @PUT
@@ -63,6 +70,66 @@ public class QueryResource {
         return Response.status(Response.Status.OK)
                .entity("Request successful for " + propertyNames.size() + " properties\n")
                .build();
+    }
+
+    @GET
+    @PATH("/systemLoad")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response systemLoad() {
+        List<String> systems = inventoryClient.getSystems();
+        // tag::countdown[]
+        CountDownLatch remainingSystems = new CountdownLatch(systems.length);
+        // end::countdown[]
+        volatile Map<Map<String, Properties> systemLoads = new ConcurrentHashMap(2);
+
+        for (String system : systems) {
+            inventoryClient.getSystem(system)
+                           // tag::thenApplyAsync[]
+                           .thenApplyAsync(r -> {
+                                Properties p = r.readEntity(Properties.class());
+                                if (systemLoads.containsKey("highest")) {
+                                    if (systemLoads.get("highest")
+                                                    .getProperty("systemLoad") 
+                                                    < p.getProperty("systemLoad")) {
+                                        systemLoads.put("highest", p);
+                                    }
+                                } else {
+                                    systemLoads.put("highest", p);
+                                }
+                                if (systemLoads.containsKey("lowest")) {
+                                    if (systemLoads.get("lowest")
+                                                    .getProperty("systemLoad") 
+                                                    > p.getProperty("systemLoad")) {
+                                        systemLoads.put("lowest", p);
+                                    }
+                                } else {
+                                    systemLoads.put("lowest", p);
+                                }
+                                // tag::countdown[]
+                                remainingSystems.countDown();
+                                // end::countdown[]
+                           })
+                           // end::thenApplyAsync[]
+                           // tag::exceptionally[]
+                           .exceptionally(ex -> {
+                                // tag::countdown[]
+                                remainingSystems.countDown();
+                                // end::countdown[]
+                                return null;
+                           });
+                           // end::exceptionally[]
+        }
+
+        // Wait for all remaining systems to be checked
+        try {
+            remainingSystems.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return Response.status(Response.Status.OK)
+                       .entity(systemLoads)
+                       .build();
     }
 
     @GET
