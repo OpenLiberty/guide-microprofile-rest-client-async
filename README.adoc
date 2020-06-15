@@ -97,7 +97,7 @@ You will update the methods in the template interface for this client to be asyn
 ----
 
 InventoryClient.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
+[source, java, linenums, role='code_column hide_tags=copyright']
 ----
 include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java[]
 ----
@@ -119,7 +119,7 @@ Completion stages can be chained together by using the [hotspot=thenApplyAsync f
 ----
 
 GatewayResource.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
+[source, java, linenums, role='code_column hide_tags=copyright']
 ----
 include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java[]
 ----
@@ -240,7 +240,7 @@ The following descriptions explain what the test cases verify:
 * The [hotspot=osInfo file=2]`testOsInfo()` test case verifies that the `gateway` service asynchronously communicates with the backend service.
 
 GatewayServiceIT.java
-[source, Java, linenums, role='code_column hide_tags=copyright,javadoc']
+[source, java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
 include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java[]
 ----
