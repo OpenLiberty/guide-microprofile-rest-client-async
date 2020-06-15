@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.gateway;
+package it.io.openliberty.guides.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,16 +27,16 @@ import org.microshed.testing.SharedContainerConfig;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
-import io.openliberty.guides.gateway.GatewayResource;
+import io.openliberty.guides.query.QueryResource;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
-public class GatewayServiceIT {
+public class QueryServiceIT {
 
     Response response;
 
     @RESTClient
-    public static GatewayResource gatewayResource;
+    public static QueryResource queryResource;
 
 
     private static String testHost1 = 
@@ -109,7 +109,7 @@ public class GatewayServiceIT {
     // tag::getSystems[]
     @Test
     public void testGetSystems() {
-        response = gatewayResource.getSystems();
+        response = queryResource.getSystems();
         assertEquals(200, response.getStatus());
 
         String contents = response.readEntity(String.class);
@@ -124,34 +124,10 @@ public class GatewayServiceIT {
     // tag::badSystem[]
     @Test
     public void testBadSystem() {
-        response = gatewayResource.getSystem("badhost");
+        response = queryResource.getSystem("badhost");
         assertEquals(404, response.getStatus(), 
             "request for badhost should have failed but did not");
     }
     // end::badSystem[]
-
-    // tag::osInfo[]
-    @Test
-    @Timeout(value = 5, unit = TimeUnit.SECONDS)
-    public void testOsInfo() {
-        response = gatewayResource.getOSProperties();
-        assertEquals(200, response.getStatus());
-
-        String contents = response.readEntity(String.class);
-
-        assertTrue(contents.contains("testHost1:os.name=Windows"),
-            "Did not properly get testHost1 OS name");
-        assertTrue(contents.contains("testHost1:os.arch=x86"),
-            "Did not properly get testHost1 OS architecture");
-        assertTrue(contents.contains("testHost1:os.version=not available"),
-            "Did not properly get testHost1 OS version");
-        assertTrue(contents.contains("testHost2:os.name=Linux"),
-            "Did not properly get testHost2 OS name");
-        assertTrue(contents.contains("testHost2:os.arch=amd64"),
-            "Did not properly get testHost2 OS architecture");
-        assertTrue(contents.contains("testHost2:os.version=not available"),
-            "Did not properly get testHost2 OS version");
-    }
-    // end::osInfo[]
 
 }
