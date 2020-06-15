@@ -11,7 +11,7 @@ LABEL \
   org.opencontainers.image.version="$VERSION" \
   org.opencontainers.image.revision="$REVISION" \
   vendor="Open Liberty" \
-  name="gateway" \
+  name="query" \
   version="$VERSION-$REVISION" \
   summary="The query microservice from the 'Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP' guide" \
   description="This image contains the query microservice running with the Open Liberty runtime."
