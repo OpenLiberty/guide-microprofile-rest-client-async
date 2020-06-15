@@ -25,6 +25,7 @@ start /b docker run -d ^
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
   --network=%NETWORK% ^
   --name=system ^
+  --scale SERVICE=3 ^
   --rm ^
   system:1.0-SNAPSHOT
 
