@@ -53,18 +53,21 @@ public class QueryResource {
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystem(@PathParam("hostname") String hostname) {
-        return inventoryClient.getSystem(hostname)
-                              // tag::thenApplyAsync[]
-                              .thenApplyAsync(r -> {
-                                  return r;
-                              })
-                              // end::thenApplyAsync[]
-                              // tag::exceptionally[]
-                              .exceptionally(ex -> {
-                                  return Response.status(Response.Status.NOT_FOUND)
-                                                 .build();
-                              });
-                              // end::exceptionally[]
+        final Holder<Response> holder = new Holder<Response>();
+        inventoryClient.getSystem(hostname)
+                       // tag::thenApplyAsync[]
+                       .thenAcceptAsync(r -> {
+                           holder.value = r;
+                       })
+                       // end::thenApplyAsync[]
+                       // tag::exceptionally[]
+                       .exceptionally(ex -> {
+                           holder.value = Response.status(Response.Status.NOT_FOUND)
+                                              .build();
+                           return null;
+                       });
+                       // end::exceptionally[]
+        return holder.value;
     }
 
     @PUT
@@ -87,25 +90,32 @@ public class QueryResource {
         // tag::countdown[]
         CountDownLatch remainingSystems = new CountDownLatch(systems.size());
         // end::countdown[]
-        final Holder<Map<Map<String, Properties>>> systemLoads = new Holder<Map<Map<String, Properties>>>();
-        systemLoads.value = new ConcurrentHashMap<Map<String, Properties>>();
+        final Holder<Map<String, Properties>> systemLoads = new Holder<Map<String, Properties>>();
+        systemLoads.value = new ConcurrentHashMap<String, Properties>();
 
         for (String system : systems) {
             inventoryClient.getSystem(system)
                            // tag::thenApplyAsync[]
                            .thenAcceptAsync(r -> {
                                 Properties p = r.readEntity(Properties.class);
+                                double load = Double.parseDouble(p.getProperty("systemLoad"));
                                 if (systemLoads.value.containsKey("highest")) {
-                                    if (systemLoads.value.get("highest")
-                                                    .getProperty("systemLoad") < p.getProperty("systemLoad")) {
+                                    double highest = Double.parseDouble(
+                                        systemLoads.value
+                                                   .get("highest")
+                                                   .getProperty("systemLoad"));
+                                    if (load > highest) {
                                         systemLoads.value.put("highest", p);
                                     }
                                 } else {
                                     systemLoads.value.put("highest", p);
                                 }
                                 if (systemLoads.value.containsKey("lowest")) {
-                                    if (systemLoads.value.get("lowest")
-                                                    .getProperty("systemLoad") > p.getProperty("systemLoad")) {
+                                    double lowest = Double.parseDouble(
+                                        systemLoads.value
+                                                   .get("lowest")
+                                                   .getProperty("systemLoad"));
+                                    if (load < lowest) {
                                         systemLoads.value.put("lowest", p);
                                     }
                                 } else {
