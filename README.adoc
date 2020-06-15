@@ -90,7 +90,7 @@ Navigate to the `start` directory to begin.
 The `gateway` service uses a MicroProfile Rest Client to access the `inventory` service.
 You will update the methods in the template interface for this client to be asynchronous.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `InventoryClient` interface.#
 `gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java`
@@ -112,7 +112,7 @@ As you will see in the next section, you will be able to indirectly use the `Res
 JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you can return a `CompletionStage<Response>` type. 
 Completion stages can be chained together by using the [hotspot=thenApplyAsync file=1]`thenApplyAsync()` method.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=1", subs="quotes"]
 ----
 #Replace the `GatewayResource` class.#
 `gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java`
@@ -227,7 +227,7 @@ While requests process, the thread can handle other work or requests such as in 
 
 You will create an endpoint test to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=2", subs="quotes"]
 ----
 #Create the `GatewayServiceIT` class.#
 `gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java`
