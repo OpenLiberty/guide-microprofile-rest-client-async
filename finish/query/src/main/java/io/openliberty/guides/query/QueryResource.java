@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway;
+package io.openliberty.guides.query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import io.openliberty.guides.gateway.client.InventoryClient;
 
 @ApplicationScoped
-@Path("/gateway")
-public class GatewayResource {
+@Path("/query")
+public class QueryResource {
     
     @Inject
     @RestClient

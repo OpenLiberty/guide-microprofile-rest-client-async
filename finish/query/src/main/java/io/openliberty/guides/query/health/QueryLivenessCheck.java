@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway.health;
+package io.openliberty.guides.query.health;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -20,7 +20,7 @@ import org.eclipse.microprofile.health.Liveness;
 
 @Liveness
 @ApplicationScoped
-public class GatewayLivenessCheck implements HealthCheck {
+public class QueryLivenessCheck implements HealthCheck {
 
     private boolean isAlive() {
         return true;

@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway.client;
+package io.openliberty.guides.query.client;
 
 import java.util.List;
 import java.util.concurrent.CompletionStage;

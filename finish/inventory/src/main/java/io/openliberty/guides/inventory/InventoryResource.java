@@ -60,10 +60,7 @@ public class InventoryResource {
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystems() {
-        List<Properties> systems = manager.getSystems()
-                .values()
-                .stream()
-                .collect(Collectors.toList());
+        List<Properties> systems = manager.getSystems();
         return Response
                 .status(Response.Status.OK)
                 .entity(systems)

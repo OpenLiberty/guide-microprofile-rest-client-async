@@ -65,8 +65,8 @@ public class InventoryManager {
         return Optional.ofNullable(p);
     }
 
-    public Map<String, Properties> getSystems() {
-        return new TreeMap<>(systems);
+    public List<String> getSystems() {
+        return new ArrayList(systems.ketSet());
     }
 
     public void resetSystems() {
