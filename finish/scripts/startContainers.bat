@@ -21,10 +21,12 @@ start /b docker run -d ^
   --rm ^
   bitnami/kafka:2 
 
-start /b docker service create ^
+start /b docker run -d ^
+  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
+  --network=%NETWORK% ^
   --name=system ^
-  --replicas=3 ^
-  system:1.0-SNAPSHOT &
+  --rm ^
+  system:1.0-SNAPSHOT 
 
 start /b docker run -d ^
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
