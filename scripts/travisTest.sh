@@ -11,7 +11,7 @@ set -euxo pipefail
 
 mvn -pl system verify
 mvn -pl inventory verify
-mvn -pl gateway verify
+mvn -pl query verify
 
 ./scripts/buildImages.sh
 ./scripts/startContainers.sh
@@ -20,9 +20,9 @@ sleep 180
 
 docker logs system
 docker logs inventory
-docker logs gateway
+docker logs query
 
-systemCPULoad="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/gateway/systems")"
+systemCPULoad="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/query/systems")"
 
 if [ "$systemCPULoad" == "200" ]
 then
