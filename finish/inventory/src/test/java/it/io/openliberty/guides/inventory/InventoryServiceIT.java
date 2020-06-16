@@ -57,15 +57,16 @@ public class InventoryServiceIT {
         producer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", sl));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
-        List<Properties> systems =
-                response.readEntity(new GenericType<List<Properties>>() {});
+        List<String> systems =
+                response.readEntity(List.class);
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
-        for (Properties system : systems) {
-            Assertions.assertEquals(sl.hostname, system.get("hostname"),
+        for (String system : systems) {
+            Properties sp = inventoryResource.getSystem(system).readEntity(Properties.class);
+            Assertions.assertEquals(sl.hostname, sp.get("hostname"),
                     "Hostname doesn't match!");
-            BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");
+            BigDecimal systemLoad = (BigDecimal) sp.get("systemLoad");
             Assertions.assertEquals(sl.loadAverage, systemLoad.doubleValue(),
                     "CPU load doesn't match!");
         }

@@ -54,19 +54,29 @@ public class QueryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystem(@PathParam("hostname") String hostname) {
         final Holder<Response> holder = new Holder<Response>();
+        CountDownLatch wait = new CountDownLatch(1);
         inventoryClient.getSystem(hostname)
                        // tag::thenApplyAsync[]
                        .thenAcceptAsync(r -> {
                            holder.value = r;
+                           wait.countDown();
                        })
                        // end::thenApplyAsync[]
                        // tag::exceptionally[]
                        .exceptionally(ex -> {
                            holder.value = Response.status(Response.Status.NOT_FOUND)
                                               .build();
+                           wait.countDown();
                            return null;
                        });
                        // end::exceptionally[]
+        
+        // Wait for system to b e found
+        try {
+            wait.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return holder.value;
     }
 
