@@ -15,8 +15,8 @@ package it.io.openliberty.guides.query;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.AfterAll;
@@ -43,53 +43,53 @@ public class QueryServiceIT {
 
     private static String testHost1 = 
         "{" + 
-            "'hostname' : 'testHost1'," +
-            "'systemLoad' : 1.23" +
+            "\"hostname\" : \"testHost1\"," +
+            "\"systemLoad\" : 1.23" +
         "}";
     private static String testHost2 = 
         "{" + 
-            "'hostname' : 'testHost2'," +
-            "'systemLoad' : 3.21" +
+            "\"hostname\" : \"testHost2\"," +
+            "\"systemLoad\" : 3.21" +
         "}";
     private static String testHost3 =
         "{" + 
-            "'hostname' : 'testHost3'," +
-            "'systemLoad' : 2.13" +
+            "\"hostname\" : \"testHost3\"," +
+            "\"systemLoad\" : 2.13" +
         "}";
 
     @BeforeAll
     public static void setup() throws InterruptedException {
         AppContainerConfig.mockClient.when(HttpRequest.request()
-                                        .withMethod("GET")
-                                        .withPath("/inventory/systems"))
-                                    .respond(HttpResponse.response()
-                                        .withStatusCode(200)
-                                        .withBody("[" + testHost1 + "," + testHost2 + "," + testHost3 + "]")
-                                        .withHeader("Content-Type", "application/json"));
+                                         .withMethod("GET")
+                                         .withPath("/inventory/systems"))
+                                     .respond(HttpResponse.response()
+                                         .withStatusCode(200)
+                                         .withBody("[\"testHost1\", \"testHost2\", \"testHost3\"]")
+                                         .withHeader("Content-Type", "application/json"));
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
-                                        .withMethod("GET")
-                                        .withPath("/inventory/systems/testHost1"))
-                                    .respond(HttpResponse.response()
-                                        .withStatusCode(200)
-                                        .withBody(testHost1)
-                                        .withHeader("Content-Type", "application/json"));
+                                         .withMethod("GET")
+                                         .withPath("/inventory/systems/testHost1"))
+                                     .respond(HttpResponse.response()
+                                         .withStatusCode(200)
+                                         .withBody(testHost1)
+                                         .withHeader("Content-Type", "application/json"));
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
-                                        .withMethod("GET")
-                                        .withPath("/inventory/systems/testHost2"))
-                                    .respond(HttpResponse.response()
-                                        .withStatusCode(200)
-                                        .withBody(testHost2)
-                                        .withHeader("Content-Type", "application/json"));
+                                         .withMethod("GET")
+                                         .withPath("/inventory/systems/testHost2"))
+                                     .respond(HttpResponse.response()
+                                         .withStatusCode(200)
+                                         .withBody(testHost2)
+                                         .withHeader("Content-Type", "application/json"));
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
-                                        .withMethod("GET")
-                                        .withPath("/inventory/systems/testHost3"))
-                                    .respond(HttpResponse.response()
-                                        .withStatusCode(200)
-                                        .withBody(testHost3)
-                                        .withHeader("Content-Type", "application/json"));
+                                         .withMethod("GET")
+                                         .withPath("/inventory/systems/testHost3"))
+                                     .respond(HttpResponse.response()
+                                         .withStatusCode(200)
+                                         .withBody(testHost3)
+                                         .withHeader("Content-Type", "application/json"));
     }
 
     // tag::getSystems[]
@@ -98,7 +98,7 @@ public class QueryServiceIT {
         response = queryResource.getSystems();
         assertEquals(200, response.getStatus());
 
-        String contents = response.readEntity(String.class);
+        List<String> contents = response.readEntity(List.class);
 
         assertTrue(contents.contains("testHost1"),
             "testHost1 not returned");
@@ -115,16 +115,16 @@ public class QueryServiceIT {
         response = queryResource.systemLoad();
         assertEquals(200, response.getStatus());
 
-        Map<String, Properties> contents = response.readEntity(Map.class);
+        Map<String, Map<String, String>> contents = response.readEntity(Map.class);
 
         assertEquals(
             "testHost2",
-            contents.get("highest").getProperty("hostname"),
+            contents.get("highest").get("hostname"),
             "Returned highest system load incorrect"
         );
         assertEquals(
             "testHost1",
-            contents.get("lowest").getProperty("hostname"),
+            contents.get("lowest").get("hostname"),
             "Returned lowest system load incorrect"
         );
     }
