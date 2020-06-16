@@ -10,15 +10,13 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway;
+package io.openliberty.guides.query;
 
 // JAX-RS
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-// tag::path1[]
-@ApplicationPath("api")
-// end::path1[]
-public class GatewayApplication extends Application {
+@ApplicationPath("/")
+public class QueryApplication extends Application {
 
 }

@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.gateway;
+package it.io.openliberty.guides.query;
 
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
@@ -22,7 +22,7 @@ import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 
-import io.openliberty.guides.gateway.client.InventoryClient;
+import io.openliberty.guides.query.client.InventoryClient;
 
 public class AppContainerConfig implements SharedContainerConfiguration {
 

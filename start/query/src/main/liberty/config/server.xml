@@ -1,4 +1,4 @@
-<server description="Gateway Service">
+<server description="Query Service">
 
   <featureManager>
     <feature>beanValidation-2.0</feature>
@@ -19,5 +19,5 @@
   <httpEndpoint host="*" httpPort="${default.http.port}"
       httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
 
-  <webApplication location="gateway.war" contextRoot="/"/>
+  <webApplication location="query.war" contextRoot="/"/>
 </server>

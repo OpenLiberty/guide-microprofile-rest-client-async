@@ -10,11 +10,14 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway;
+package io.openliberty.guides.query;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.Map;
+import java.util.Properties;
+import java.util.HashMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,11 +32,11 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import io.openliberty.guides.gateway.client.InventoryClient;
+import io.openliberty.guides.query.client.InventoryClient;
 
 @ApplicationScoped
-@Path("/gateway")
-public class GatewayResource {
+@Path("/query")
+public class QueryResource {
     
     @Inject
     @RestClient
@@ -66,19 +69,41 @@ public class GatewayResource {
     }
 
     @GET
-    @Path("/data/os")
+    @Path("/systemLoad")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOSProperties() {
-        final String[] osProperties = new String[] {"os.name", "os.arch", "os.version"};
-        final List<List<String>> holder = new ArrayList<List<String>>();
+    public Response systemLoad() {
+        List<String> systems = inventoryClient.getSystems().readEntity(List.class);
+        Map<String, Properties> systemLoads = new HashMap<String, Properties>();
 
-        for (String osProperty : osProperties) {
-            holder.add(inventoryClient.getProperty(osProperty)
-                                      .readEntity(List.class));
+        for (String system : systems) {
+            Properties p = inventoryClient.getSystem(system)
+                                          .readEntity(Properties.class);
+            BigDecimal load = (BigDecimal) p.get("systemLoad");
+
+            if (systemLoads.containsKey("highest")) {
+                BigDecimal highest = (BigDecimal) 
+                    systemLoads.get("highest")
+                               .get("systemLoad");
+                if (load.compareTo(highest) > 0) {
+                    systemLoads.put("highest", p);
+                }
+            } else {
+                systemLoads.put("highest", p);
+            }
+            if (systemLoads.containsKey("lowest")) {
+                BigDecimal lowest = (BigDecimal)
+                    systemLoads.get("lowest")
+                               .get("systemLoad");
+                if (load.compareTo(lowest) < 0) {
+                    systemLoads.put("lowest", p);
+                }
+            } else {
+                systemLoads.put("lowest", p);
+            }
         }
 
         return Response.status(Response.Status.OK)
-                       .entity(holder)
+                       .entity(systemLoads)
                        .build();
     }
 }

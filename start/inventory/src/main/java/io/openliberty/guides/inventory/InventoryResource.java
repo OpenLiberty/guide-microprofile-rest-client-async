@@ -49,9 +49,6 @@ import io.reactivex.rxjava3.core.FlowableEmitter;
 public class InventoryResource {
 
     private static Logger logger = Logger.getLogger(InventoryResource.class.getName());
-    // tag::flowableEmitterDecl[]
-    private FlowableEmitter<String> propertyNameEmitter;
-    // end::flowableEmitterDecl[]
 
     @Inject
     private InventoryManager manager;
@@ -60,13 +57,9 @@ public class InventoryResource {
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystems() {
-        List<Properties> systems = manager.getSystems()
-                .values()
-                .stream()
-                .collect(Collectors.toList());
         return Response
                 .status(Response.Status.OK)
-                .entity(systems)
+                .entity(manager.getSystems())
                 .build();
     }
 
@@ -86,44 +79,7 @@ public class InventoryResource {
                 .entity("hostname does not exist.")
                 .build();
     }
-    
-    @PUT
-    // tag::postPath[]
-    @Path("/data")
-    // end::postPath[]
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.TEXT_PLAIN)
-    // tag::updateSystemProperty[]
-    public Response updateSystemProperty(String propertyName) {
-        logger.info("updateSystemProperty: " + propertyName);
-        // tag::flowableEmitter[]
-        propertyNameEmitter.onNext(propertyName);
-        // end::flowableEmitter[]
-        return Response
-                   .status(Response.Status.OK)
-                   .entity("Request successful for the " + propertyName + " property\n")
-                   .build();
-    }
-    // end::updateSystemProperty[]
 
-    @GET
-    @Path("/data/{propertyName}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<String> getSystemProperty(@PathParam("propertyName") String propertyName) {
-    	logger.info("getSystemProperty: " + propertyName);
-        List<Properties> systems = manager.getSystems()
-                .values()
-                .stream()
-                .collect(Collectors.toList());
-        List<String> properties = new ArrayList<String>();
-        for (Properties s : systems) {
-        	String h = s.getProperty("hostname");
-        	String p = s.getProperty(propertyName, "not avaliable");
-        	properties.add(h + ":" + propertyName + "=" + p);
-        }
-        return properties;
-    }
-    
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response resetSystems() {
@@ -133,10 +89,7 @@ public class InventoryResource {
                 .build();
     }
 
-    // tag::updateStatus[]
-    // tag::systemLoad[]
     @Incoming("systemLoad")
-    // end::systemLoad[]
     public void updateStatus(SystemLoad sl)  {
         String hostname = sl.hostname;
         if (manager.getSystem(hostname).isPresent()) {
@@ -146,32 +99,5 @@ public class InventoryResource {
             manager.addSystem(hostname, sl.loadAverage);
             logger.info("Host " + hostname + " was added: " + sl);
         }
-    }
-    // end::updateStatus[]
-    
-    // tag::propertyMessage[]
-    @Incoming("addSystemProperty")
-    // end::propertyMessage[]
-    public void getPropertyMessage(PropertyMessage pm)  {
-        logger.info("getPropertyMessage: " + pm);
-        String hostId = pm.hostname;
-        if (manager.getSystem(hostId).isPresent()) {
-            manager.updatePropertyMessage(hostId, pm.key, pm.value);
-            logger.info("Host " + hostId + " was updated: " + pm);
-        } else {
-            manager.addSystem(hostId, pm.key, pm.value);
-            logger.info("Host " + hostId + " was added: " + pm);
-        }
-    }
-    
-    // tag::OutgoingPropertyName[]
-    @Outgoing("requestSystemProperty")
-    // end::OutgoingPropertyName[]
-    public Publisher<String> sendPropertyName() {
-        // tag::flowableCreate[]
-        Flowable<String> flowable = Flowable.<String>create(emitter -> 
-            this.propertyNameEmitter = emitter, BackpressureStrategy.BUFFER);
-        // end::flowableCreate[]
-        return flowable;
     }
 }

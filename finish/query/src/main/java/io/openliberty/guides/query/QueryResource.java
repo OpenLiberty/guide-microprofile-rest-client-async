@@ -72,7 +72,7 @@ public class QueryResource {
                        });
                        // end::exceptionally[]
         
-        // Wait for system to b e found
+        // Wait for system to be found
         try {
             wait.await();
         } catch (InterruptedException e) {

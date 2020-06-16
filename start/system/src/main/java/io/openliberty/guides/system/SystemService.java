@@ -31,8 +31,6 @@ import io.reactivex.rxjava3.core.Flowable;
 
 @ApplicationScoped
 public class SystemService {
-    
-    private static Logger logger = Logger.getLogger(SystemService.class.getName());
 
     private static final OperatingSystemMXBean osMean = 
             ManagementFactory.getOperatingSystemMXBean();
@@ -49,37 +47,11 @@ public class SystemService {
         return hostname;
     }
 
-    // tag::publishSystemLoad[]
     @Outgoing("systemLoad")
-    // end::publishSystemLoad[]
-    // tag::sendSystemLoad[]
     public Publisher<SystemLoad> sendSystemLoad() {
-        // tag::flowableInterval[]
         return Flowable.interval(15, TimeUnit.SECONDS)
                 .map((interval -> new SystemLoad(getHostname(),
                         new Double(osMean.getSystemLoadAverage()))));
-        // end::flowableInterval[]
     }
-    // end::sendSystemLoad[]
-    
-    // tag::getProperty[]
-    @Incoming("propertyRequest")
-    // end::getProperty[]
-    // tag::setProperty[]
-    @Outgoing("propertyResponse")
-    // end::setProperty[]
-    // tag::sendPropertyDetails[]
-    public PropertyMessage sendProperty(String propertyName) {
-        logger.info("sendProperty: " + propertyName);
-        String propertyValue = System.getProperty(propertyName);
-        if (propertyValue == null) {
-            logger.warning(propertyName + " is not System property.");
-            return null;
-        }
-        return new PropertyMessage(getHostname(), 
-                    propertyName, 
-                    System.getProperty(propertyName, "unknown"));
-    }
-    // end::sendPropertyDetails[]
 
 }

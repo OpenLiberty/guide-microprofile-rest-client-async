@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.gateway.client;
+package io.openliberty.guides.query.client;
 
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -46,9 +46,4 @@ public interface InventoryClient extends AutoCloseable {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addProperty(String propertyName);
-
-    @GET
-    @Path("/data/{propertyName}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProperty(@PathParam("propertyName") String propertyName);
 }
