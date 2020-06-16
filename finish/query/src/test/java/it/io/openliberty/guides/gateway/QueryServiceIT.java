@@ -15,6 +15,8 @@ package it.io.openliberty.guides.query;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.AfterAll;
@@ -43,15 +45,16 @@ public class QueryServiceIT {
         "{" + 
             "'hostname' : 'testHost1'," +
             "'systemLoad' : 1.23" +
-            "'os.name' : 'Windows'" + 
-            "'os.arch' : 'x86'" +
         "}";
     private static String testHost2 = 
         "{" + 
             "'hostname' : 'testHost2'," +
-            "'systemLoad' : 3.21," +
-            "'os.name' : 'Linux'" + 
-            "'os.arch' : 'amd64'" +
+            "'systemLoad' : 3.21" +
+        "}";
+    private static String testHost3 =
+        "{" + 
+            "'hostname' : 'testHost3'," +
+            "'systemLoad' : 2.13" +
         "}";
 
     @BeforeAll
@@ -61,7 +64,7 @@ public class QueryServiceIT {
                                         .withPath("/inventory/systems"))
                                     .respond(HttpResponse.response()
                                         .withStatusCode(200)
-                                        .withBody("[" + testHost1 + "," + testHost2 + "]")
+                                        .withBody("[" + testHost1 + "," + testHost2 + "," + testHost3 + "]")
                                         .withHeader("Content-Type", "application/json"));
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
@@ -74,35 +77,18 @@ public class QueryServiceIT {
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
                                         .withMethod("GET")
-                                        .withPath("/inventory/data/os.name"))
+                                        .withPath("/inventory/systems/testHost2"))
                                     .respond(HttpResponse.response()
                                         .withStatusCode(200)
-                                        .withBody("[" + 
-                                                    "\"testHost1:os.name=Windows\"," +
-                                                    "\"testHost2:os.name=Linux\"" +
-                                                "]")
+                                        .withBody(testHost2)
                                         .withHeader("Content-Type", "application/json"));
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
                                         .withMethod("GET")
-                                        .withPath("/inventory/data/os.arch"))
+                                        .withPath("/inventory/systems/testHost3"))
                                     .respond(HttpResponse.response()
                                         .withStatusCode(200)
-                                        .withBody("[" + 
-                                                    "\"testHost1:os.arch=x86\"," +
-                                                    "\"testHost2:os.arch=amd64\"" +
-                                                "]")
-                                        .withHeader("Content-Type", "application/json"));
-
-        AppContainerConfig.mockClient.when(HttpRequest.request()
-                                        .withMethod("GET")
-                                        .withPath("/inventory/data/os.version"))
-                                    .respond(HttpResponse.response()
-                                        .withStatusCode(200)
-                                        .withBody("[" + 
-                                                    "\"testHost1:os.version=not available\"," +
-                                                    "\"testHost2:os.version=not available\"" +
-                                                "]")
+                                        .withBody(testHost3)
                                         .withHeader("Content-Type", "application/json"));
     }
 
@@ -118,16 +104,30 @@ public class QueryServiceIT {
             "testHost1 not returned");
         assertTrue(contents.contains("testHost2"),
             "testHost2 not returned");
+        assertTrue(contents.contains("testHost3"),
+            "testHost3 not returned");
     }
     // end::getSystems[]
 
-    // tag::badSystem[]
+    // tag::testLoads[]
     @Test
-    public void testBadSystem() {
-        response = queryResource.getSystem("badhost");
-        assertEquals(404, response.getStatus(), 
-            "request for badhost should have failed but did not");
+    public void testLoads() {
+        response = queryResource.systemLoad();
+        assertEquals(200, response.getStatus());
+
+        Map<String, Properties> contents = response.readEntity(Map.class);
+
+        assertEquals(
+            "testHost2",
+            contents.get("highest").getProperty("hostname"),
+            "Returned highest system load incorrect"
+        );
+        assertEquals(
+            "testHost1",
+            contents.get("lowest").getProperty("hostname"),
+            "Returned lowest system load incorrect"
+        );
     }
-    // end::badSystem[]
+    // end::testLoads[]
 
 }
