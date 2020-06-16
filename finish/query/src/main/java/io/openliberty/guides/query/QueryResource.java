@@ -55,26 +55,34 @@ public class QueryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystem(@PathParam("hostname") String hostname) {
         final Holder<Response> holder = new Holder<Response>();
+        // tag::countdown[]
         CountDownLatch wait = new CountDownLatch(1);
+        // end::countdown[]
         inventoryClient.getSystem(hostname)
-                       // tag::thenApplyAsync[]
+                       // tag::thenAcceptAsync[]
                        .thenAcceptAsync(r -> {
                            holder.value = r;
+                           // tag::countdown[]
                            wait.countDown();
+                           // end::countdown[]
                        })
-                       // end::thenApplyAsync[]
+                       // end::thenAcceptAsync[]
                        // tag::exceptionally[]
                        .exceptionally(ex -> {
                            holder.value = Response.status(Response.Status.NOT_FOUND)
                                               .build();
+                           // tag::countdown[]
                            wait.countDown();
+                           // end::countdown[]
                            return null;
                        });
                        // end::exceptionally[]
         
         // Wait for system to be found
         try {
+            // tag::await[]
             wait.await();
+            // end::await[]
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -106,7 +114,7 @@ public class QueryResource {
 
         for (String system : systems) {
             inventoryClient.getSystem(system)
-                           // tag::thenApplyAsync[]
+                           // tag::thenAcceptAsync[]
                            .thenAcceptAsync(r -> {
                                 Properties p = r.readEntity(Properties.class);
                                 BigDecimal load = (BigDecimal) p.get("systemLoad");
@@ -136,7 +144,7 @@ public class QueryResource {
                                 remainingSystems.countDown();
                                 // end::countdown[]
                            })
-                           // end::thenApplyAsync[]
+                           // end::thenAcceptAsync[]
                            // tag::exceptionally[]
                            .exceptionally(ex -> {
                                 // tag::countdown[]
@@ -149,7 +157,9 @@ public class QueryResource {
 
         // Wait for all remaining systems to be checked
         try {
+            // tag::await[]
             remainingSystems.await();
+            // end::await[]
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

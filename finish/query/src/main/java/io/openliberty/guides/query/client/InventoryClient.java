@@ -36,11 +36,13 @@ public interface InventoryClient extends AutoCloseable {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystems();
 
+    // tag::getSystem[]
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
     @Asynchronous
     public CompletionStage<Response> getSystem(@PathParam("hostname") String hostname);
+    // end::getSystem[]
 
     // tag::addProperty[]
     @PUT
@@ -49,5 +51,5 @@ public interface InventoryClient extends AutoCloseable {
     @Produces(MediaType.APPLICATION_JSON)
     @Asynchronous
     public CompletionStage<Response> addProperty(String propertyName);
-    // end:addProperty[]
+    // end::addProperty[]
 }
