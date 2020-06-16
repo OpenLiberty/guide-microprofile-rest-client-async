@@ -12,6 +12,7 @@
 // end::copyright[]
 package io.openliberty.guides.query;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -108,24 +109,24 @@ public class QueryResource {
                            // tag::thenApplyAsync[]
                            .thenAcceptAsync(r -> {
                                 Properties p = r.readEntity(Properties.class);
-                                double load = Double.parseDouble(p.getProperty("systemLoad"));
+                                BigDecimal load = (BigDecimal) p.get("systemLoad");
                                 if (systemLoads.value.containsKey("highest")) {
-                                    double highest = Double.parseDouble(
+                                    BigDecimal highest = (BigDecimal) 
                                         systemLoads.value
                                                    .get("highest")
-                                                   .getProperty("systemLoad"));
-                                    if (load > highest) {
+                                                   .get("systemLoad");
+                                    if (load.compareTo(highest) > 0) {
                                         systemLoads.value.put("highest", p);
                                     }
                                 } else {
                                     systemLoads.value.put("highest", p);
                                 }
                                 if (systemLoads.value.containsKey("lowest")) {
-                                    double lowest = Double.parseDouble(
+                                    BigDecimal lowest = (BigDecimal)
                                         systemLoads.value
                                                    .get("lowest")
-                                                   .getProperty("systemLoad"));
-                                    if (load < lowest) {
+                                                   .get("systemLoad");
+                                    if (load.compareTo(lowest) < 0) {
                                         systemLoads.value.put("lowest", p);
                                     }
                                 } else {
