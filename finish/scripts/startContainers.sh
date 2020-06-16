@@ -27,7 +27,21 @@ sleep 15
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
   --network=$NETWORK \
-  --name=system \
+  --name=system1 \
+  --rm \
+  system:1.0-SNAPSHOT &
+
+docker run -d \
+  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
+  --network=$NETWORK \
+  --name=system2 \
+  --rm \
+  system:1.0-SNAPSHOT &
+
+docker run -d \
+  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
+  --network=$NETWORK \
+  --name=system3 \
   --rm \
   system:1.0-SNAPSHOT &
  
