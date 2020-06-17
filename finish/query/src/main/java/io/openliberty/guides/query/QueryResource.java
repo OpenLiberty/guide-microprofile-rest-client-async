@@ -48,37 +48,15 @@ public class QueryResource {
         // tag::countdown[]
         CountDownLatch remainingSystems = new CountDownLatch(systems.size());
         // end::countdown[]
-        final Holder<Map<String, Properties>> systemLoads = new Holder<Map<String, Properties>>();
-        systemLoads.value = new ConcurrentHashMap<String, Properties>();
+        final Holder systemLoads = new Holder();
 
         for (String system : systems) {
             inventoryClient.getSystem(system)
                            // tag::thenAcceptAsync[]
                            .thenAcceptAsync(r -> {
                                 Properties p = r.readEntity(Properties.class);
-                                BigDecimal load = (BigDecimal) p.get("systemLoad");
-                                if (systemLoads.value.containsKey("highest")) {
-                                    BigDecimal highest = (BigDecimal) 
-                                        systemLoads.value
-                                                   .get("highest")
-                                                   .get("systemLoad");
-                                    if (load.compareTo(highest) > 0) {
-                                        systemLoads.value.put("highest", p);
-                                    }
-                                } else {
-                                    systemLoads.value.put("highest", p);
-                                }
-                                if (systemLoads.value.containsKey("lowest")) {
-                                    BigDecimal lowest = (BigDecimal)
-                                        systemLoads.value
-                                                   .get("lowest")
-                                                   .get("systemLoad");
-                                    if (load.compareTo(lowest) < 0) {
-                                        systemLoads.value.put("lowest", p);
-                                    }
-                                } else {
-                                    systemLoads.value.put("lowest", p);
-                                }
+                                systemLoads.updateHighest(p);
+                                systemLoads.updateLowest(p);
                                 // tag::countdown[]
                                 remainingSystems.countDown();
                                 // end::countdown[]
@@ -86,6 +64,7 @@ public class QueryResource {
                            // end::thenAcceptAsync[]
                            // tag::exceptionally[]
                            .exceptionally(ex -> {
+                                System.out.println(ex);
                                 // tag::countdown[]
                                 remainingSystems.countDown();
                                 // end::countdown[]
@@ -104,15 +83,43 @@ public class QueryResource {
         }
 
         return Response.status(Response.Status.OK)
-                       .entity(systemLoads.value)
+                       .entity(systemLoads.values)
                        .build();
     }
     // end::systemLoad[]
 
-    // tag::holder[]
-    private class Holder<T> {
+    private class Holder {
         @SuppressWarnings("unchecked")
-        public volatile T value;
+        public volatile Map<String, Properties> values;
+
+        public Holder() {
+            this.values = new ConcurrentHashMap<String, Properties>();
+            
+            // Initialize highest and lowest values
+            this.values.put("highest", new Properties());
+            this.values.put("lowest", new Properties());
+            this.values.get("highest").put("systemLoad", new BigDecimal(0));
+            this.values.get("lowest").put("systemLoad", new BigDecimal(100));
+        }
+
+        public void updateHighest(Properties p) {
+            BigDecimal load = (BigDecimal) p.get("systemLoad");
+            BigDecimal highest = (BigDecimal) this.values
+                                                  .get("highest")
+                                                  .get("systemLoad");
+            if (load.compareTo(highest) > 0) {
+                this.values.put("highest", p);
+            }
+        }
+
+        public void updateLowest(Properties p) {
+            BigDecimal load = (BigDecimal) p.get("systemLoad");
+            BigDecimal lowest = (BigDecimal) this.values
+                                                 .get("lowest")
+                                                 .get("systemLoad");
+            if (load.compareTo(lowest) < 0) {
+                this.values.put("lowest", p);
+            }
+        }
     }
-    // end::holder[]
 }

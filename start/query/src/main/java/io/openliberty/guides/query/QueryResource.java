@@ -43,37 +43,53 @@ public class QueryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response systemLoad() {
         List<String> systems = inventoryClient.getSystems().readEntity(List.class);
-        Map<String, Properties> systemLoads = new HashMap<String, Properties>();
+        Holder systemLoads = new Holder();
 
         for (String system : systems) {
             Properties p = inventoryClient.getSystem(system)
                                           .readEntity(Properties.class);
-            BigDecimal load = (BigDecimal) p.get("systemLoad");
-
-            if (systemLoads.containsKey("highest")) {
-                BigDecimal highest = (BigDecimal) 
-                    systemLoads.get("highest")
-                               .get("systemLoad");
-                if (load.compareTo(highest) > 0) {
-                    systemLoads.put("highest", p);
-                }
-            } else {
-                systemLoads.put("highest", p);
-            }
-            if (systemLoads.containsKey("lowest")) {
-                BigDecimal lowest = (BigDecimal)
-                    systemLoads.get("lowest")
-                               .get("systemLoad");
-                if (load.compareTo(lowest) < 0) {
-                    systemLoads.put("lowest", p);
-                }
-            } else {
-                systemLoads.put("lowest", p);
-            }
+            
+            systemLoads.updateHighest(p);
+            systemLoads.updateLowest(p);
         }
 
         return Response.status(Response.Status.OK)
-                       .entity(systemLoads)
+                       .entity(systemLoads.values)
                        .build();
+    }
+
+    private class Holder {
+        @SuppressWarnings("unchecked")
+        public Map<String, Properties> values;
+
+        public Holder() {
+            this.values = new HashMap<String, Properties>();
+            
+            // Initialize highest and lowest values
+            this.values.put("highest", new Properties());
+            this.values.put("lowest", new Properties());
+            this.values.get("highest").put("systemLoad", new BigDecimal(0));
+            this.values.get("lowest").put("systemLoad", new BigDecimal(100));
+        }
+
+        public void updateHighest(Properties p) {
+            BigDecimal load = (BigDecimal) p.get("systemLoad");
+            BigDecimal highest = (BigDecimal) this.values
+                                                  .get("highest")
+                                                  .get("systemLoad");
+            if (load.compareTo(highest) > 0) {
+                this.values.put("highest", p);
+            }
+        }
+
+        public void updateLowest(Properties p) {
+            BigDecimal load = (BigDecimal) p.get("systemLoad");
+            BigDecimal lowest = (BigDecimal) this.values
+                                                 .get("lowest")
+                                                 .get("systemLoad");
+            if (load.compareTo(lowest) < 0) {
+                this.values.put("lowest", p);
+            }
+        }
     }
 }
