@@ -50,7 +50,7 @@ public class InventoryManager {
     }
 
     public List<String> getSystems() {
-        return new ArrayList(systems.keySet());
+        return new ArrayList<String>(systems.keySet());
     }
 
     public void resetSystems() {
