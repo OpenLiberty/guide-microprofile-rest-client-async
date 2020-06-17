@@ -44,12 +44,4 @@ public interface InventoryClient extends AutoCloseable {
     public CompletionStage<Response> getSystem(@PathParam("hostname") String hostname);
     // end::getSystem[]
 
-    // tag::addProperty[]
-    @PUT
-    @Path("/data")
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Asynchronous
-    public CompletionStage<Response> addProperty(String propertyName);
-    // end::addProperty[]
 }

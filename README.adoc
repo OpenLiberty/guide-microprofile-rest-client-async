@@ -101,10 +101,10 @@ InventoryClient.java
 include::finish/query/src/main/java/io/openliberty/guides/query/client/InventoryClient.java[]
 ----
 
-The changes involve the [hotspot=addProperty file=0]`addProperty` and [hotspot=getSystem file=0]`getSystem` methods. 
-Change the return types to `CompletionStage<Response>` and add the annotation `@Asynchronous`.
-These changes make the methods asynchronous.
-Since the methods now have return type of `CompletionStage<Response>`, you aren't able to directly manipulate the inner `Response`. 
+The changes involve the [hotspot=getSystem file=0]`getSystem` method. 
+Change the return type to `CompletionStage<Response>` and add the annotation `@Asynchronous`.
+These changes make the method asynchronous.
+Since the method now has the return type of `CompletionStage<Response>`, you aren't able to directly manipulate the inner `Response`. 
 As you will see in the next section, you will be able to indirectly use the `Response` by chaining callbacks.
 
 == Updating a REST resource to asynchronously handle HTTP requests
@@ -126,7 +126,7 @@ include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.ja
 
 Just like the synchronous approach, you can request information from the `inventory` microservice through the `query` microservice.
 A [hotspot=countdown file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
-Using the [hotspot=await file=0]`await` function we stop and wait until all our requests are complete. 
+Using the [hotspot=await file=0]`await` method, we stop and wait until all our requests are complete. 
 
 The `CompletionStage` interface represents a unit of computation. 
 After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
@@ -234,7 +234,8 @@ The output will be similar to the following. The given example has been formatte
 ----
 
 Switching to an asynchronous programming model freed up the thread that handles requests to the inventory service. 
-While requests process, the thread can handle other work or requests such as in the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint where multiple systems are read and compared at once to 
+While requests process, the thread can handle other work or requests.
+In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint multiple systems are read and compared at once to 
 
 // =================================================================================================
 // Testing
