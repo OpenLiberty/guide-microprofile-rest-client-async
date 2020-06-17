@@ -211,14 +211,27 @@ include::{common-includes}/os-tabs.adoc[]
 The services take some time to become available.
 Access the application by using `curl` commands as follows:
 
-[options="header", role="wrap_table"]
-|===
-|Description |`curl` command |Sample Output
-|Get all system names | `curl -X GET http://localhost:9080/query/systems` | `["265e82fda375","37140ec44c9b","8841bd7d6fcd"]`
-|Get the highest/lowest system loads | `curl -X GET http://localhost:9080/query/systemLoad` | `{"highest":{"hostname":"8841bd7d6fcd","systemLoad":6.96},"lowest":{"hostname":"37140ec44c9b","systemLoad":6.4}}`
-|===
+[role='command']
+```
+curl -X GET localhost:9080/query/systemLoad
+```
 
 If `curl` is not available, the Postman application can also be used.
+The output will be similar to the following. The given example has been formatted for readability. 
+
+[source, role='no_copy']
+----
+{
+    "highest": {
+        "hostname" : "8841bd7d6fcd",
+        "systemLoad" : 6.96
+    },
+    "lowest": {
+        "hostname" : "37140ec44c9b",
+        "systemLoad" : 6.4
+    }
+}
+----
 
 Switching to an asynchronous programming model freed up the thread that handles requests to the inventory service. 
 While requests process, the thread can handle other work or requests such as in the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint where multiple systems are read and compared at once to 
@@ -238,10 +251,7 @@ If a test failure occurs, then you may have introduced a bug into the code.
 `query/src/test/java/it/io/openliberty/guides/query/QueryServiceIT.java`
 ----
 
-The following descriptions explain what the test cases verify:
-
-* The [hotspot=getSystems file=0]`testGetSystems()` test case verifies that the `query` service communicates with a backend service to get all system names.
-* The [hotspot=testLoads file=0]`testLoads()` test case verifies that the `query` service can calculate the highest and lowest system loads. 
+The [hotspot=testLoads file=0]`testLoads()` test case verifies that the `query` service can calculate the highest and lowest system loads. 
 
 QueryServiceIT.java
 [source, java, linenums, role='code_column hide_tags=copyright,javadoc']
@@ -270,11 +280,11 @@ When the tests succeed, you see output similar to the following example:
  T E S T S
 -------------------------------------------------------
 Running it.io.openliberty.guides.query.QueryServiceIT
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 32.123 s - in it.io.openliberty.guides.query.QueryServiceIT
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 32.123 s - in it.io.openliberty.guides.query.QueryServiceIT
 
 Results:
 
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ----
 
 == Tearing down the environment
