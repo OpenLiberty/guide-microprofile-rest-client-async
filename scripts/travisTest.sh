@@ -18,7 +18,9 @@ mvn -pl query verify
 
 sleep 180
 
-docker logs system
+docker logs system1
+docker logs system2
+docker logs system3
 docker logs inventory
 docker logs query
 
