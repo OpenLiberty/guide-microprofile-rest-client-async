@@ -16,7 +16,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+// tag::concurrentHashMap
 import java.util.concurrent.ConcurrentHashMap;
+// end::concurrentHashMap
 import java.util.concurrent.CountDownLatch;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -43,8 +45,8 @@ public class QueryResource {
     @GET
     @Path("/systemLoad")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response systemLoad() {
-        List<String> systems = inventoryClient.getSystems().readEntity(List.class);
+    public Map<String, Properties> systemLoad() {
+        List<String> systems = inventoryClient.getSystems();
         // tag::countdown[]
         CountDownLatch remainingSystems = new CountDownLatch(systems.size());
         // end::countdown[]
@@ -53,13 +55,14 @@ public class QueryResource {
         for (String system : systems) {
             inventoryClient.getSystem(system)
                            // tag::thenAcceptAsync[]
-                           .thenAcceptAsync(r -> {
-                                Properties p = r.readEntity(Properties.class);
-                                systemLoads.updateHighest(p);
-                                systemLoads.updateLowest(p);
-                                // tag::countdown[]
-                                remainingSystems.countDown();
-                                // end::countdown[]
+                           .thenAcceptAsync(p -> {
+                                if (p != null) {
+                                    systemLoads.updateHighest(p);
+                                    systemLoads.updateLowest(p);
+                                    // tag::countdown[]
+                                    remainingSystems.countDown();
+                                    // end::countdown[]
+                                }
                            })
                            // end::thenAcceptAsync[]
                            // tag::exceptionally[]
@@ -82,24 +85,26 @@ public class QueryResource {
             e.printStackTrace();
         }
 
-        return Response.status(Response.Status.OK)
-                       .entity(systemLoads.values)
-                       .build();
+        return systemLoads.values;
     }
     // end::systemLoad[]
 
     private class Holder {
         @SuppressWarnings("unchecked")
+        // tag::volatile
         public volatile Map<String, Properties> values;
+        // end::volatile
 
         public Holder() {
+            // tag::concurrentHashMap
             this.values = new ConcurrentHashMap<String, Properties>();
+            // end::concurrentHashMap
             
             // Initialize highest and lowest values
             this.values.put("highest", new Properties());
             this.values.put("lowest", new Properties());
-            this.values.get("highest").put("systemLoad", new BigDecimal(0));
-            this.values.get("lowest").put("systemLoad", new BigDecimal(100));
+            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
+            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
         }
 
         public void updateHighest(Properties p) {

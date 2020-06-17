@@ -13,11 +13,11 @@
 package io.openliberty.guides.query.client;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CompletionStage;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -34,14 +34,14 @@ public interface InventoryClient extends AutoCloseable {
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystems();
+    public List<String> getSystems();
 
     // tag::getSystem[]
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
     @Asynchronous
-    public CompletionStage<Response> getSystem(@PathParam("hostname") String hostname);
+    public CompletionStage<Properties> getSystem(@PathParam("hostname") String hostname);
     // end::getSystem[]
 
 }

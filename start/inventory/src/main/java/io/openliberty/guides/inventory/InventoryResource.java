@@ -47,28 +47,19 @@ public class InventoryResource {
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystems() {
-        return Response
-                .status(Response.Status.OK)
-                .entity(manager.getSystems())
-                .build();
+    public List<String> getSystems() {
+        return manager.getSystems();
     }
 
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystem(@PathParam("hostname") String hostname) {
+    public Properties getSystem(@PathParam("hostname") String hostname) {
         Optional<Properties> system = manager.getSystem(hostname);
         if (system.isPresent()) {
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(system)
-                    .build();
+            return system.get();
         }
-        return Response
-                .status(Response.Status.NOT_FOUND)
-                .entity("{\"error\" : \"hostname does not exist\"}")
-                .build();
+        return null;
     }
 
     @DELETE

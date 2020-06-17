@@ -13,10 +13,10 @@
 package it.io.openliberty.guides.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.AfterAll;
@@ -34,8 +34,6 @@ import io.openliberty.guides.query.QueryResource;
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 public class QueryServiceIT {
-
-    Response response;
 
     @RESTClient
     public static QueryResource queryResource;
@@ -94,19 +92,16 @@ public class QueryServiceIT {
     // tag::testLoads[]
     @Test
     public void testLoads() {
-        response = queryResource.systemLoad();
-        assertEquals(200, response.getStatus());
-
-        Map<String, Map<String, String>> contents = response.readEntity(Map.class);
+        Map<String, Properties> response = queryResource.systemLoad();
 
         assertEquals(
             "testHost2",
-            contents.get("highest").get("hostname"),
+            response.get("highest").get("hostname"),
             "Returned highest system load incorrect"
         );
         assertEquals(
             "testHost1",
-            contents.get("lowest").get("hostname"),
+            response.get("lowest").get("hostname"),
             "Returned lowest system load incorrect"
         );
     }
