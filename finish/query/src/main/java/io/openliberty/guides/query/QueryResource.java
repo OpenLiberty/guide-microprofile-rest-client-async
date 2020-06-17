@@ -16,9 +16,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-// tag::concurrentHashMap
+// tag::concurrentHashMap[]
 import java.util.concurrent.ConcurrentHashMap;
-// end::concurrentHashMap
+// end::concurrentHashMap[]
 // tag::countdown[]
 import java.util.concurrent.CountDownLatch;
 // end::countdown[]
@@ -93,14 +93,14 @@ public class QueryResource {
 
     private class Holder {
         @SuppressWarnings("unchecked")
-        // tag::volatile
+        // tag::volatile[]
         public volatile Map<String, Properties> values;
-        // end::volatile
+        // end::volatile[]
 
         public Holder() {
-            // tag::concurrentHashMap
+            // tag::concurrentHashMap[]
             this.values = new ConcurrentHashMap<String, Properties>();
-            // end::concurrentHashMap
+            // end::concurrentHashMap[]
             
             // Initialize highest and lowest values
             this.values.put("highest", new Properties());
