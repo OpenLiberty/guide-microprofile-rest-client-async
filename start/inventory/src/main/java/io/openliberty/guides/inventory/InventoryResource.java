@@ -67,7 +67,7 @@ public class InventoryResource {
         }
         return Response
                 .status(Response.Status.NOT_FOUND)
-                .entity("hostname does not exist.")
+                .entity("{\"error\" : \"hostname does not exist\"}")
                 .build();
     }
 
