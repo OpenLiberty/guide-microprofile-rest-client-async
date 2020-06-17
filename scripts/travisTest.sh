@@ -24,7 +24,7 @@ docker logs system3
 docker logs inventory
 docker logs query
 
-systemCPULoad="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/query/systems")"
+systemCPULoad="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9085/inventory/systems")"
 
 if [ "$systemCPULoad" == "200" ]
 then
