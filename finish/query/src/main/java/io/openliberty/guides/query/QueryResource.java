@@ -19,7 +19,9 @@ import java.util.Properties;
 // tag::concurrentHashMap
 import java.util.concurrent.ConcurrentHashMap;
 // end::concurrentHashMap
+// tag::countdown[]
 import java.util.concurrent.CountDownLatch;
+// end::countdown[]
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

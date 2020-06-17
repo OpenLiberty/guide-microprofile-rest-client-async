@@ -124,15 +124,17 @@ QueryResource.java
 include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.java[]
 ----
 
-Just like the synchronous approach, you can request information from the `inventory` microservice through the `query` microservice.
-A [hotspot=countdown file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
-Using the [hotspot=await file=0]`await` method, we stop and wait until all our requests are complete. 
-
-The `CompletionStage` interface represents a unit of computation. 
-After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
+The `CompletionStage` interface represents a unit of computation.
+After a computation is complete, it can be either finished or chained with more completion stages using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
 Exceptions are handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves similar to a catch block.
 When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
 JAX-RS will respond to the caller after the `CompletionStage` completes.
+
+A [hotspot=countdown file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
+Using the [hotspot=await file=0]`await` method, we stop and wait until all our requests are complete. 
+
+The keyword [hotspot=volatile file=0]`volatile` and the type [hotspot=concurrentHashMap]`ConcurrentHashMap` are used to store the system information.
+Together these allow us to store system information and have it safely accessed asynchronously by multiple threads. 
 
 // =================================================================================================
 // Building the application
