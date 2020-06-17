@@ -24,9 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -42,64 +40,6 @@ public class QueryResource {
     @Inject
     @RestClient
     private InventoryClient inventoryClient;
-
-    @GET
-    @Path("/systems")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystems() {
-        return inventoryClient.getSystems();
-    }
-
-    @GET
-    @Path("/systems/{hostname}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystem(@PathParam("hostname") String hostname) {
-        final Holder<Response> holder = new Holder<Response>();
-        // tag::countdown[]
-        CountDownLatch wait = new CountDownLatch(1);
-        // end::countdown[]
-        inventoryClient.getSystem(hostname)
-                       // tag::thenAcceptAsync[]
-                       .thenAcceptAsync(r -> {
-                           holder.value = r;
-                           // tag::countdown[]
-                           wait.countDown();
-                           // end::countdown[]
-                       })
-                       // end::thenAcceptAsync[]
-                       // tag::exceptionally[]
-                       .exceptionally(ex -> {
-                           holder.value = Response.status(Response.Status.NOT_FOUND)
-                                              .build();
-                           // tag::countdown[]
-                           wait.countDown();
-                           // end::countdown[]
-                           return null;
-                       });
-                       // end::exceptionally[]
-        
-        // Wait for system to be found
-        try {
-            // tag::await[]
-            wait.await();
-            // end::await[]
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return holder.value;
-    }
-
-    @PUT
-    @Path("/data")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addProperties(List<String> propertyNames) {
-        for (String propertyName : propertyNames)
-            inventoryClient.addProperty(propertyName);
-        return Response.status(Response.Status.OK)
-               .entity("Request successful for " + propertyNames.size() + " properties\n")
-               .build();
-    }
 
     // tag::systemLoad[]
     @GET

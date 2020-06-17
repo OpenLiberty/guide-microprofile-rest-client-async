@@ -23,9 +23,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,32 +39,6 @@ public class QueryResource {
     @Inject
     @RestClient
     private InventoryClient inventoryClient;
-
-    @GET
-    @Path("/systems")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystems() {
-        return inventoryClient.getSystems();
-    }
-
-    @GET
-    @Path("/systems/{hostname}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystem(@PathParam("hostname") String hostname) {
-        return inventoryClient.getSystem(hostname);
-    }
-
-    @PUT
-    @Path("/data")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addProperties(List<String> propertyNames) {
-        for (String propertyName : propertyNames)
-            inventoryClient.addProperty(propertyName);
-        return Response.status(Response.Status.OK)
-               .entity("Request successful for " + propertyNames.size() + " properties\n")
-               .build();
-    }
 
     @GET
     @Path("/systemLoad")
