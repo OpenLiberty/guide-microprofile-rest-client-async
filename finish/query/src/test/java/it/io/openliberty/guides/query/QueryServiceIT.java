@@ -40,7 +40,6 @@ public class QueryServiceIT {
     @RESTClient
     public static QueryResource queryResource;
 
-
     private static String testHost1 = 
         "{" + 
             "\"hostname\" : \"testHost1\"," +
@@ -91,23 +90,6 @@ public class QueryServiceIT {
                                          .withBody(testHost3)
                                          .withHeader("Content-Type", "application/json"));
     }
-
-    // tag::getSystems[]
-    @Test
-    public void testGetSystems() {
-        response = queryResource.getSystems();
-        assertEquals(200, response.getStatus());
-
-        List<String> contents = response.readEntity(List.class);
-
-        assertTrue(contents.contains("testHost1"),
-            "testHost1 not returned");
-        assertTrue(contents.contains("testHost2"),
-            "testHost2 not returned");
-        assertTrue(contents.contains("testHost3"),
-            "testHost3 not returned");
-    }
-    // end::getSystems[]
 
     // tag::testLoads[]
     @Test
