@@ -130,10 +130,10 @@ Exceptions are handled in a callback provided to the [hotspot=exceptionally file
 When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
 JAX-RS will respond to the caller after the `CompletionStage` completes.
 
-A [hotspot=countdown file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
+A [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
 Using the [hotspot=await file=0]`await` method, we stop and wait until all our requests are complete. 
 
-The keyword [hotspot=volatile file=0]`volatile` and the type [hotspot=concurrentHashMap]`ConcurrentHashMap` are used to store the system information.
+The keyword [hotspot=volatile file=0]`volatile` and the type [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` are used to store the system information.
 Together these allow us to store system information and have it safely accessed asynchronously by multiple threads. 
 
 // =================================================================================================
@@ -237,7 +237,7 @@ The output will be similar to the following. The given example has been formatte
 
 Switching to an asynchronous programming model freed up the thread that handles requests to the inventory service. 
 While requests process, the thread can handle other work or requests.
-In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint multiple systems are read and compared at once to 
+In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint multiple systems are read and compared at once.
 
 // =================================================================================================
 // Testing

@@ -16,12 +16,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-// tag::concurrentHashMap[]
 import java.util.concurrent.ConcurrentHashMap;
-// end::concurrentHashMap[]
-// tag::countdown[]
 import java.util.concurrent.CountDownLatch;
-// end::countdown[]
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -49,9 +45,9 @@ public class QueryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Properties> systemLoad() {
         List<String> systems = inventoryClient.getSystems();
-        // tag::countdown[]
+        // tag::countdown1[]
         CountDownLatch remainingSystems = new CountDownLatch(systems.size());
-        // end::countdown[]
+        // end::countdown1[]
         final Holder systemLoads = new Holder();
 
         for (String system : systems) {
@@ -61,18 +57,18 @@ public class QueryResource {
                                 if (p != null) {
                                     systemLoads.updateHighest(p);
                                     systemLoads.updateLowest(p);
-                                    // tag::countdown[]
+                                    // tag::countdown2[]
                                     remainingSystems.countDown();
-                                    // end::countdown[]
+                                    // end::countdown2[]
                                 }
                            })
                            // end::thenAcceptAsync[]
                            // tag::exceptionally[]
                            .exceptionally(ex -> {
                                 System.out.println(ex);
-                                // tag::countdown[]
+                                // tag::countdown3[]
                                 remainingSystems.countDown();
-                                // end::countdown[]
+                                // end::countdown3[]
                                 return null;
                            });
                            // end::exceptionally[]
