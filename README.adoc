@@ -67,8 +67,7 @@ image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
 The microservice that you will modify is the `query` service.
 It acts as a middleman to communicate with the backend microservices.
 Whenever a request is made to the `query` service to retrieve the inventory,
-the `query` service communicates with the `inventory`
-service on that host to get system information.
+the `query` service communicates with the `inventory`service to get system information.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
 The application also uses the Apache Kafka and ZooKeeper services to distribute the system status.
