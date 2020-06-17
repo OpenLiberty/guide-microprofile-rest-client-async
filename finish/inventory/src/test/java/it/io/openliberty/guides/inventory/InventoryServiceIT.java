@@ -58,7 +58,7 @@ public class InventoryServiceIT {
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
         List<String> systems =
-                response.readEntity(List.class);
+                response.readEntity(new GenericType<List<String>>() {});
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
