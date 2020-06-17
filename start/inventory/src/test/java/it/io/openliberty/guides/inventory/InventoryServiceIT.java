@@ -12,6 +12,9 @@
 // end::copyright[]
 package it.io.openliberty.guides.inventory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
@@ -22,7 +25,6 @@ import javax.ws.rs.core.Response;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -56,18 +58,15 @@ public class InventoryServiceIT {
         SystemLoad sl = new SystemLoad("localhost", 1.1);
         producer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", sl));
         Thread.sleep(5000);
-        Response response = inventoryResource.getSystems();
-        List<String> systems =
-                response.readEntity(new GenericType<List<String>>() {});
-        Assertions.assertEquals(200, response.getStatus(),
-                "Response should be 200");
-        Assertions.assertEquals(systems.size(), 1);
-        for (String system : systems) {
-            Properties sp = inventoryResource.getSystem(system).readEntity(Properties.class);
-            Assertions.assertEquals(sl.hostname, sp.get("hostname"),
+        List<String> response = inventoryResource.getSystems();
+        assertNotNull(response);
+        assertEquals(response.size(), 1);
+        for (String system : response) {
+            Properties sp = inventoryResource.getSystem(system);
+            assertEquals(sl.hostname, sp.get("hostname"),
                     "Hostname doesn't match!");
             BigDecimal systemLoad = (BigDecimal) sp.get("systemLoad");
-            Assertions.assertEquals(sl.loadAverage, systemLoad.doubleValue(),
+            assertEquals(sl.loadAverage, systemLoad.doubleValue(),
                     "CPU load doesn't match!");
         }
     }

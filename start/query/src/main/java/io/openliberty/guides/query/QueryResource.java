@@ -41,21 +41,18 @@ public class QueryResource {
     @GET
     @Path("/systemLoad")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response systemLoad() {
-        List<String> systems = inventoryClient.getSystems().readEntity(List.class);
+    public Map<String, Properties> systemLoad() {
+        List<String> systems = inventoryClient.getSystems();
         Holder systemLoads = new Holder();
 
         for (String system : systems) {
-            Properties p = inventoryClient.getSystem(system)
-                                          .readEntity(Properties.class);
+            Properties p = inventoryClient.getSystem(system);
             
             systemLoads.updateHighest(p);
             systemLoads.updateLowest(p);
         }
 
-        return Response.status(Response.Status.OK)
-                       .entity(systemLoads.values)
-                       .build();
+        return systemLoads.values;
     }
 
     private class Holder {
