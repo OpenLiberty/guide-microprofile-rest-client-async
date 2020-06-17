@@ -101,6 +101,7 @@ public class QueryResource {
                .build();
     }
 
+    // tag::systemLoad[]
     @GET
     @Path("/systemLoad")
     @Produces(MediaType.APPLICATION_JSON)
@@ -168,6 +169,7 @@ public class QueryResource {
                        .entity(systemLoads.value)
                        .build();
     }
+    // end::systemLoad[]
 
     // tag::holder[]
     private class Holder<T> {

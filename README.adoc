@@ -55,19 +55,19 @@ The network might be slow, or maybe the upstream service is overwhelmed and can'
 These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
 The application that you'll be working with is a system manager that maintains an inventory of available systems.
-It consists of three microservices, `gateway`, `inventory`, and `system`. 
+It consists of three microservices, `query`, `inventory`, and `system`. 
 
 The `system` microservice records system information such as the system load.
 The `system` microservice registers itself at startup with the `inventory` microservice which keeps track of all instances of the `system` microservice. 
-Finally,the `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+Finally,the `query` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend `inventory` microservice on the caller's behalf.
 
 image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
 
-The microservice that you will modify is the `gateway` service.
-It acts as a gateway to communicate with the backend microservices.
-Whenever a request is made to the `gateway` service to retrieve the inventory,
-the `gateway` service communicates with the `inventory`
+The microservice that you will modify is the `query` service.
+It acts as a middleman to communicate with the backend microservices.
+Whenever a request is made to the `query` service to retrieve the inventory,
+the `query` service communicates with the `inventory`
 service on that host to get system information.
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
@@ -87,22 +87,23 @@ include::{common-includes}/gitclone.adoc[]
 
 Navigate to the `start` directory to begin.
 
-The `gateway` service uses a MicroProfile Rest Client to access the `inventory` service.
+The `query` service uses a MicroProfile Rest Client to access the `inventory` service.
 You will update the methods in the template interface for this client to be asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `InventoryClient` interface.#
-`gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java`
+`query/src/main/java/io/openliberty/guides/query/client/InventoryClient.java`
 ----
 
 InventoryClient.java
 [source, java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/client/InventoryClient.java[]
+include::finish/query/src/main/java/io/openliberty/guides/query/client/InventoryClient.java[]
 ----
 
-The changes involve changing the return types of the [hotspot=addProperty file=0]`addProperty` and [hotspot=getProperty file=0]`getProperty` methods to return the type `CompletionStage<Response>` and add the annotation `@Asynchronous`.
+The changes involve the [hotspot=addProperty file=0]`addProperty` and [hotspot=getSystem file=0]`getSystem` methods. 
+Change the return types to `CompletionStage<Response>` and add the annotation `@Asynchronous`.
 These changes make the methods asynchronous.
 Since the methods now have return type of `CompletionStage<Response>`, you aren't able to directly manipulate the inner `Response`. 
 As you will see in the next section, you will be able to indirectly use the `Response` by chaining callbacks.
@@ -110,26 +111,29 @@ As you will see in the next section, you will be able to indirectly use the `Res
 == Updating a REST resource to asynchronously handle HTTP requests
 
 JAX-RS resources can also have asynchronous methods. So instead of returning a `Response` type, you can return a `CompletionStage<Response>` type. 
-Completion stages can be chained together by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
+Completion stages can be chained together by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Replace the `GatewayResource` class.#
-`gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java`
+#Replace the `QueryResource` class.#
+`query/src/main/java/io/openliberty/guides/query/QueryResource.java`
 ----
 
-GatewayResource.java
+QueryResource.java
 [source, java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/gateway/src/main/java/io/openliberty/guides/gateway/GatewayResource.java[]
+include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.java[]
 ----
 
-Similar to the synchronous approach, if properties are successfully added or retrieved from the `inventory` microservice, the resource responds with an HTTP status of 200. 
-The user receives either a confirmation message of the addition or the properties retrieved.
-If properties are received as a `List<String>` they are added to a `Holder` using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method.
-A [hotspot=countdown file=0]`CountDownLatch` keeps track of our asynchronous requests to know when they're all finished.
+Just like the synchronous approach, you can request information from the `inventory` microservice through the `query` microservice.
+A [hotspot=countdown file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
+Using the [hotspot=await file=0]`await` function we stop and wait until all our requests are complete. 
 
-The `CompletionStage` interface represents a unit of computation. After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenApplyAsync file=0]`thenApplyAsync()` method to perform more computations. Exceptions can be handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves similar to a catch block. When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built. JAX-RS will respond to the caller after the `CompletionStage` completes.
+The `CompletionStage` interface represents a unit of computation. 
+After that computation completes, it can either be finished or chained with more completion stages by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
+Exceptions are handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves similar to a catch block.
+When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
+JAX-RS will respond to the caller after the `CompletionStage` completes.
 
 // =================================================================================================
 // Building the application
@@ -137,7 +141,8 @@ The `CompletionStage` interface represents a unit of computation. After that com
 
 == Building and running the application
 
-You will build and run the `gateway`, `system`, and `inventory` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+You will build and run the `query`, `system`, and `inventory` microservices in Docker containers. 
+You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
@@ -161,7 +166,7 @@ include::{common-includes}/os-tabs.adoc[]
 ```
 --
 
-Build your docker images using the provided `buildImages` script:
+Build your Docker images using the provided `buildImages` script:
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -181,7 +186,10 @@ include::{common-includes}/os-tabs.adoc[]
 ```
 --
 
-Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
+Next, use the provided `startContainers` script to start the application in Docker containers. 
+The script creates a network for the containers to communicate with each other. 
+It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
+The script also creates three instances of the `system` microservice. 
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -207,42 +215,39 @@ Access the application by using `curl` commands as follows:
 [options="header", role="wrap_table"]
 |===
 |Description |`curl` command |Sample Output
-|Get all system info |`curl -X GET http://localhost:9080/api/gateway/systems` |`[{"hostname":"642c2ace934a","systemLoad":6.73}]`
-|Track another system property |`curl -X PUT -d '["os.name", "os.arch"]' http://localhost:9080/api/gateway/data --header "Content-Type:application/json"` |`Request successful for 2 properties`
-|Get all OS properties |`curl -X GET http://localhost:9080/api/gateway/data/os` |`[["642c2ace934a:os.name=Linux"],["642c2ace934a:os.version=not avaliable"],["642c2ace934a:os.arch=amd64"]]`
+|Get all system names | `curl -X GET http://localhost:9080/query/systems` | `["265e82fda375","37140ec44c9b","8841bd7d6fcd"]`
+|Get the highest/lowest system loads | `curl -X GET http://localhost:9080/query/systemLoad` | `{"highest":{"hostname":"8841bd7d6fcd","systemLoad":6.96},"lowest":{"hostname":"37140ec44c9b","systemLoad":6.4}}`
 |===
 
 If `curl` is not available, the Postman application can also be used.
-The `/api/gateway/data` endpoint can take any number of properties and will add them all asynchronously. 
-You will be able to see the added properties at the `/api/gateway/systems` endpoint.
 
 Switching to an asynchronous programming model freed up the thread that handles requests to the inventory service. 
-While requests process, the thread can handle other work or requests such as in the `/api/gateway/data/os` endpoint where multiple system properties are requested at once. 
+While requests process, the thread can handle other work or requests such as in the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint where multiple systems are read and compared at once to 
 
 // =================================================================================================
 // Testing
 // =================================================================================================
 
-== Testing the gateway application
+== Testing the query application
 
-You will create an endpoint test to test the basic functionality of the `gateway` microservice. If a test failure occurs, then you may have introduced a bug into the code.
+You will create an endpoint test to test the basic functionality of the `query` microservice. 
+If a test failure occurs, then you may have introduced a bug into the code.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#Create the `GatewayServiceIT` class.#
-`gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java`
+#Create the `QueryServiceIT` class.#
+`query/src/test/java/it/io/openliberty/guides/query/QueryServiceIT.java`
 ----
 
 The following descriptions explain what the test cases verify:
 
-* The [hotspot=getSystems file=0]`testGetSystems()` test case verifies that the `gateway` service communicates with a backend service to get all system info.
-* The [hotspot=badSystem file=0]`testBadSystem()` test case verifies that the `gateway` service properly handles a bad system request.
-* The [hotspot=osInfo file=0]`testOsInfo()` test case verifies that the `gateway` service asynchronously communicates with the backend service.
+* The [hotspot=getSystems file=0]`testGetSystems()` test case verifies that the `query` service communicates with a backend service to get all system names.
+* The [hotspot=testLoads file=0]`testLoads()` test case verifies that the `query` service can calculate the highest and lowest system loads. 
 
-GatewayServiceIT.java
+QueryServiceIT.java
 [source, java, linenums, role='code_column hide_tags=copyright,javadoc']
 ----
-include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/GatewayServiceIT.java[]
+include::finish/query/src/test/java/it/io/openliberty/guides/query/QueryServiceIT.java[]
 ----
 
 // =================================================================================================
@@ -251,7 +256,7 @@ include::finish/gateway/src/test/java/it/io/openliberty/guides/gateway/GatewaySe
 
 === Running the tests
 
-Navigate to the `gateway` directory, then verify that the tests pass by using the Maven `verify` goal:
+Navigate to the `query` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 [role='command']
 ```
@@ -265,19 +270,19 @@ When the tests succeed, you see output similar to the following example:
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running it.io.openliberty.guides.gateway.GatewayServiceIT
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 32.123 s - in it.io.openliberty.guides.gateway.GatewayServiceIT
+Running it.io.openliberty.guides.query.QueryServiceIT
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 32.123 s - in it.io.openliberty.guides.query.QueryServiceIT
 
 Results:
 
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 ----
 
 == Tearing down the environment
 
 Navigate back to the `start` directory.
 
-Finally, use the following script to stop the application:
+Finally, use the `stopContainers` script to stop the application:
 
 include::{common-includes}/os-tabs.adoc[]
 
