@@ -24,7 +24,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -56,7 +55,6 @@ public class QueryResource {
     }
 
     private class Holder {
-        @SuppressWarnings("unchecked")
         public Map<String, Properties> values;
 
         public Holder() {
@@ -65,8 +63,10 @@ public class QueryResource {
             // Initialize highest and lowest values
             this.values.put("highest", new Properties());
             this.values.put("lowest", new Properties());
-            this.values.get("highest").put("systemLoad", new BigDecimal(0));
-            this.values.get("lowest").put("systemLoad", new BigDecimal(100));
+            this.values.get("highest").put("hostname", "temp_max");
+            this.values.get("lowest").put("hostname", "temp_min");
+            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
+            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
         }
 
         public void updateHighest(Properties p) {
