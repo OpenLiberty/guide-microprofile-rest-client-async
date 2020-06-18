@@ -25,7 +25,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -88,7 +87,6 @@ public class QueryResource {
     // end::systemLoad[]
 
     private class Holder {
-        @SuppressWarnings("unchecked")
         // tag::volatile[]
         public volatile Map<String, Properties> values;
         // end::volatile[]

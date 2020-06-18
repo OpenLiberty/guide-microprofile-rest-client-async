@@ -19,9 +19,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
 
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
