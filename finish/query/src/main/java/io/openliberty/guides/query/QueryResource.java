@@ -56,10 +56,10 @@ public class QueryResource {
                                 if (p != null) {
                                     systemLoads.updateHighest(p);
                                     systemLoads.updateLowest(p);
-                                    // tag::countdown2[]
-                                    remainingSystems.countDown();
-                                    // end::countdown2[]
                                 }
+                                // tag::countdown2[]
+                                remainingSystems.countDown();
+                                // end::countdown2[]
                            })
                            // end::thenAcceptAsync[]
                            // tag::exceptionally[]
@@ -99,6 +99,8 @@ public class QueryResource {
             // Initialize highest and lowest values
             this.values.put("highest", new Properties());
             this.values.put("lowest", new Properties());
+            this.values.get("highest").put("hostname", "temp_max");
+            this.values.get("lowest").put("hostname", "temp_min");
             this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
             this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
         }
