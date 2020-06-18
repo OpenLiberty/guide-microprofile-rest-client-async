@@ -64,7 +64,6 @@ public class QueryResource {
                            // end::thenAcceptAsync[]
                            // tag::exceptionally[]
                            .exceptionally(ex -> {
-                                System.out.println(ex);
                                 // tag::countdown3[]
                                 remainingSystems.countDown();
                                 // end::countdown3[]
