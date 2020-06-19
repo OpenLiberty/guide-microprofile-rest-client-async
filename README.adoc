@@ -210,7 +210,20 @@ include::{common-includes}/os-tabs.adoc[]
 ```
 --
 
-The services take some time to become available.
+The services take some time to become available. Check if they're available by running the following command:
+
+[role='command']
+```
+docker exec -it inventory cat /logs/messages.log
+```
+
+The application is ready when you see messages similar to the following:
+
+[source, role='no_copy']
+----
+Host d95127348814 was updated: CpuLoadAverage: {"hostname":"d95127348814","loadAverage":14.7}
+----
+
 Access the application by using `curl` commands as follows:
 
 [role='command']
