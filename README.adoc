@@ -142,50 +142,31 @@ Together these allow us to store system information and have it safely accessed 
 
 == Building and running the application
 
-You will build and run the `query`, `system`, and `inventory` microservices in Docker containers. 
+You will build and run the `system`, `inventory`, and `query` microservices in Docker containers. 
 You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-To build the application, run the provided `packageApps` script:
+Start your Docker environment. Dockerfiles are provided for you to use.
 
-include::{common-includes}/os-tabs.adoc[]
+To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
 
-[.tab_content.windows_section]
---
 [role='command']
 ```
-.\scripts\packageApps.bat
+mvn -pl models install
+mvn package
 ```
---
 
-[.tab_content.mac_section.linux_section]
---
+include::{common-includes}/ol-kernel-docker-pull.adoc[]
+
+Run the following commands to containerize the microservices:
+
 [role='command']
 ```
-./scripts/packageApps.sh
+docker build -t system:1.0-SNAPSHOT system/.
+docker build -t inventory:1.0-SNAPSHOT inventory/.
+docker build -t inventory:1.0-SNAPSHOT query/.
 ```
---
-
-Build your Docker images using the provided `buildImages` script:
-
-include::{common-includes}/os-tabs.adoc[]
-
-[.tab_content.windows_section]
---
-[role='command']
-```
-.\scripts\buildImages.bat
-```
---
-
-[.tab_content.mac_section.linux_section]
---
-[role='command']
-```
-./scripts/buildImages.sh
-```
---
 
 Next, use the provided `startContainers` script to start the application in Docker containers. 
 The script creates a network for the containers to communicate with each other. 
@@ -252,11 +233,31 @@ Switching to an asynchronous programming model freed up the thread that handles 
 While requests process, the thread can handle other work or requests.
 In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint multiple systems are read and compared at once.
 
+When you are done checking out the application, run the following script to stop the application:
+
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/stopContainers.sh
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\stopContainers.bat
+```
+--
+
 // =================================================================================================
 // Testing
 // =================================================================================================
 
-== Testing the query application
+== Testing the query microservice
 
 You will create an endpoint test to test the basic functionality of the `query` microservice. 
 If a test failure occurs, then you may have introduced a bug into the code.
@@ -302,30 +303,6 @@ Results:
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ----
-
-== Tearing down the environment
-
-Navigate back to the `start` directory.
-
-Finally, use the `stopContainers` script to stop the application:
-
-include::{common-includes}/os-tabs.adoc[]
-
-[.tab_content.mac_section.linux_section]
---
-[role='command']
-```
-./scripts/stopContainers.sh
-```
---
-
-[.tab_content.windows_section]
---
-[role='command']
-```
-.\scripts\stopContainers.bat
-```
---
 
 == Great work! You're done!
 
