@@ -54,26 +54,26 @@ In the context of REST clients, HTTP request calls can be time consuming.
 The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. 
 These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application that you'll be working with is a system manager that maintains an inventory of available systems.
-It consists of three microservices, `query`, `inventory`, and `system`. 
-
-The `system` microservice records system information such as the system load.
-The `system` microservice registers itself at startup with the `inventory` microservice which keeps track of all instances of the `system` microservice. 
-Finally,the `query` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
-It communicates with the backend `inventory` microservice on the caller's behalf.
+The application in this guide consists of three microservices, `system`, `inventory`, and `query`. 
+Every 15 seconds the `system` microservice calculates and publishes an event that contains its average system load. 
+The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. 
 
 image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
 
 The microservice that you will modify is the `query` service.
-It acts as a middleman to communicate with the backend microservices.
-Whenever a request is made to the `query` service to retrieve the inventory,
-the `query` service communicates with the `inventory`service to get system information.
+It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
 
 The implementations of the application and its services are provided for you in the `start/src` directory.
-The application also uses the Apache Kafka and ZooKeeper services to distribute the system status.
+The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events.
 
-If you want to learn more about MicroProfile Rest Client, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
+If you want to learn more about reactive messaging, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
+// =================================================================================================
+// Prerequisites
+// =================================================================================================
+== Additional prerequisites
+
+You need to have Docker installed. For installation instructions, refer to the official https://docs.docker.com/get-docker/[Docker documentation^]. You will build and run the microservices in Docker containers. An installation of Apache Kafka is provided in another Docker container.
 
 // =================================================================================================
 // Getting started
@@ -102,9 +102,9 @@ include::finish/query/src/main/java/io/openliberty/guides/query/client/Inventory
 ----
 
 The changes involve the [hotspot=getSystem file=0]`getSystem` method. 
-Change the return type to `CompletionStage<Properties>` and add the annotation `@Asynchronous`.
+Change the return type to `CompletionStage<Properties>` and add the annotation [hotspot=async file=0]`@Asynchronous`.
 These changes make the method asynchronous.
-Since the method now has the return type of `CompletionStage<Properties>`, you aren't able to directly manipulate the inner `Properties`. 
+Since the method now has the return type of `CompletionStage<Properties>`, you aren't able to directly manipulate the inner type `Properties`. 
 As you will see in the next section, you will be able to indirectly use the `Properties` by chaining callbacks.
 
 == Updating a REST resource to asynchronously handle HTTP requests
@@ -133,8 +133,7 @@ JAX-RS will respond to the caller after the `CompletionStage` completes.
 A [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to keep track of how many asynchronous requests we are waiting on.
 Using the [hotspot=await file=0]`await` method, we stop and wait until all our requests are complete. 
 
-The keyword [hotspot=volatile file=0]`volatile` and the type [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` are used to store the system information.
-Together these allow us to store system information and have it safely accessed asynchronously by multiple threads. 
+Delcaring the `values` variable with [hotspot=volatile file=0]`volatile` and instantiating it as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` allows it to store system information and safely access it asynchronously from multiple threads.
 
 // =================================================================================================
 // Building the application
