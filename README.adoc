@@ -148,7 +148,7 @@ Install Docker by following the instructions on the official https://docs.docker
 
 Start your Docker environment. Dockerfiles are provided for you to use.
 
-To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
+To build the application, run the Maven `install` and `package` goals from the command-line session in the `start` directory:
 
 [role='command']
 ```
