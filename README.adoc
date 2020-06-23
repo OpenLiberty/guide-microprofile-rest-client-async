@@ -58,7 +58,7 @@ The application in this guide consists of three microservices, `system`, `invent
 Every 15 seconds the `system` microservice calculates and publishes an event that contains its average system load. 
 The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. 
 
-image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
+image::reactive-inventory-system.png[Reactive Inventory System,width=343,height=465,align="center"]
 
 The microservice that you will modify is the `query` service.
 It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
