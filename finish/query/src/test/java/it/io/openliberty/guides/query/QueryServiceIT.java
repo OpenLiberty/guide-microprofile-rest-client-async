@@ -56,7 +56,9 @@ public class QueryServiceIT {
                                          .withPath("/inventory/systems"))
                                      .respond(HttpResponse.response()
                                          .withStatusCode(200)
-                                         .withBody("[\"testHost1\", \"testHost2\", \"testHost3\"]")
+                                         .withBody("[\"testHost1\"," + 
+                                                    "\"testHost2\"," +
+                                                    "\"testHost3\"]")
                                          .withHeader("Content-Type", "application/json"));
 
         AppContainerConfig.mockClient.when(HttpRequest.request()
