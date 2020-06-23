@@ -63,9 +63,7 @@ image::reactive-inventory-system.png[Reactive Inventory System,align="center"]
 The microservice that you will modify is the `query` service.
 It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
 
-The implementations of the application and its services are provided for you in the `start/src` directory.
-The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events.
-
+The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events. 
 If you want to learn more about reactive messaging, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
 
 // =================================================================================================
@@ -144,8 +142,6 @@ Delcaring the `values` variable with [hotspot=volatile file=0]`volatile` and ins
 You will build and run the `system`, `inventory`, and `query` microservices in Docker containers. 
 You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
-Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
-
 Start your Docker environment. Dockerfiles are provided for you to use.
 
 To build the application, run the Maven `install` and `package` goals from the command-line session in the `start` directory:
@@ -164,7 +160,7 @@ Run the following commands to containerize the microservices:
 ```
 docker build -t system:1.0-SNAPSHOT system/.
 docker build -t inventory:1.0-SNAPSHOT inventory/.
-docker build -t inventory:1.0-SNAPSHOT query/.
+docker build -t query:1.0-SNAPSHOT query/.
 ```
 
 Next, use the provided `startContainers` script to start the application in Docker containers. 
