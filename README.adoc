@@ -226,7 +226,7 @@ The output will be similar to the following. The given example has been formatte
 
 Switching to an asynchronous programming model freed up the thread that handles requests to the inventory service. 
 While requests process, the thread can handle other work or requests.
-In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint multiple systems are read and compared at once.
+In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint, multiple systems are read and compared at once.
 
 When you are done checking out the application, run the following script to stop the application:
 
