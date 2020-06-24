@@ -107,7 +107,8 @@ As you will see in the next section, you will be able to indirectly use the `Pro
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `Properties` type, you can return a `CompletionStage<Properties>` type. 
+JAX-RS resources can also have asynchronous methods. 
+These would return a `CompletionStage<Properties>` type instead of a a `Properties` type. 
 Completion stages can be chained together by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]
