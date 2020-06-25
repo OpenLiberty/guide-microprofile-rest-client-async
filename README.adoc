@@ -17,7 +17,7 @@
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile']
 :page-permalink: /guides/{projectid}
-:page-related-guides: ['microprofile-rest-client']
+:page-related-guides: ['microprofile-reactive-messaging', 'jax-rs-reactive-client']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :imagesdir: /img/guide/{projectid}
 :source-highlighter: prettify
@@ -64,7 +64,7 @@ The microservice that you will modify is the `query` service.
 It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
 
 The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events. 
-If you want to learn more about reactive messaging, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
+If you want to learn more about reactive messaging, you can read the https://openliberty.io/guides/microprofile-reactive-messaging.html[Creating Reactive Java Microservices^] guide.
 
 // =================================================================================================
 // Prerequisites
@@ -107,7 +107,8 @@ As you will see in the next section, you will be able to indirectly use the `Pro
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
-JAX-RS resources can also have asynchronous methods. So instead of returning a `Properties` type, you can return a `CompletionStage<Properties>` type. 
+JAX-RS resources can also have asynchronous methods. 
+These would return a `CompletionStage<Properties>` type instead of a a `Properties` type. 
 Completion stages can be chained together by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]
@@ -186,29 +187,11 @@ include::{common-includes}/os-tabs.adoc[]
 ```
 --
 
-The services take some time to become available. Check if they're available by running the following command:
+The services take some time to become available. 
+You can access the application by making requests to the `query/systemLoad` endpoint by accessing https://localhost:9080/query/systemLoad[localhost:9080/query/systemLoad^].
 
-[role='command']
-```
-docker exec -it inventory cat /logs/messages.log
-```
-
-The application is ready when you see messages similar to the following:
-
-[source, role='no_copy']
-----
-Host d95127348814 was updated: CpuLoadAverage: {"hostname":"d95127348814","loadAverage":14.7}
-----
-
-Access the application by using `curl` commands as follows:
-
-[role='command']
-```
-curl -X GET localhost:9080/query/systemLoad
-```
-
-If `curl` is not available, the Postman application can also be used.
-The output will be similar to the following. The given example has been formatted for readability. 
+When the service is ready, you will see an output similar to the following.
+The given example has been formatted for readability. 
 
 [source, role='no_copy']
 ----
@@ -226,7 +209,7 @@ The output will be similar to the following. The given example has been formatte
 
 Switching to an asynchronous programming model freed up the thread that handles requests to the inventory service. 
 While requests process, the thread can handle other work or requests.
-In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint multiple systems are read and compared at once.
+In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint, multiple systems are read and compared at once.
 
 When you are done checking out the application, run the following script to stop the application:
 
