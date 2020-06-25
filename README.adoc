@@ -188,16 +188,9 @@ include::{common-includes}/os-tabs.adoc[]
 --
 
 The services take some time to become available. 
-When the service is available you can access the application by using a `curl` command as follows:
+You can access the application by making requests to the `query/systemLoad` endpoint by accessing https://localhost:9080/query/systemLoad[localhost:9080/query/systemLoad^].
 
-[role='command']
-```
-curl -X GET localhost:9080/query/systemLoad
-```
-
-If `curl` is not available, the Postman application can also be used.
-If the output is empty, the service may not be available yet and additional waiting may be required. 
-The expected output will be similar to the following. 
+When the service is ready, you will see an output similar to the following.
 The given example has been formatted for readability. 
 
 [source, role='no_copy']
