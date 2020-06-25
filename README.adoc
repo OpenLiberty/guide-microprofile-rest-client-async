@@ -64,7 +64,7 @@ The microservice that you will modify is the `query` service.
 It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
 
 The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events. 
-If you want to learn more about reactive messaging, you can read the https://openliberty.io/guides/microprofile-rest-client.html[Consuming RESTful services with template interfaces^] guide.
+If you want to learn more about reactive messaging, you can read the https://openliberty.io/guides/microprofile-reactive-messaging.html[Creating Reactive Java Microservices^] guide.
 
 // =================================================================================================
 // Prerequisites
