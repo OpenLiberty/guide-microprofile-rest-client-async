@@ -100,15 +100,14 @@ include::finish/query/src/main/java/io/openliberty/guides/query/client/Inventory
 ----
 
 The changes involve the [hotspot=getSystem file=0]`getSystem` method. 
-Change the return type to `CompletionStage<Properties>` and add the annotation [hotspot=async file=0]`@Asynchronous`.
-These changes make the method asynchronous.
+Change the return type to `CompletionStage<Properties>` to make the method asynchronous.
 Since the method now has the return type of `CompletionStage<Properties>`, you aren't able to directly manipulate the inner type `Properties`. 
 As you will see in the next section, you will be able to indirectly use the `Properties` by chaining callbacks.
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
 JAX-RS resources can also have asynchronous methods. 
-These would return a `CompletionStage<Properties>` type instead of a a `Properties` type. 
+These would return a `CompletionStage<Map<String, Properties>>` type instead of a `Map<String, Properties>` type. 
 Completion stages can be chained together by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
 
 [role="code_command hotspot", subs="quotes"]

@@ -22,7 +22,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("/inventory")
@@ -38,9 +37,6 @@ public interface InventoryClient extends AutoCloseable {
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    // tag::async[]
-    @Asynchronous
-    // end::async[]
     public CompletionStage<Properties> getSystem(@PathParam("hostname") String hostname);
     // end::getSystem[]
 
