@@ -187,7 +187,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 
 The services take some time to become available. 
-You can access the application by making requests to the `query/systemLoad` endpoint by accessing https://localhost:9080/query/systemLoad[localhost:9080/query/systemLoad^].
+You can access the application by making requests to the `query/systemLoad` endpoint by accessing http://localhost:9080/query/systemLoad[localhost:9080/query/systemLoad^].
 
 When the service is ready, you will see an output similar to the following.
 The given example has been formatted for readability. 
