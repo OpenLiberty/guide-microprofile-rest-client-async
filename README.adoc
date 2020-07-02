@@ -129,7 +129,7 @@ When you return a `CompletionStage` type in the resource, it doesn’t necessari
 JAX-RS responds to the caller after the `CompletionStage` completes.
 
 A [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to track how many asynchronous requests that you're waiting on.
-Using the [hotspot=await file=0]`await` method, we stop and wait until all our requests are complete. 
+By using the [hotspot=await file=0]`await` method, the program stops and waits until all our requests are complete. 
 
 Delcaring the `values` variable with the [hotspot=volatile file=0]`volatile` keyword and instantiating it as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` object allows it to store system information and safely access that information asynchronously from multiple threads.
 
