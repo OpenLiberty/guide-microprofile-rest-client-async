@@ -128,8 +128,14 @@ Exceptions are handled in a callback provided to the [hotspot=exceptionally file
 When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
 JAX-RS responds to the caller after the `CompletionStage` completes.
 
-A [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to track how many asynchronous requests that you're waiting on.
-By using the [hotspot=await file=0]`await` method, the program stops and waits until all our requests are complete. 
+This application will get all the hostnames by calling [hotspot=getSystems file=0]`getSystems`.
+Then it loops through each hostname and calls [[hotspot=getSystem file=0]`getSystem` on each one. 
+This returns a `CompletionStage` interface which we process asynchronously in the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync` method. 
+
+In this method we use a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` to keep track of our asynchronous requests. 
+The [hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` counts down whenever a request is complete.
+When it gets to zero, we know that all our requests are complete.
+Then by using the [hotspot=await file=0]`await` method of the `CountDownLatch`, the program waits for all the requests to be complete before it continues.
 
 Declaring the `values` variable with the [hotspot=volatile file=0]`volatile` keyword and instantiating it as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` object allows it to store system information and safely access that information asynchronously from multiple threads.
 
