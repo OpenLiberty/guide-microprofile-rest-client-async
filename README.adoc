@@ -129,7 +129,7 @@ When you return a `CompletionStage` type in the resource, it doesn’t necessari
 JAX-RS responds to the caller after the `CompletionStage` completes.
 
 This application will get all the hostnames by calling [hotspot=getSystems file=0]`getSystems`.
-Then it loops through each hostname and calls [[hotspot=getSystem file=0]`getSystem` on each one. 
+Then it loops through each hostname and calls [hotspot=getSystem file=0]`getSystem` on each one. 
 This returns a `CompletionStage` interface which we process asynchronously in the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync` method. 
 
 In this method we use a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` to keep track of our asynchronous requests. 
