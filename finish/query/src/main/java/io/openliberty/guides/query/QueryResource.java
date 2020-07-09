@@ -99,14 +99,7 @@ public class QueryResource {
             // tag::concurrentHashMap[]
             this.values = new ConcurrentHashMap<String, Properties>();
             // end::concurrentHashMap[]
-            
-            // Initialize highest and lowest values
-            this.values.put("highest", new Properties());
-            this.values.put("lowest", new Properties());
-            this.values.get("highest").put("hostname", "temp_max");
-            this.values.get("lowest").put("hostname", "temp_min");
-            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
-            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
+            init();
         }
 
         public void updateHighest(Properties p) {
@@ -127,6 +120,16 @@ public class QueryResource {
             if (load.compareTo(lowest) < 0) {
                 this.values.put("lowest", p);
             }
+        }
+
+        private void init() {
+            // Initialize highest and lowest values
+            this.values.put("highest", new Properties());
+            this.values.put("lowest", new Properties());
+            this.values.get("highest").put("hostname", "temp_max");
+            this.values.get("lowest").put("hostname", "temp_min");
+            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
+            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
         }
     }
     // end::holder[]
