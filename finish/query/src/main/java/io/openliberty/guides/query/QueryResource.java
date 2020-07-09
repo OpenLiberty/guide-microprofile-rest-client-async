@@ -89,6 +89,7 @@ public class QueryResource {
     }
     // end::systemLoad[]
 
+    // tag::holder[]
     private class Holder {
         // tag::volatile[]
         public volatile Map<String, Properties> values;
@@ -128,4 +129,5 @@ public class QueryResource {
             }
         }
     }
+    // end::holder[]
 }
