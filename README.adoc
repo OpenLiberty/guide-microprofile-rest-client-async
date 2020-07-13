@@ -123,8 +123,7 @@ include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.ja
 ----
 
 The [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
-Then it loops through each hostname and calls [hotspot=getSystem file=0]`getSystem()` on each one. 
-This returns a `CompletionStage` interface which is processed asynchronously in the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
+Each hostname is asynchronously processed using the method [hotspot=getSystem file=0]`getSystem()` and the method [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` from the `CompletionStage` interface.
 
 The `CompletionStage` interface represents a unit of computation.
 After a computation is complete, it can be either finished or chained with more `CompletionStage` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
@@ -134,8 +133,9 @@ JAX-RS responds to the caller after the `CompletionStage` completes.
 
 In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to keep track of the asynchronous requests. 
 The [hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` counts down whenever a request is complete.
-The `CountDownLatch` being at zero indicates that all requests are complete.
-By using the [hotspot=await file=0]`await()` method of the `CountDownLatch`, the program waits for all the requests to be complete before it continues.
+The `CountDownLatch` being at zero indicates that all asynchronous requests are complete.
+By using the [hotspot=await file=0]`await()` method of the `CountDownLatch`, the program waits for all the asynchronous requests to be complete.
+When all asynchronous requests are complete, the program will resume execution with all required data processed. 
 
 A [hotspot=holder file=0]`Holder` class is used to wrap a variable called `values` which has the [hotspot=volatile file=0]`volatile` keyword.
 The variable `values` is instantiated as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap`.
