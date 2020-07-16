@@ -1,4 +1,4 @@
-// Copyright (c) 2019 IBM Corporation and others.
+// Copyright (c) 2019, 2020 IBM Corporation and others.
 // Licensed under Creative Commons Attribution-NoDerivatives
 // 4.0 International (CC BY-ND 4.0)
 //   https://creativecommons.org/licenses/by-nd/4.0/
@@ -123,8 +123,8 @@ include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.ja
 ----
 
 The [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
-Multiple requests will be sent to the client service for each hostname asynchronously by the [hotspot=getSystem file=0]`getSystem()` method.
-When the client service returns, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method will process the returned data with the `CompletionStage<Properties>` interface.
+In the [hotspot=getSystem file=0]`getSystem()` method, multiple requests are sent to the `inventory` service for each hostname asynchronously. 
+When the requests return, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method processes the returned data with the `CompletionStage<Properties>` interface.
 
 The `CompletionStage<Properties>` interface represents a unit of computation.
 After a computation is complete, it can be either finished or chained with more `CompletionStage<Properties>` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
