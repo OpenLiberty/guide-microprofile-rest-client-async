@@ -123,7 +123,8 @@ include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.ja
 ----
 
 The [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
-Each hostname is asynchronously processed using the method [hotspot=getSystem file=0]`getSystem()` and the method [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` from the `CompletionStage` interface.
+Multiple requests will be sent to the client service for each hostname asynchronously by the [hotspot=getSystem file=0]`getSystem()` method.
+When a client returns, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method will process the returned data with the `CompletionStage<Properties>` interface.
 
 The `CompletionStage` interface represents a unit of computation.
 After a computation is complete, it can be either finished or chained with more `CompletionStage` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
