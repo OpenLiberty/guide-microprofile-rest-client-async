@@ -124,13 +124,13 @@ include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.ja
 
 The [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
 Multiple requests will be sent to the client service for each hostname asynchronously by the [hotspot=getSystem file=0]`getSystem()` method.
-When a client returns, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method will process the returned data with the `CompletionStage<Properties>` interface.
+When the client service returns, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method will process the returned data with the `CompletionStage<Properties>` interface.
 
-The `CompletionStage` interface represents a unit of computation.
-After a computation is complete, it can be either finished or chained with more `CompletionStage` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
+The `CompletionStage<Properties>` interface represents a unit of computation.
+After a computation is complete, it can be either finished or chained with more `CompletionStage<Properties>` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
 Exceptions are handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves like a catch block.
-When you return a `CompletionStage` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
-JAX-RS responds to the caller after the `CompletionStage` completes.
+When you return a `CompletionStage<Properties>` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
+JAX-RS responds to the caller after the computation completes.
 
 In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to keep track of the asynchronous requests. 
 The [hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` counts down whenever a request is complete.
