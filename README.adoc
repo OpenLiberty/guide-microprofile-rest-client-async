@@ -106,9 +106,9 @@ As you will see in the next section, you're able to indirectly use the `Properti
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
-JAX-RS resources can also have asynchronous methods. 
-These methods would return a `CompletionStage<Map<String, Properties>>` type instead of a `Map<String, Properties>` type. 
-`CompletionStage` interfaces can be chained together by using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method.
+To reduce the processing time, you will update the `/query/systemLoad` endpoint to send the requests asynchronously. 
+Multiple client requests will be sent synchronously in a loop.
+Since asynchronous calls do not block the program, the endpoint need to ensure that all calls are completed and all returned data is processed before proceeding.
 
 [role="code_command hotspot", subs="quotes"]
 ----
