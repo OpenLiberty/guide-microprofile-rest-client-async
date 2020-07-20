@@ -106,9 +106,9 @@ As you will see in the next section, you're able to indirectly use the `Properti
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
-To reduce the processing time, you will update the `/query/systemLoad` endpoint to send the requests asynchronously. 
+To reduce the processing time, you will update the `/query/systemLoad` endpoint to asynchronously send the requests. 
 Multiple client requests will be sent synchronously in a loop.
-Since asynchronous calls do not block the program, the endpoint need to ensure that all calls are completed and all returned data is processed before proceeding.
+Since asynchronous calls do not block the program, the endpoint needs to ensure that all calls are completed and all returned data is processed before proceeding.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -122,25 +122,25 @@ QueryResource.java
 include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.java[]
 ----
 
-The [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
-In the [hotspot=getSystem file=0]`getSystem()` method, multiple requests are sent to the `inventory` service for each hostname asynchronously. 
+First, the [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
+In the [hotspot=getSystem file=0]`getSystem()` method, multiple requests are sent asynchronously to the `inventory` service for each hostname.
 When the requests return, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method processes the returned data with the `CompletionStage<Properties>` interface.
 
 The `CompletionStage<Properties>` interface represents a unit of computation.
-After a computation is complete, it can be either finished or chained with more `CompletionStage<Properties>` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
-Exceptions are handled in a callback provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves like a catch block.
+After a computation is complete, it can either be finished or it can be chained with more `CompletionStage<Properties>` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
+Exceptions are handled in a callback that is provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves like a catch block.
 When you return a `CompletionStage<Properties>` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
 JAX-RS responds to the caller after the computation completes.
 
-In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is used to keep track of the asynchronous requests. 
+In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` object is used to track asynchronous requests. 
 The [hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` counts down whenever a request is complete.
-The `CountDownLatch` being at zero indicates that all asynchronous requests are complete.
+When the `CountDownLatch` is at zero, it indicates that all asynchronous requests are complete.
 By using the [hotspot=await file=0]`await()` method of the `CountDownLatch`, the program waits for all the asynchronous requests to be complete.
-When all asynchronous requests are complete, the program will resume execution with all required data processed. 
+When all asynchronous requests are complete, the program resumes execution with all required data processed. 
 
-A [hotspot=holder file=0]`Holder` class is used to wrap a variable called `values` which has the [hotspot=volatile file=0]`volatile` keyword.
-The variable `values` is instantiated as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap`.
-Together this allows the `Holder` class to store the system information and safely access it asynchronously from multiple threads.
+A [hotspot=holder file=0]`Holder` class is used to wrap a variable called `values` that has the [hotspot=volatile file=0]`volatile` keyword.
+The `values` variable is instantiated as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` object.
+Together, the `volatile` keyword and `ConcurrentHashMap` type allow the `Holder` class to store system information and safely access it asynchronously from multiple threads.
 
 // =================================================================================================
 // Building the application
