@@ -133,9 +133,9 @@ When you return a `CompletionStage<Properties>` type in the resource, it doesnâ€
 JAX-RS responds to the caller after the computation completes.
 
 In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` object is used to track asynchronous requests. 
-The [hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` counts down whenever a request is complete.
-When the `CountDownLatch` is at zero, it indicates that all asynchronous requests are complete.
-By using the [hotspot=await file=0]`await()` method of the `CountDownLatch`, the program waits for all the asynchronous requests to be complete.
+The [hotspot=countdown2 hotspot=countdown3 file=0]`countDown()` method is called whenever a request is complete.
+When the [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is at zero, it indicates that all asynchronous requests are complete.
+By using the [hotspot=await file=0]`await()` method of the [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch`, the program waits for all the asynchronous requests to be complete.
 When all asynchronous requests are complete, the program resumes execution with all required data processed. 
 
 A [hotspot=holder file=0]`Holder` class is used to wrap a variable called `values` that has the [hotspot=volatile file=0]`volatile` keyword.
