@@ -43,14 +43,18 @@ public class QueryResource {
     @Path("/systemLoad")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Properties> systemLoad() {
+        // tag::getSystems[]
         List<String> systems = inventoryClient.getSystems();
+        // end::getSystems[]
         // tag::countdown1[]
         CountDownLatch remainingSystems = new CountDownLatch(systems.size());
         // end::countdown1[]
         final Holder systemLoads = new Holder();
 
         for (String system : systems) {
+            // tag::getSystem[]
             inventoryClient.getSystem(system)
+            // end::getSystem[]
                            // tag::thenAcceptAsync[]
                            .thenAcceptAsync(p -> {
                                 if (p != null) {
@@ -85,6 +89,7 @@ public class QueryResource {
     }
     // end::systemLoad[]
 
+    // tag::holder[]
     private class Holder {
         // tag::volatile[]
         public volatile Map<String, Properties> values;
@@ -94,14 +99,7 @@ public class QueryResource {
             // tag::concurrentHashMap[]
             this.values = new ConcurrentHashMap<String, Properties>();
             // end::concurrentHashMap[]
-            
-            // Initialize highest and lowest values
-            this.values.put("highest", new Properties());
-            this.values.put("lowest", new Properties());
-            this.values.get("highest").put("hostname", "temp_max");
-            this.values.get("lowest").put("hostname", "temp_min");
-            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
-            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
+            init();
         }
 
         public void updateHighest(Properties p) {
@@ -123,5 +121,16 @@ public class QueryResource {
                 this.values.put("lowest", p);
             }
         }
+
+        private void init() {
+            // Initialize highest and lowest values
+            this.values.put("highest", new Properties());
+            this.values.put("lowest", new Properties());
+            this.values.get("highest").put("hostname", "temp_max");
+            this.values.get("lowest").put("hostname", "temp_min");
+            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
+            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
+        }
     }
+    // end::holder[]
 }
