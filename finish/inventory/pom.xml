@@ -1,91 +1,90 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>io.openliberty.guides</groupId>
-        <artifactId>reactive-demo</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
-
+    <groupId>io.openliberty.guides</groupId>
     <artifactId>inventory</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Liberty configuration -->
+        <liberty.var.default.http.port>9085</liberty.var.default.http.port>
+        <liberty.var.default.https.port>9448</liberty.var.default.https.port>
+    </properties>
+    
     <dependencies>
+        <!-- Provided dependencies -->
         <dependency>
-            <groupId>io.openliberty.guides</groupId>
-            <artifactId>models</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.openliberty.features</groupId>
-            <artifactId>concurrent-1.0</artifactId>
-            <type>esa</type>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>8.0.0</version>
             <scope>provided</scope>
         </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>jaxrs-2.1</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>cdi-2.0</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
-       <dependency>
-           <groupId>org.eclipse.microprofile.rest.client</groupId>
-           <artifactId>microprofile-rest-client-api</artifactId>
-       </dependency>
-       <dependency>
-           <groupId>io.openliberty.features</groupId>
-           <artifactId>mpConfig-1.4</artifactId>
-           <type>esa</type>
-           <scope>provided</scope>
-       </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <groupId>javax.enterprise.concurrent</groupId>
+            <artifactId>javax.enterprise.concurrent-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.eclipse.microprofile</groupId>
+            <artifactId>microprofile</artifactId>
+            <version>3.3</version>
+            <type>pom</type>
+            <scope>provided</scope>
         </dependency>
+        <!-- tag::reactiveMessaging[] -->
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-extension-providers</artifactId>
+            <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
+            <artifactId>microprofile-reactive-messaging-api</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
+        <!-- end::reactiveMessaging[] -->
+        
+        <!--  Required dependencies -->
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-client</artifactId>
+           <groupId>io.openliberty.guides</groupId>
+           <artifactId>models</artifactId>
+           <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-        </dependency>
+        <!-- tag::kafka[] -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.12</artifactId>
+            <artifactId>kafka-clients</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <!-- end::kafka[] -->
+        <!-- tag::rxjava[] -->
+        <dependency>
+             <groupId>io.reactivex.rxjava3</groupId>
+             <artifactId>rxjava</artifactId>
+             <version>3.0.0</version>
+        </dependency>
+        <!-- end::rxjava[] -->
+        <!-- For tests -->
+        <dependency>
+            <groupId>org.microshed</groupId>
+            <artifactId>microshed-testing-liberty</artifactId>
+            <version>0.9</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>runtime</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <version>1.14.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <!-- Support for JDK 9 and above -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.6.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -95,44 +94,39 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>net.wasdev.wlp.maven.plugins</groupId>
-                <artifactId>liberty-maven-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
-                    <configFile>src/main/liberty/config/server.xml</configFile>
-                    <include>usr</include>
-                    <bootstrapProperties>
-                        <default.http.port>${http.port}</default.http.port>
-                        <default.https.port>${https.port}</default.https.port>
-                    </bootstrapProperties>
+                    <packagingExcludes>pom.xml</packagingExcludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>install-apps</id>
-                        <configuration>
-                            <appsDirectory>apps</appsDirectory>
-                            <stripVersion>true</stripVersion>
-                            <installAppPackages>project</installAppPackages>
-                            <looseApplication>true</looseApplication>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>package-server</id>
-                        <configuration>
-                            <packageFile>${project.build.directory}/inventory.tar.gz</packageFile>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
-            <!-- for tests -->
+
+            <!-- Liberty plugin -->
+            <plugin>
+                <groupId>io.openliberty.tools</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>3.2.2</version>
+            </plugin>
+
+            <!-- Plugin to run unit tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
             </plugin>
+
+            <!-- Plugin to run integration tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
