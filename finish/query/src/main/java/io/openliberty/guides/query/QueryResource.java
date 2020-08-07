@@ -68,6 +68,7 @@ public class QueryResource {
                            // end::thenAcceptAsync[]
                            // tag::exceptionally[]
                            .exceptionally(ex -> {
+                                ex.printStackTrace();
                                 // tag::countdown3[]
                                 remainingSystems.countDown();
                                 // end::countdown3[]
