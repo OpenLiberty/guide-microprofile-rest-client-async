@@ -103,7 +103,7 @@ public class QueryResource {
             init();
         }
 
-        public void updateHighest(Properties p) {
+        public synchronized void updateHighest(Properties p) {
             BigDecimal load = (BigDecimal) p.get("systemLoad");
             BigDecimal highest = (BigDecimal) this.values
                                                   .get("highest")
@@ -113,7 +113,7 @@ public class QueryResource {
             }
         }
 
-        public void updateLowest(Properties p) {
+        public synchronized void updateLowest(Properties p) {
             BigDecimal load = (BigDecimal) p.get("systemLoad");
             BigDecimal lowest = (BigDecimal) this.values
                                                  .get("lowest")
