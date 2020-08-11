@@ -86,14 +86,14 @@ public class QueryResource {
             e.printStackTrace();
         }
 
-        return systemLoads.values;
+        return systemLoads.getValues();
     }
     // end::systemLoad[]
 
     // tag::holder[]
     private class Holder {
         // tag::volatile[]
-        public volatile Map<String, Properties> values;
+        private volatile Map<String, Properties> values;
         // end::volatile[]
 
         public Holder() {
@@ -101,6 +101,10 @@ public class QueryResource {
             this.values = new ConcurrentHashMap<String, Properties>();
             // end::concurrentHashMap[]
             init();
+        }
+
+        public Map<String, Properties> getValues() {
+            return this.values;
         }
 
         public synchronized void updateHighest(Properties p) {
