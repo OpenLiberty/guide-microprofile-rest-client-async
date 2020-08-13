@@ -58,8 +58,7 @@ public class QueryResource {
                            // tag::thenAcceptAsync[]
                            .thenAcceptAsync(p -> {
                                 if (p != null) {
-                                    systemLoads.updateHighest(p);
-                                    systemLoads.updateLowest(p);
+                                    systemLoads.updateValues(p);
                                 }
                                 // tag::countdown2[]
                                 remainingSystems.countDown();
@@ -107,24 +106,30 @@ public class QueryResource {
             return this.values;
         }
 
-        public synchronized void updateHighest(Properties p) {
-            BigDecimal load = (BigDecimal) p.get("systemLoad");
-            BigDecimal highest = (BigDecimal) this.values
-                                                  .get("highest")
-                                                  .get("systemLoad");
-            if (load.compareTo(highest) > 0) {
-                this.values.put("highest", p);
-            }
-        }
+        public void updateValues(Properties p) {
+            final BigDecimal load = (BigDecimal) p.get("systemLoad");
+            System.out.println("Read load " + load);
 
-        public synchronized void updateLowest(Properties p) {
-            BigDecimal load = (BigDecimal) p.get("systemLoad");
-            BigDecimal lowest = (BigDecimal) this.values
-                                                 .get("lowest")
-                                                 .get("systemLoad");
-            if (load.compareTo(lowest) < 0) {
-                this.values.put("lowest", p);
-            }
+            this.values.computeIfPresent("lowest", (key, curr_val) -> {
+                BigDecimal lowest = (BigDecimal) curr_val.get("systemLoad");
+                System.out.println("Read lowest");
+                if (load.compareTo(lowest) < 0) {
+                    System.out.println("Updated lowest to " + load);
+                    return p;
+                } else {
+                    return curr_val;
+                }
+            });
+            this.values.computeIfPresent("highest", (key, curr_val) -> {
+                BigDecimal highest = (BigDecimal) curr_val.get("systemLoad");
+                System.out.println("Read highest");
+                if (load.compareTo(highest) > 0) {
+                    System.out.println("Updated highest to " + load);
+                    return p;
+                } else {
+                    return curr_val;
+                }
+            });
         }
 
         private void init() {
