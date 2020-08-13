@@ -108,13 +108,10 @@ public class QueryResource {
 
         public void updateValues(Properties p) {
             final BigDecimal load = (BigDecimal) p.get("systemLoad");
-            System.out.println("Read load " + load);
 
             this.values.computeIfPresent("lowest", (key, curr_val) -> {
                 BigDecimal lowest = (BigDecimal) curr_val.get("systemLoad");
-                System.out.println("Read lowest");
                 if (load.compareTo(lowest) < 0) {
-                    System.out.println("Updated lowest to " + load);
                     return p;
                 } else {
                     return curr_val;
@@ -122,9 +119,7 @@ public class QueryResource {
             });
             this.values.computeIfPresent("highest", (key, curr_val) -> {
                 BigDecimal highest = (BigDecimal) curr_val.get("systemLoad");
-                System.out.println("Read highest");
                 if (load.compareTo(highest) > 0) {
-                    System.out.println("Updated highest to " + load);
                     return p;
                 } else {
                     return curr_val;
