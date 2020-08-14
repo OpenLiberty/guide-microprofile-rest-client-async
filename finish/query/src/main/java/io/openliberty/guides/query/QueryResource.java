@@ -111,19 +111,11 @@ public class QueryResource {
 
             this.values.computeIfPresent("lowest", (key, curr_val) -> {
                 BigDecimal lowest = (BigDecimal) curr_val.get("systemLoad");
-                if (load.compareTo(lowest) < 0) {
-                    return p;
-                } else {
-                    return curr_val;
-                }
+                return load.compareTo(lowest) < 0 ? p : curr_val;
             });
             this.values.computeIfPresent("highest", (key, curr_val) -> {
                 BigDecimal highest = (BigDecimal) curr_val.get("systemLoad");
-                if (load.compareTo(highest) > 0) {
-                    return p;
-                } else {
-                    return curr_val;
-                }
+                return load.compareTo(highest) > 0 ? p : curr_val;
             });
         }
 
