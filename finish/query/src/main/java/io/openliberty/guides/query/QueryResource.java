@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -79,7 +80,7 @@ public class QueryResource {
         // Wait for all remaining systems to be checked
         try {
             // tag::await[]
-            remainingSystems.await();
+            remainingSystems.await(30, TimeUnit.SECONDS);
             // end::await[]
         } catch (InterruptedException e) {
             e.printStackTrace();
