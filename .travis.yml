@@ -6,9 +6,9 @@ before_script:
 script: 
 - ../scripts/travisTest.sh
 after_script:
-- if [ "$TRAVIS_TEST_RESULT" -eq 0 ]; then result="passed"; else result="failed"; fi;
-- echo -e "\n"\
-  "\033[1;34m Result: $result \033[0m \n"\
+- docker images
+- if [[ "$TRAVIS_TEST_RESULT" == "0" ]]; then RESULT="passed"; else RESULT="failed"; fi
+- echo -e "\033[1;34m result:\033[0m\033[1;36m $RESULT \033[0m \n"
 notifications:
   slack:
     template:
