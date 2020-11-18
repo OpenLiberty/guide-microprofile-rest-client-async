@@ -53,7 +53,7 @@ public class InventoryServiceIT {
     @Test
     public void testCpuUsage() throws InterruptedException {
         SystemLoad sl = new SystemLoad("localhost", 1.1);
-        producer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", sl));
+        producer.send(new ProducerRecord<String, SystemLoad>("system.load", sl));
         Thread.sleep(5000);
         List<String> response = inventoryResource.getSystems();
         assertNotNull(response);
