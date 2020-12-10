@@ -9,6 +9,8 @@ do
     esac
 done
 
+echo "Testing daily OpenLiberty image"
+
 sed -i "\#<artifactId>liberty-maven-plugin</artifactId>#a<configuration><install><runtimeUrl>https://public.dhe.ibm.com/ibmdl/export/pub/software/openliberty/runtime/nightly/"$DATE"/"$DRIVER"</runtimeUrl></install></configuration>" system/pom.xml query/pom.xml inventory/pom.xml
 cat system/pom.xml query/pom.xml inventory/pom.xml
 
@@ -16,5 +18,15 @@ sed -i "s;FROM openliberty/open-liberty:kernel-java8-openj9-ubi;FROM "$DOCKER_US
 cat system/Dockerfile query/Dockerfile inventory/Dockerfile
 
 docker pull $DOCKER_USERNAME"/olguides:"$BUILD
+
+../scripts/testApp.sh
+
+echo "Testing latest OL Docker image"
+
+sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:latest;g" system/Dockerfile query/Dockerfile inventory/Dockerfile
+
+cat system/Dockerfile query/Dockerfile inventory/Dockerfile
+
+docker pull "openliberty/daily:latest"
 
 ../scripts/testApp.sh
