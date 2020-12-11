@@ -1,7 +1,3 @@
-# This workflow will test the guide application.
-# For more information about building and testing Java,
-# see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
 name: Test application
 
 on:
