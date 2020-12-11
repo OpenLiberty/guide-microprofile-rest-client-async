@@ -19,16 +19,16 @@ cat system/Dockerfile query/Dockerfile inventory/Dockerfile
 
 docker pull $DOCKER_USERNAME"/olguides:"$BUILD
 
-sudo ../scripts/testApp.sh
+../scripts/testApp.sh
 
 sleep 15
 
 echo "Testing latest OL Docker image"
 
-sed -i "s;FROM "FROM openliberty/open-liberty:kernel-java8-openj9-ubi;FROM openliberty/daily:latest;g" system/Dockerfile query/Dockerfile inventory/Dockerfile
+sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:latest;g" system/Dockerfile query/Dockerfile inventory/Dockerfile
 
 cat system/Dockerfile query/Dockerfile inventory/Dockerfile
 
 docker pull "openliberty/daily:latest"
 
-sudo ../scripts/testApp.sh
+../scripts/testApp.sh
