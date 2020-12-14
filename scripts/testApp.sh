@@ -31,3 +31,7 @@ else
 fi
 
 ./scripts/stopContainers.sh
+
+docker image remove system:1.0-SNAPSHOT
+docker image remove inventory:1.0-SNAPSHOT
+docker image remove query:1.0-SNAPSHOT
