@@ -21,8 +21,6 @@ docker pull $DOCKER_USERNAME"/olguides:"$BUILD
 
 ../scripts/testApp.sh
 
-sleep 15
-
 echo "Testing latest OL Docker image"
 
 sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:latest;g" system/Dockerfile query/Dockerfile inventory/Dockerfile
