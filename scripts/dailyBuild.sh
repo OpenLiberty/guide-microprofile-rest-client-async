@@ -19,7 +19,7 @@ cat system/Dockerfile query/Dockerfile inventory/Dockerfile
 
 docker pull $DOCKER_USERNAME"/olguides:"$BUILD
 
-../scripts/testApp.sh
+sudo ../scripts/testApp.sh
 
 echo "Testing latest OL Docker image"
 
@@ -29,4 +29,4 @@ cat system/Dockerfile query/Dockerfile inventory/Dockerfile
 
 docker pull "openliberty/daily:latest"
 
-../scripts/testApp.sh
+sudo ../scripts/testApp.sh
