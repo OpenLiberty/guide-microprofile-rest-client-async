@@ -3,9 +3,9 @@ set -euxo pipefail
 
 ./scripts/packageApps.sh
 
-mvn -pl system verify -e
-mvn -pl inventory verify -e
-mvn -pl query verify -e
+mvn -pl system verify
+mvn -pl inventory verify
+mvn -pl query verify
 
 ./scripts/buildImages.sh
 ./scripts/startContainers.sh
