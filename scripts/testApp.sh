@@ -8,6 +8,10 @@ mvn -pl inventory verify
 mvn -pl query verify
 
 ./scripts/buildImages.sh
+
+docker pull "bitnami/zookeeper:3"
+docker pull "bitnami/kafka:2"
+
 ./scripts/startContainers.sh
 
 sleep 180
