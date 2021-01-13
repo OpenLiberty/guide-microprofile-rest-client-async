@@ -1,12 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
 
-##############################################################################
-##
-##  Travis CI test script
-##
-##############################################################################
-
 ./scripts/packageApps.sh
 
 mvn -pl system verify
@@ -14,6 +8,10 @@ mvn -pl inventory verify
 mvn -pl query verify
 
 ./scripts/buildImages.sh
+
+docker pull "bitnami/zookeeper:3"
+docker pull "bitnami/kafka:2"
+
 ./scripts/startContainers.sh
 
 sleep 180
@@ -37,3 +35,12 @@ else
 fi
 
 ./scripts/stopContainers.sh
+
+sleep 15
+
+# Delete images and clear .m2 cache
+docker image remove system:1.0-SNAPSHOT
+docker image remove inventory:1.0-SNAPSHOT
+docker image remove query:1.0-SNAPSHOT
+
+rm -rf ~/.m2
