@@ -12,7 +12,7 @@
 // end::copyright[]
 package it.io.openliberty.guides.system;
 
-mport java.time.Duration;
+import java.time.Duration;
 
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
