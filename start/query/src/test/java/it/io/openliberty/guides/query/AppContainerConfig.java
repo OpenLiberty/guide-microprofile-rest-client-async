@@ -47,7 +47,8 @@ public class AppContainerConfig implements SharedContainerConfiguration {
                     .withNetwork(network)
                     .withStartupTimeout(Duration.ofMinutes(3))
                     .dependsOn(kafka)
-                    .withMpRestClient(InventoryClient.class, "http://mock-server:" + MockServerContainer.PORT);
+                    .withMpRestClient(InventoryClient.class,
+                                      "http://mock-server:" + MockServerContainer.PORT);
 
     @Override
     public void startContainers() {
