@@ -178,19 +178,19 @@ The script also creates three instances of the `system` microservice.
 
 include::{common-includes}/os-tabs.adoc[]
 
-[.tab_content.mac_section.linux_section]
---
-[role='command']
-```
-./scripts/startContainers.sh
-```
---
-
 [.tab_content.windows_section]
 --
 [role='command']
 ```
 .\scripts\startContainers.bat
+```
+--
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/startContainers.sh
 ```
 --
 
@@ -221,19 +221,19 @@ When you are done checking out the application, run the following script to stop
 
 include::{common-includes}/os-tabs.adoc[]
 
-[.tab_content.mac_section.linux_section]
---
-[role='command']
-```
-./scripts/stopContainers.sh
-```
---
-
 [.tab_content.windows_section]
 --
 [role='command']
 ```
 .\scripts\stopContainers.bat
+```
+--
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/stopContainers.sh
 ```
 --
 
