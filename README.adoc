@@ -82,7 +82,19 @@ include::{common-includes}/gitclone.adoc[]
 
 == Updating the template interface of a REST client to use asynchronous methods
 
+// static guide instructions:
+ifndef::cloud-hosted[]
 Navigate to the `start` directory to begin.
+endif::[]
+
+// cloud-hosted guide instructions:
+ifdef::cloud-hosted[]
+To begin, run the following command to navigate to the **start** directory:
+```
+cd /home/project/guide-microprofile-jwt/start
+```
+{: codeblock}
+endif::[]
 
 The `query` service uses a MicroProfile Rest Client to access the `inventory` service.
 You will update the methods in the template interface for this client to be asynchronous.
@@ -194,8 +206,21 @@ include::{common-includes}/os-tabs.adoc[]
 ```
 --
 
+// static guide instructions:
+ifndef::cloud-hosted[]
 The services take some time to become available. 
 You can access the application by making requests to the `query/systemLoad` endpoint by going to http://localhost:9080/query/systemLoad[localhost:9080/query/systemLoad^].
+endif::[]
+
+// cloud-hosted guide instructions:
+ifdef::cloud-hosted[]
+The services take some time to become available. 
+You can access the application by making requests to the `query/systemLoad` endpoint by running the following curl command:
+```
+curl http://localhost:9080/query/systemLoad
+```
+{: codeblock}
+endif::[]
 
 When the service is ready, you see an output similar to the following example which was formatted for readability. 
 
