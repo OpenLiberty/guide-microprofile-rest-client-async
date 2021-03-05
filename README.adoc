@@ -91,7 +91,7 @@ endif::[]
 ifdef::cloud-hosted[]
 To begin, run the following command to navigate to the **start** directory:
 ```
-cd /home/project/guide-microprofile-jwt/start
+cd /home/project/guide-microprofile-rest-client-async/start
 ```
 {: codeblock}
 endif::[]
