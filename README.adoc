@@ -307,7 +307,7 @@ endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-Run the following curl command to navigate to the **query** directory, and verify that the tests pass by using the Maven **verify** goal:
+Run the following commands to navigate to the **query** directory, and verify that the tests pass by using the Maven **verify** goal:
 
 [role='command']
 ```
