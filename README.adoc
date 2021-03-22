@@ -293,17 +293,31 @@ include::finish/query/src/test/java/it/io/openliberty/guides/query/QueryServiceI
 
 === Running the tests
 
+// static guide instructions:
+ifndef::cloud-hosted[]
 Navigate to the `query` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 [role='command']
 ```
 mvn verify
 ```
+
+When the tests succeed, you see output similar to the following example:
+endif::[]
+
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-The tests might take a few minutes to complete. 
+Run the following commands to navigate to the **query** directory and verify that the tests pass by using the Maven **verify** goal:
+
+[role='command']
+```
+cd /home/project/guide-microprofile-rest-client-async/start/query
+mvn verify
+```
+{: codeblock}
+
+The tests might take a few minutes to complete. When the tests succeed, you see output similar to the following example:
 endif::[]
-When the tests succeed, you see output similar to the following example:
 
 [source, role='no_copy']
 ----
