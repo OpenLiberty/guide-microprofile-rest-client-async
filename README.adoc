@@ -209,8 +209,8 @@ include::{common-includes}/os-tabs.adoc[]
 
 // static guide instructions:
 ifndef::cloud-hosted[]
-The services take some time to become available. 
-You can access the application by making requests to the `query/systemLoad` endpoint by going to http://localhost:9080/query/systemLoad[localhost:9080/query/systemLoad^].
+The services may take several minutes to become available. 
+You can access the application by making requests to the `query/systemLoad` endpoint by going to http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^].
 endif::[]
 
 // cloud-hosted guide instructions:
@@ -299,6 +299,7 @@ Navigate to the `query` directory, then verify that the tests pass by using the 
 mvn verify
 ```
 
+The tests may take a few minutes to complete. 
 When the tests succeed, you see output similar to the following example:
 
 [source, role='no_copy']
