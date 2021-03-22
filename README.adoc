@@ -209,13 +209,13 @@ include::{common-includes}/os-tabs.adoc[]
 
 // static guide instructions:
 ifndef::cloud-hosted[]
-The services may take several minutes to become available. 
+The services take some time to become available.  
 You can access the application by making requests to the `query/systemLoad` endpoint by going to http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^].
 endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-The services take some time to become available. 
+The services may take several minutes to become available.
 You can access the application by making requests to the **query/systemLoad** endpoint by running the following curl command:
 ```
 curl http://localhost:9080/query/systemLoad
