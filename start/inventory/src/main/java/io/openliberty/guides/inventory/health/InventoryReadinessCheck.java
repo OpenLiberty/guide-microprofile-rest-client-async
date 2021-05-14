@@ -45,29 +45,34 @@ public class InventoryReadinessCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         boolean up = isReady();
-        return HealthCheckResponse.named(this.getClass().getSimpleName()).state(up).build();
+        return HealthCheckResponse.named(this.getClass().getSimpleName())
+                                                        .status(up).build();
     }
 
     private boolean isReady() {
         AdminClient adminClient = createAdminClient();
         return checkIfBarConsumerGroupRegistered(adminClient);
     }
-    
+
     private AdminClient createAdminClient() {
         Properties connectionProperties = new Properties();
         connectionProperties.put("bootstrap.servers", kafkaServer);
         AdminClient adminClient = AdminClient.create(connectionProperties);
         return adminClient;
     }
-    
+
     private boolean checkIfBarConsumerGroupRegistered(AdminClient adminClient) {
         ListConsumerGroupsResult groupsResult = adminClient.listConsumerGroups();
-        KafkaFuture<Collection<ConsumerGroupListing>> consumerGroupsFuture = groupsResult.valid();
+        KafkaFuture<Collection<ConsumerGroupListing>> consumerGroupsFuture =
+                                                            groupsResult.valid();
         try {
-            Collection<ConsumerGroupListing> consumerGroups = consumerGroupsFuture.get();
-            for (ConsumerGroupListing g : consumerGroups)
+            Collection<ConsumerGroupListing> consumerGroups = consumerGroupsFuture
+                                                            .get();
+            for (ConsumerGroupListing g : consumerGroups) {
                 logger.info("groupId: " + g.groupId());
-            return consumerGroups.stream().anyMatch(group -> group.groupId().equals(groupId));
+            }
+            return consumerGroups.stream().anyMatch(group -> group.groupId()
+                                                            .equals(groupId));
         } catch (Exception e) {
             return false;
         }
