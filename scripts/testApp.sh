@@ -3,9 +3,18 @@ set -euxo pipefail
 
 ./scripts/packageApps.sh
 
-mvn -pl system verify
-mvn -pl inventory verify
-mvn -pl query verify
+mvn -Dhttp.keepAlive=false \
+    -Dmaven.wagon.http.pool=false \
+    -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
+    -pl system verify
+mvn -Dhttp.keepAlive=false \
+    -Dmaven.wagon.http.pool=false \
+    -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
+    -pl inventory verify
+mvn -Dhttp.keepAlive=false \
+    -Dmaven.wagon.http.pool=false \
+    -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
+    -pl query verify
 
 ./scripts/buildImages.sh
 

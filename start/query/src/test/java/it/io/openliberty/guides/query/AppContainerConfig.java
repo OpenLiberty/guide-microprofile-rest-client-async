@@ -29,7 +29,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
     private static Network network = Network.newNetwork();
 
     @Container
-    public static MockServerContainer mockServer = new MockServerContainer("5.10.0")
+    public static MockServerContainer mockServer = new MockServerContainer("5.11.2")
                     .withNetworkAliases("mock-server")
                     .withNetwork(network);
 
