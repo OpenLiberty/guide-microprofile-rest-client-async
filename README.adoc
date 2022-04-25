@@ -95,11 +95,11 @@ InventoryClient.java
 include::finish/query/src/main/java/io/openliberty/guides/query/client/InventoryClient.java[]
 ----
 
-The changes involve the [hotspot=getSystem file=0]`getSystem` method. Change the return type to `CompletionStage<Properties>` to make the method asynchronous. Since the method now has the return type of `CompletionStage<Properties>`, you aren't able to directly manipulate the `Properties` inner type. As you will see in the next section, you're able to indirectly use the `Properties` by chaining callbacks.
+The changes involve the [hotspot=getSystem file=0]`getSystem` method. Change the return type to `CompletionStage<Properties>` to make the method asynchronous. The method now has the return type of `CompletionStage<Properties>` so you aren't able to directly manipulate the `Properties` inner type. As you will see in the next section, you're able to indirectly use the `Properties` by chaining callbacks.
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
-To reduce the processing time, you will update the `/query/systemLoad` endpoint to asynchronously send the requests. Multiple client requests will be sent synchronously in a loop. Since asynchronous calls do not block the program, the endpoint needs to ensure that all calls are completed and all returned data is processed before proceeding.
+To reduce the processing time, you will update the `/query/systemLoad` endpoint to asynchronously send the requests. Multiple client requests will be sent synchronously in a loop. The asynchronous calls do not block the program so the endpoint needs to ensure that all calls are completed and all returned data is processed before proceeding.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -134,7 +134,7 @@ Start your Docker environment. Dockerfiles are provided for you to use.
 To build the application, run the Maven `install` and `package` goals from the command-line session in the `start` directory:
 
 [role='command']
-```bash
+```
 mvn -pl models install
 mvn package
 ```
@@ -144,7 +144,7 @@ include::{common-includes}/ol-icr-full-docker-pull.adoc[]
 Run the following commands to containerize the microservices:
 
 [role='command']
-```bash
+```
 docker build -t system:1.0-SNAPSHOT system/.
 docker build -t inventory:1.0-SNAPSHOT inventory/.
 docker build -t query:1.0-SNAPSHOT query/.
@@ -157,7 +157,7 @@ include::{common-includes}/os-tabs.adoc[]
 [.tab_content.windows_section]
 --
 [role='command']
-```bash
+```
 .\scripts\startContainers.bat
 ```
 --
@@ -165,7 +165,7 @@ include::{common-includes}/os-tabs.adoc[]
 [.tab_content.mac_section.linux_section]
 --
 [role='command']
-```bash
+```
 ./scripts/startContainers.sh
 ```
 --
@@ -209,7 +209,7 @@ include::{common-includes}/os-tabs.adoc[]
 [.tab_content.windows_section]
 --
 [role='command']
-```bash
+```
 .\scripts\stopContainers.bat
 ```
 --
@@ -217,7 +217,7 @@ include::{common-includes}/os-tabs.adoc[]
 [.tab_content.mac_section.linux_section]
 --
 [role='command']
-```bash
+```
 ./scripts/stopContainers.sh
 ```
 --
