@@ -78,7 +78,6 @@ To begin, run the following command to navigate to the ***start*** directory:
 ```bash
 cd /home/project/guide-microprofile-rest-client-async/start
 ```
-
 endif::[]
 
 The `query` service uses a MicroProfile Rest Client to access the `inventory` service. You will update the methods in the template interface for this client to be asynchronous.
@@ -181,7 +180,6 @@ The services might take several minutes to become available. You can access the 
 ```bash
 curl -s http://localhost:9080/query/systemLoad | jq
 ```
-
 endif::[]
 
 When the service is ready, you see an output similar to the following example which was formatted for readability. 
@@ -265,7 +263,6 @@ endif::[]
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
 Run the following commands to navigate to the ***query*** directory and verify that the tests pass by using the Maven ***verify*** goal:
-
 ```bash
 cd /home/project/guide-microprofile-rest-client-async/start/query
 mvn verify
