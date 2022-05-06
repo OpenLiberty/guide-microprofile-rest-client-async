@@ -1,4 +1,4 @@
-// Copyright (c) 2019, 2021 IBM Corporation and others.
+// Copyright (c) 2019, 2022 IBM Corporation and others.
 // Licensed under Creative Commons Attribution-NoDerivatives
 // 4.0 International (CC BY-ND 4.0)
 //   https://creativecommons.org/licenses/by-nd/4.0/
@@ -33,40 +33,23 @@ Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynch
 
 == What you'll learn
 
-You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. 
-You'll update the template interface for a MicroProfile Rest Client to use the `CompletionStage` return type. 
-The template interface maps to the remote service that you want to call. 
-A `CompletionStage` interface allows you to work with the result of your remote service call asynchronously.
+You will learn how to build a MicroProfile Rest Client to access remote RESTful services using asynchronous method calls. You'll update the template interface for a MicroProfile Rest Client to use the `CompletionStage` return type. The template interface maps to the remote service that you want to call. A `CompletionStage` interface allows you to work with the result of your remote service call asynchronously.
 
 *What is asynchronous programming?*
 
-Imagine asynchronous programming as a restaurant. 
-After you're seated, a waiter takes your order. 
-Then, you must wait a few minutes for your food to be prepared. 
-While your food is being prepared, your waiter may take more orders or serve other tables. 
-After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. 
-This method blocks other customers from placing orders or receiving their food.
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. 
-The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. 
-As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. 
-Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
+You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
 
-In the context of REST clients, HTTP request calls can be time consuming. 
-The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. 
-These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
+In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can't respond quickly. These lengthy operations can block the execution of your thread when it's in use and prevent other work from being completed.
 
-The application in this guide consists of three microservices, `system`, `inventory`, and `query`. 
-Every 15 seconds the `system` microservice calculates and publishes an event that contains its average system load. 
-The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. 
+The application in this guide consists of three microservices, `system`, `inventory`, and `query`. Every 15 seconds the `system` microservice calculates and publishes an event that contains its average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. 
 
 image::QueryService.png[Reactive Inventory System,width=253,height=327,align="center"]
 
-The microservice that you will modify is the `query` service.
-It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
+The microservice that you will modify is the `query` service. It communicates with the `inventory` service to determine which system has the highest system load and which system has the lowest system load. 
 
-The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events. 
-If you want to learn more about reactive messaging, see the https://openliberty.io/guides/microprofile-reactive-messaging.html[Creating Reactive Java Microservices^] guide.
+The `system` and `inventory` microservices use MicroProfile Reactive Messaging to send and receive the system load events. If you want to learn more about reactive messaging, see the https://openliberty.io/guides/microprofile-reactive-messaging.html[Creating Reactive Java Microservices^] guide.
 
 // =================================================================================================
 // Prerequisites
@@ -91,15 +74,13 @@ endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-To begin, run the following command to navigate to the **start** directory:
-```
+To begin, run the following command to navigate to the ***start*** directory:
+```bash
 cd /home/project/guide-microprofile-rest-client-async/start
 ```
-{: codeblock}
 endif::[]
 
-The `query` service uses a MicroProfile Rest Client to access the `inventory` service.
-You will update the methods in the template interface for this client to be asynchronous.
+The `query` service uses a MicroProfile Rest Client to access the `inventory` service. You will update the methods in the template interface for this client to be asynchronous.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -113,16 +94,11 @@ InventoryClient.java
 include::finish/query/src/main/java/io/openliberty/guides/query/client/InventoryClient.java[]
 ----
 
-The changes involve the [hotspot=getSystem file=0]`getSystem` method. 
-Change the return type to `CompletionStage<Properties>` to make the method asynchronous.
-Since the method now has the return type of `CompletionStage<Properties>`, you aren't able to directly manipulate the `Properties` inner type. 
-As you will see in the next section, you're able to indirectly use the `Properties` by chaining callbacks.
+The changes involve the [hotspot=getSystem file=0]`getSystem` method. Change the return type to `CompletionStage<Properties>` to make the method asynchronous. The method now has the return type of `CompletionStage<Properties>` so you aren't able to directly manipulate the `Properties` inner type. As you will see in the next section, you're able to indirectly use the `Properties` by chaining callbacks.
 
 == Updating a REST resource to asynchronously handle HTTP requests
 
-To reduce the processing time, you will update the `/query/systemLoad` endpoint to asynchronously send the requests. 
-Multiple client requests will be sent synchronously in a loop.
-Since asynchronous calls do not block the program, the endpoint needs to ensure that all calls are completed and all returned data is processed before proceeding.
+To reduce the processing time, you will update the `/query/systemLoad` endpoint to asynchronously send the requests. Multiple client requests will be sent synchronously in a loop. The asynchronous calls do not block the program so the endpoint needs to ensure that all calls are completed and all returned data is processed before proceeding.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -136,25 +112,13 @@ QueryResource.java
 include::finish/query/src/main/java/io/openliberty/guides/query/QueryResource.java[]
 ----
 
-First, the [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`.
-In the [hotspot=getSystem file=0]`getSystem()` method, multiple requests are sent asynchronously to the `inventory` service for each hostname.
-When the requests return, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method processes the returned data with the `CompletionStage<Properties>` interface.
+First, the [hotspot=systemLoad file=0]`systemLoad` endpoint first gets all the hostnames by calling [hotspot=getSystems file=0]`getSystems()`. In the [hotspot=getSystem file=0]`getSystem()` method, multiple requests are sent asynchronously to the `inventory` service for each hostname. When the requests return, the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method processes the returned data with the `CompletionStage<Properties>` interface.
 
-The `CompletionStage<Properties>` interface represents a unit of computation.
-After a computation is complete, it can either be finished or it can be chained with more `CompletionStage<Properties>` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. 
-Exceptions are handled in a callback that is provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves like a catch block.
-When you return a `CompletionStage<Properties>` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built.
-JAX-RS responds to the caller after the computation completes.
+The `CompletionStage<Properties>` interface represents a unit of computation. After a computation is complete, it can either be finished or it can be chained with more `CompletionStage<Properties>` interfaces using the [hotspot=thenAcceptAsync file=0]`thenAcceptAsync()` method. Exceptions are handled in a callback that is provided to the [hotspot=exceptionally file=0]`exceptionally()` method, which behaves like a catch block. When you return a `CompletionStage<Properties>` type in the resource, it doesn’t necessarily mean that the computation completed and the response was built. JAX-RS responds to the caller after the computation completes.
 
-In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` object is used to track asynchronous requests. 
-The [hotspot=countdown2 hotspot=countdown3 file=0]`countDown()` method is called whenever a request is complete.
-When the [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is at zero, it indicates that all asynchronous requests are complete.
-By using the [hotspot=await file=0]`await()` method of the [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch`, the program waits for all the asynchronous requests to be complete.
-When all asynchronous requests are complete, the program resumes execution with all required data processed. 
+In the [hotspot=systemLoad file=0]`systemLoad()` method a [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` object is used to track asynchronous requests. The [hotspot=countdown2 hotspot=countdown3 file=0]`countDown()` method is called whenever a request is complete. When the [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch` is at zero, it indicates that all asynchronous requests are complete. By using the [hotspot=await file=0]`await()` method of the [hotspot=countdown1 hotspot=countdown2 hotspot=countdown3 file=0]`CountDownLatch`, the program waits for all the asynchronous requests to be complete. When all asynchronous requests are complete, the program resumes execution with all required data processed. 
 
-A [hotspot=holder file=0]`Holder` class is used to wrap a variable called `values` that has the [hotspot=volatile file=0]`volatile` keyword.
-The `values` variable is instantiated as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` object.
-Together, the `volatile` keyword and `ConcurrentHashMap` type allow the `Holder` class to store system information and safely access it asynchronously from multiple threads.
+A [hotspot=holder file=0]`Holder` class is used to wrap a variable called `values` that has the [hotspot=volatile file=0]`volatile` keyword. The `values` variable is instantiated as a [hotspot=concurrentHashMap file=0]`ConcurrentHashMap` object. Together, the `volatile` keyword and `ConcurrentHashMap` type allow the `Holder` class to store system information and safely access it asynchronously from multiple threads.
 
 // =================================================================================================
 // Building the application
@@ -162,8 +126,7 @@ Together, the `volatile` keyword and `ConcurrentHashMap` type allow the `Holder`
 
 == Building and running the application
 
-You will build and run the `system`, `inventory`, and `query` microservices in Docker containers. 
-You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+You will build and run the `system`, `inventory`, and `query` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Start your Docker environment. Dockerfiles are provided for you to use.
 
@@ -186,9 +149,7 @@ docker build -t inventory:1.0-SNAPSHOT inventory/.
 docker build -t query:1.0-SNAPSHOT query/.
 ```
 
-Next, use the provided `startContainers` script to start the application in Docker containers. 
-The script creates containers for Kafka, Zookeeper, and all of the microservices in the project, in addition to a network for the containers to communicate with each other.
-The script also creates three instances of the `system` microservice. 
+Next, use the provided `startContainers` script to start the application in Docker containers. The script creates containers for Kafka, Zookeeper, and all of the microservices in the project, in addition to a network for the containers to communicate with each other. The script also creates three instances of the `system` microservice. 
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -210,18 +171,15 @@ include::{common-includes}/os-tabs.adoc[]
 
 // static guide instructions:
 ifndef::cloud-hosted[]
-The services take some time to become available.  
-You can access the application by making requests to the `query/systemLoad` endpoint by going to the http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^] URL.
+The services take some time to become available. You can access the application by making requests to the `query/systemLoad` endpoint by going to the http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^] URL.
 endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-The services might take several minutes to become available.
-You can access the application by making requests to the **query/systemLoad** endpoint by running the following curl command:
-```
+The services might take several minutes to become available. You can access the application by making requests to the ***query/systemLoad*** endpoint by running the following curl command:
+```bash
 curl -s http://localhost:9080/query/systemLoad | jq
 ```
-{: codeblock}
 endif::[]
 
 When the service is ready, you see an output similar to the following example which was formatted for readability. 
@@ -240,9 +198,7 @@ When the service is ready, you see an output similar to the following example wh
 }
 ----
 
-Switching to an asynchronous programming model freed up the thread that handles requests to the `inventory` service. 
-While requests process, the thread can handle other work or requests.
-In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint, multiple systems are read and compared at once.
+Switching to an asynchronous programming model freed up the thread that handles requests to the `inventory` service. While requests process, the thread can handle other work or requests. In the [hotspot=systemLoad file=0]`/query/systemLoad` endpoint, multiple systems are read and compared at once.
 
 When you are done checking out the application, run the following script to stop the application:
 
@@ -270,8 +226,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Testing the query microservice
 
-You will create an endpoint test to test the basic functionality of the `query` microservice. 
-If a test failure occurs, then you might have introduced a bug into the code.
+You will create an endpoint test to test the basic functionality of the `query` microservice. If a test failure occurs, then you might have introduced a bug into the code.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -298,7 +253,7 @@ ifndef::cloud-hosted[]
 Navigate to the `query` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 [role='command']
-```
+```bash
 mvn verify
 ```
 
@@ -307,13 +262,11 @@ endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-Run the following commands to navigate to the **query** directory and verify that the tests pass by using the Maven **verify** goal:
-
-```
+Run the following commands to navigate to the ***query*** directory and verify that the tests pass by using the Maven ***verify*** goal:
+```bash
 cd /home/project/guide-microprofile-rest-client-async/start/query
 mvn verify
 ```
-{: codeblock}
 
 The tests might take a few minutes to complete. When the tests succeed, you see output similar to the following example:
 endif::[]
