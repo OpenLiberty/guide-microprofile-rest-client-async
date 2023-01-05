@@ -18,6 +18,6 @@ cat system/pom.xml query/pom.xml inventory/pom.xml
 sed -i "s;FROM icr.io/appcafe/open-liberty:full-java11-openj9-ubi;FROM $DOCKER_USERNAME/olguides:$BUILD;g" system/Dockerfile query/Dockerfile inventory/Dockerfile
 cat system/Dockerfile query/Dockerfile inventory/Dockerfile
 
-docker pull "$DOCKER_USERNAME""/olguides:""$BUILD"
+docker pull -q "$DOCKER_USERNAME""/olguides:""$BUILD"
 
 sudo ../scripts/testApp.sh
