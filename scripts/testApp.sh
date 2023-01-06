@@ -3,23 +3,23 @@ set -euxo pipefail
 
 ./scripts/packageApps.sh
 
-mvn -Dhttp.keepAlive=false \
+mvn -ntp -Dhttp.keepAlive=false \
     -Dmaven.wagon.http.pool=false \
     -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
     -pl system verify
-mvn -Dhttp.keepAlive=false \
+mvn -ntp -Dhttp.keepAlive=false \
     -Dmaven.wagon.http.pool=false \
     -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
     -pl inventory verify
-mvn -Dhttp.keepAlive=false \
+mvn -ntp -Dhttp.keepAlive=false \
     -Dmaven.wagon.http.pool=false \
     -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
     -pl query verify
 
 ./scripts/buildImages.sh
 
-docker pull "bitnami/zookeeper:3"
-docker pull "bitnami/kafka:2"
+docker pull -q "bitnami/zookeeper:3"
+docker pull -q "bitnami/kafka:2"
 
 ./scripts/startContainers.sh
 
