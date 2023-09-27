@@ -42,7 +42,7 @@ public class SystemReadinessCheck implements HealthCheck {
     public HealthCheckResponse call() {
         boolean up = isReady();
         return HealthCheckResponse.named(
-            this.getClass().getSimpleName()).state(up).build();
+            this.getClass().getSimpleName()).status(up).build();
     }
 
     private boolean isReady() {
