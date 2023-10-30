@@ -49,24 +49,24 @@ public class QueryServiceIT {
     public static QueryResourceClient client;
 
     private static Network network = Network.newNetwork();
-    
+
     public static String restClientClass = "InventoryClient.class";
 
     private static String testHost1 =
-        "{" + 
-            "\"hostname\" : \"testHost1\"," +
-            "\"systemLoad\" : 1.23" +
-        "}";
+        "{" 
+            + "\"hostname\" : \"testHost1\","
+            + "\"systemLoad\" : 1.23"
+        +"}";
     private static String testHost2 =
-        "{" + 
-            "\"hostname\" : \"testHost2\"," +
-            "\"systemLoad\" : 3.21" +
-        "}";
+        "{" 
+            + "\"hostname\" : \"testHost2\","
+            + "\"systemLoad\" : 3.21"
+        +"}";
     private static String testHost3 =
-        "{" + 
-            "\"hostname\" : \"testHost3\"," +
-            "\"systemLoad\" : 2.13" +
-        "}";
+        "{" 
+            + "\"hostname\" : \"testHost3\","
+            + "\"systemLoad\" : 2.13"
+        +"}";
 
     private static ImageFromDockerfile queryImage
         = new ImageFromDockerfile("query:1.0-SNAPSHOT")
@@ -77,7 +77,8 @@ public class QueryServiceIT {
         .withTag("mockserver-" + MockServerClient.class
                 .getPackage().getImplementationVersion());
 
-    public static MockServerContainer mockServer = new MockServerContainer(MOCKSERVER_IMAGE)
+    public static MockServerContainer mockServer = 
+                new MockServerContainer(MOCKSERVER_IMAGE)
                     .withNetworkAliases("mock-server")
                     .withNetwork(network);
     public static MockServerClient mockClient;
@@ -107,13 +108,14 @@ public class QueryServiceIT {
     public static void startContainers() {
         mockServer.start();
         mockClient = new MockServerClient(
-            mockServer.getHost(), 
+            mockServer.getHost(),
             mockServer.getServerPort());
 
         kafkaContainer.start();
 
         queryContainer.withEnv(
-            "InventoryClient/mp-rest/uri", "http://mock-server:" + MockServerContainer.PORT);
+            "InventoryClient/mp-rest/uri", 
+                "http://mock-server:" + MockServerContainer.PORT);
         queryContainer.start();
 
         client = createRestClient("http://"
@@ -127,9 +129,9 @@ public class QueryServiceIT {
                         .withPath("/inventory/systems"))
                     .respond(HttpResponse.response()
                         .withStatusCode(200)
-                        .withBody("[\"testHost1\"," + 
-                                "\"testHost2\"," +
-                                "\"testHost3\"]")
+                        .withBody("[\"testHost1\","
+                                + "\"testHost2\","
+                                + "\"testHost3\"]")
                         .withHeader("Content-Type", "application/json"));
 
         mockClient.when(HttpRequest.request()
@@ -166,7 +168,7 @@ public class QueryServiceIT {
     }
 
     @Test
-    public void testLoads(){
+    public void testLoads() {
         Map<String, Properties> response = client.systemLoad();
 
         assertEquals(

@@ -30,13 +30,14 @@ public interface InventoryClient extends AutoCloseable {
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<String> getSystems();
+    List<String> getSystems();
 
     // tag::getSystem[]
     @GET
     @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<Properties> getSystem(@PathParam("hostname") String hostname);
+    CompletionStage<Properties> getSystem(
+        @PathParam("hostname") String hostname);
     // end::getSystem[]
 
 }
