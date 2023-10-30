@@ -70,7 +70,7 @@ public class SystemLoad {
     public static class SystemLoadDeserializer implements Deserializer<SystemLoad> {
         @Override
         public SystemLoad deserialize(String topic, byte[] data) {
-            if (data == null){
+            if (data == null) {
                 return null;
             }
             return JSONB.fromJson(new String(data), SystemLoad.class);

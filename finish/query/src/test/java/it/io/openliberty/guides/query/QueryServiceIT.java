@@ -53,20 +53,20 @@ public class QueryServiceIT {
     public static String restClientClass = "InventoryClient.class";
 
     private static String testHost1 =
-        "{" 
+        "{"
             + "\"hostname\" : \"testHost1\","
             + "\"systemLoad\" : 1.23"
-        +"}";
+        + "}";
     private static String testHost2 =
-        "{" 
+        "{"
             + "\"hostname\" : \"testHost2\","
             + "\"systemLoad\" : 3.21"
-        +"}";
+        + "}";
     private static String testHost3 =
-        "{" 
+        "{"
             + "\"hostname\" : \"testHost3\","
             + "\"systemLoad\" : 2.13"
-        +"}";
+        + "}";
 
     private static ImageFromDockerfile queryImage
         = new ImageFromDockerfile("query:1.0-SNAPSHOT")
@@ -77,7 +77,7 @@ public class QueryServiceIT {
         .withTag("mockserver-" + MockServerClient.class
                 .getPackage().getImplementationVersion());
 
-    public static MockServerContainer mockServer = 
+    public static MockServerContainer mockServer =
                 new MockServerContainer(MOCKSERVER_IMAGE)
                     .withNetworkAliases("mock-server")
                     .withNetwork(network);
@@ -114,7 +114,7 @@ public class QueryServiceIT {
         kafkaContainer.start();
 
         queryContainer.withEnv(
-            "InventoryClient/mp-rest/uri", 
+            "InventoryClient/mp-rest/uri",
                 "http://mock-server:" + MockServerContainer.PORT);
         queryContainer.start();
 
