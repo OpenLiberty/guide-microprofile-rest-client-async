@@ -54,7 +54,7 @@ public class QueryResource {
 
     private class Holder {
         private Map<String, Properties> values;
-         
+
         Holder() {
             this.values = new HashMap<String, Properties>();
             init();
