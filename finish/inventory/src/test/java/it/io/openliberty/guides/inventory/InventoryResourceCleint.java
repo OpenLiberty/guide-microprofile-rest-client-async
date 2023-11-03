@@ -12,16 +12,14 @@
 package it.io.openliberty.guides.inventory;
 
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.Produces;
 
 import java.util.List;
 import java.util.Properties;
 
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -37,5 +35,10 @@ public interface InventoryResourceCleint {
     @Produces(MediaType.APPLICATION_JSON)
     Properties getSystem(
         @PathParam("hostname") String hostname);
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    Response resetSystems();
+
 }
 
