@@ -18,8 +18,7 @@ mvn -ntp -Dhttp.keepAlive=false \
 
 ./scripts/buildImages.sh
 
-docker pull -q "bitnami/zookeeper:3"
-docker pull -q "bitnami/kafka:2"
+docker pull -q "bitnami/kafka:latest"
 
 ./scripts/startContainers.sh
 
