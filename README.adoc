@@ -149,7 +149,7 @@ docker build -t inventory:1.0-SNAPSHOT inventory/.
 docker build -t query:1.0-SNAPSHOT query/.
 ```
 
-Next, use the provided `startContainers` script to start the application in Docker containers. The script creates containers for Kafka, Zookeeper, and all of the microservices in the project, in addition to a network for the containers to communicate with each other. The script also creates three instances of the `system` microservice. 
+Next, use the provided `startContainers` script to start the application in Docker containers. The script creates containers for Kafka and all of the microservices in the project, in addition to a network for the containers to communicate with each other. The script also creates three instances of the `system` microservice. 
 
 include::{common-includes}/os-tabs.adoc[]
 
