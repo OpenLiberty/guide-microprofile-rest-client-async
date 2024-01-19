@@ -50,8 +50,6 @@ public class QueryServiceIT {
 
     private static Network network = Network.newNetwork();
 
-    public static String restClientClass = "InventoryClient.class";
-
     private static String testHost1 =
         "{"
             + "\"hostname\" : \"testHost1\","
