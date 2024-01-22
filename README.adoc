@@ -234,7 +234,7 @@ You will create an endpoint test to test the basic functionality of the `query` 
 `query/src/test/java/it/io/openliberty/guides/query/QueryServiceIT.java`
 ----
 
-The [hotspot=testLoads file=1]`testLoads()` test case verifies that the `query` service can calculate the highest and lowest system loads. 
+The [hotspot=testLoads file=0]`testLoads()` test case verifies that the `query` service can calculate the highest and lowest system loads. 
 
 QueryServiceIT.java
 [source, java, linenums, role='code_column hide_tags=copyright,javadoc']
