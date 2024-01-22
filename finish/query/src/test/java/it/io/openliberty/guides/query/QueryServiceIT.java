@@ -165,6 +165,7 @@ public class QueryServiceIT {
         network.close();
     }
 
+    // tag::testLoads[]
     @Test
     public void testLoads() {
         Map<String, Properties> response = client.systemLoad();
@@ -180,4 +181,5 @@ public class QueryServiceIT {
             "Returned lowest system load incorrect"
         );
     }
+    // end::testLoads[]
 }
