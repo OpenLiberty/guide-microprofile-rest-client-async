@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020, 2023 IBM Corporation and others.
+ * Copyright (c) 2020, 2024 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public class SystemLoad {
         }
         SystemLoad sl = (SystemLoad) o;
         return Objects.equals(hostname, sl.hostname)
-                && Objects.equals(loadAverage, sl.loadAverage);
+               && Objects.equals(loadAverage, sl.loadAverage);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SystemLoad {
     public static class SystemLoadSerializer implements Serializer<Object> {
         @Override
         public byte[] serialize(String topic, Object data) {
-          return JSONB.toJson(data).getBytes();
+            return JSONB.toJson(data).getBytes();
         }
     }
     //end::jsonbSerializer[]

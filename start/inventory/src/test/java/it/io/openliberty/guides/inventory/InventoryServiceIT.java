@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020, 2023 IBM Corporation and others.
+ * Copyright (c) 2020, 2024 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -62,12 +62,12 @@ public class InventoryServiceIT {
 
     public static KafkaProducer<String, SystemLoad> producer;
 
-    private static ImageFromDockerfile inventoryImage
-        = new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
+    private static ImageFromDockerfile inventoryImage =
+        new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer = new KafkaContainer(
-        DockerImageName.parse("confluentinc/cp-kafka:latest"))
+    private static KafkaContainer kafkaContainer =
+        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
             .withNetwork(network);
 
@@ -104,10 +104,11 @@ public class InventoryServiceIT {
             System.out.println("Testing with mvn liberty:devc");
             urlPath = "http://localhost:9085";
         } else {
+            System.out.println("Testing with mvn verify");
             kafkaContainer.start();
             inventoryContainer.withEnv(
-            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
-            System.out.println("Testing with mvn verify");
+                "mp.messaging.connector.liberty-kafka.bootstrap.servers",
+                "kafka:19092");
             inventoryContainer.start();
             urlPath = "http://"
                 + inventoryContainer.getHost()
@@ -123,19 +124,19 @@ public class InventoryServiceIT {
         Properties producerProps = new Properties();
         if (isServiceRunning("localhost", 9085)) {
             producerProps.put(
-            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 "localhost:9094");
         } else {
             producerProps.put(
-            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 kafkaContainer.getBootstrapServers());
         }
         producerProps.put(
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                StringSerializer.class.getName());
+            StringSerializer.class.getName());
         producerProps.put(
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                SystemLoadSerializer.class.getName());
+            SystemLoadSerializer.class.getName());
 
         producer = new KafkaProducer<String, SystemLoad>(producerProps);
     }
@@ -164,10 +165,10 @@ public class InventoryServiceIT {
         for (String system : response) {
             Properties sp = client.getSystem(system);
             assertEquals(sl.hostname, sp.get("hostname"),
-                    "Hostname doesn't match!");
+                "Hostname doesn't match!");
             BigDecimal systemLoad = (BigDecimal) sp.get("systemLoad");
             assertEquals(sl.loadAverage, systemLoad.doubleValue(),
-                    "CPU load doesn't match!");
+                "CPU load doesn't match!");
         }
     }
 }
