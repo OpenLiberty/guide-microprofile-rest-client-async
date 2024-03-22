@@ -172,12 +172,19 @@ include::{common-includes}/os-tabs.adoc[]
 
 // static guide instructions:
 ifndef::cloud-hosted[]
-The services take some time to become available. You can access the application by making requests to the `query/systemLoad` endpoint by going to the http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^] URL.
+The services take some time to become available. Visit the http://localhost:9085/health[^] URL to confirm that the `inventory` microservice is up and running.
+
+You can access the application by making requests to the `query/systemLoad` endpoint by going to the http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^] URL.
 endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-The services might take several minutes to become available. You can access the application by making requests to the ***query/systemLoad*** endpoint by running the following curl command:
+The services might take several minutes to become available. Run the following curl command to confirm that the ***inventory*** microservice is up and running.
+```bash
+curl -s http://localhost:9085/health | jq
+```
+
+You can access the application by making requests to the ***query/systemLoad*** endpoint by running the following curl command:
 ```bash
 curl -s http://localhost:9080/query/systemLoad | jq
 ```
