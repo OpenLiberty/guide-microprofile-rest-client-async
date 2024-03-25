@@ -1,4 +1,4 @@
-// Copyright (c) 2019, 2023 IBM Corporation and others.
+// Copyright (c) 2019, 2024 IBM Corporation and others.
 // Licensed under Creative Commons Attribution-NoDerivatives
 // 4.0 International (CC BY-ND 4.0)
 //   https://creativecommons.org/licenses/by-nd/4.0/
@@ -9,13 +9,14 @@
 :page-layout: guide-multipane
 :page-duration: 15 minutes
 :page-releasedate: 2019-09-13
+:page-majorupdateddate: 2024-04-30
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Rest Client to invoke RESTful microservices asynchronously over HTTP.
 :page-seo-title: Consuming RESTful Java microservices asynchronously using Eclipse MicroProfile Rest Client
 :page-seo-description: A getting started tutorial and an example on how to consume RESTful Java microservices with asynchronous method calls using the CompletionStage interface and MicroProfile Rest Client.
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile']
+:page-tags: ['microprofile']
 :page-permalink: /guides/{projectid}
 :page-related-guides: ['microprofile-reactive-messaging', 'reactive-rest-client']
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/prod
@@ -149,7 +150,7 @@ docker build -t inventory:1.0-SNAPSHOT inventory/.
 docker build -t query:1.0-SNAPSHOT query/.
 ```
 
-Next, use the provided `startContainers` script to start the application in Docker containers. The script creates containers for Kafka, Zookeeper, and all of the microservices in the project, in addition to a network for the containers to communicate with each other. The script also creates three instances of the `system` microservice. 
+Next, use the provided `startContainers` script to start the application in Docker containers. The script creates containers for Kafka and all of the microservices in the project, in addition to a network for the containers to communicate with each other. The script also creates three instances of the `system` microservice. 
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -171,12 +172,19 @@ include::{common-includes}/os-tabs.adoc[]
 
 // static guide instructions:
 ifndef::cloud-hosted[]
-The services take some time to become available. You can access the application by making requests to the `query/systemLoad` endpoint by going to the http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^] URL.
+The services take some time to become available. Visit the http://localhost:9085/health[^] URL to confirm that the `inventory` microservice is up and running.
+
+You can access the application by making requests to the `query/systemLoad` endpoint by going to the http://localhost:9080/query/systemLoad[http://localhost:9080/query/systemLoad^] URL.
 endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-The services might take several minutes to become available. You can access the application by making requests to the ***query/systemLoad*** endpoint by running the following curl command:
+The services might take several minutes to become available. Run the following curl command to confirm that the ***inventory*** microservice is up and running.
+```bash
+curl -s http://localhost:9085/health | jq
+```
+
+You can access the application by making requests to the ***query/systemLoad*** endpoint by running the following curl command:
 ```bash
 curl -s http://localhost:9080/query/systemLoad | jq
 ```
@@ -252,10 +260,26 @@ include::finish/query/src/test/java/it/io/openliberty/guides/query/QueryServiceI
 ifndef::cloud-hosted[]
 Navigate to the `query` directory, then verify that the tests pass by using the Maven `verify` goal:
 
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.windows_section]
+--
 [role='command']
-```bash
+```
 mvn verify
 ```
+--
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+export TESTCONTAINERS_RYUK_DISABLED=true
+mvn verify
+```
+
+For more information about disabling Ryuk, see the https://java.testcontainers.org/features/configuration/#disabling-ryuk[Testcontainers custom configuration^] document.
+--
 
 When the tests succeed, you see output similar to the following example:
 endif::[]
@@ -264,9 +288,12 @@ endif::[]
 ifdef::cloud-hosted[]
 Run the following commands to navigate to the ***query*** directory and verify that the tests pass by using the Maven ***verify*** goal:
 ```bash
+export TESTCONTAINERS_RYUK_DISABLED=true
 cd /home/project/guide-microprofile-rest-client-async/start/query
 mvn verify
 ```
+
+For more information about disabling Ryuk, see the [Testcontainers custom configuratio](https://java.testcontainers.org/features/configuration/#disabling-ryuk) document.
 
 The tests might take a few minutes to complete. When the tests succeed, you see output similar to the following example:
 endif::[]
