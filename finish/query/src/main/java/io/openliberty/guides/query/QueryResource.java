@@ -1,13 +1,12 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020 IBM Corporation and others.
+ * Copyright (c) 2020, 2024 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-2.0/
  *
- * Contributors:
- *     IBM Corporation - Initial implementation
+ * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 // end::copyright[]
 package io.openliberty.guides.query;
@@ -20,12 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -34,7 +33,7 @@ import io.openliberty.guides.query.client.InventoryClient;
 @ApplicationScoped
 @Path("/query")
 public class QueryResource {
-    
+
     @Inject
     @RestClient
     private InventoryClient inventoryClient;
@@ -96,7 +95,7 @@ public class QueryResource {
         private volatile Map<String, Properties> values;
         // end::volatile[]
 
-        public Holder() {
+        Holder() {
             // tag::concurrentHashMap[]
             this.values = new ConcurrentHashMap<String, Properties>();
             // end::concurrentHashMap[]
@@ -126,8 +125,10 @@ public class QueryResource {
             this.values.put("lowest", new Properties());
             this.values.get("highest").put("hostname", "temp_max");
             this.values.get("lowest").put("hostname", "temp_min");
-            this.values.get("highest").put("systemLoad", new BigDecimal(Double.MIN_VALUE));
-            this.values.get("lowest").put("systemLoad", new BigDecimal(Double.MAX_VALUE));
+            this.values.get("highest").put(
+                "systemLoad", new BigDecimal(Double.MIN_VALUE));
+            this.values.get("lowest").put(
+                "systemLoad", new BigDecimal(Double.MAX_VALUE));
         }
     }
     // end::holder[]
