@@ -30,13 +30,13 @@
         <dependency>
             <groupId>jakarta.enterprise.concurrent</groupId>
             <artifactId>jakarta.enterprise.concurrent-api</artifactId>
-            <version>3.1.1</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.1.0</version>
+            <version>3.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
