@@ -1,16 +1,18 @@
 <server description="Query Service">
 
   <featureManager>
-    <feature>beanValidation-3.0</feature>
-    <feature>restfulWS-3.1</feature>
-    <feature>cdi-4.0</feature>
-    <feature>concurrent-3.0</feature>
-    <feature>jsonb-3.0</feature>
-    <feature>mpHealth-4.0</feature>
-    <feature>mpConfig-3.1</feature>
-    <feature>mpOpenAPI-3.1</feature>
-    <feature>mpReactiveMessaging-3.0</feature>
-    <feature>mpRestClient-3.0</feature>
+    <platform>jakartaee-10.0</platform>
+    <platform>microprofile-7.0</platform>
+    <feature>beanValidation</feature>
+    <feature>restfulWS</feature>
+    <feature>cdi</feature>
+    <feature>concurrent</feature>
+    <feature>jsonb</feature>
+    <feature>mpHealth</feature>
+    <feature>mpConfig</feature>
+    <feature>mpOpenAPI</feature>
+    <feature>mpReactiveMessaging</feature>
+    <feature>mpRestClient</feature>
   </featureManager>
 
   <variable name="http.port" defaultValue="9080"/>
