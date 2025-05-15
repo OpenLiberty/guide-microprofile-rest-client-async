@@ -297,7 +297,7 @@ include::finish/query/src/test/java/it/io/openliberty/guides/query/QueryServiceI
 
 // static guide instructions:
 ifndef::cloud-hosted[]
-Navigate to the `query` directory, then verify that the tests pass by using the Maven `verify` goal:
+Navigate to the `start` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -305,7 +305,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-mvnw.cmd verify
+mvnw.cmd -pl query verify
 ```
 --
 
@@ -314,7 +314,7 @@ mvnw.cmd verify
 [role='command']
 ```
 export TESTCONTAINERS_RYUK_DISABLED=true
-./mvnw verify
+./mvnw -pl query verify
 ```
 
 For more information about disabling Ryuk, see the https://java.testcontainers.org/features/configuration/#disabling-ryuk[Testcontainers custom configuration^] document.
@@ -325,7 +325,7 @@ For more information about disabling Ryuk, see the https://java.testcontainers.o
 [role='command']
 ```
 export TESTCONTAINERS_RYUK_DISABLED=true
-./mvnw verify
+./mvnw -pl query verify
 ```
 
 For more information about disabling Ryuk, see the https://java.testcontainers.org/features/configuration/#disabling-ryuk[Testcontainers custom configuration^] document.
@@ -336,11 +336,11 @@ endif::[]
 
 // cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
-Run the following commands to navigate to the ***query*** directory and verify that the tests pass by using the Maven ***verify*** goal:
+Run the following commands to navigate to the ***start*** directory and verify that the tests pass by using the Maven ***verify*** goal:
 ```bash
 export TESTCONTAINERS_RYUK_DISABLED=true
-cd /home/project/guide-microprofile-rest-client-async/start/query
-./mvnw verify
+cd /home/project/guide-microprofile-rest-client-async/start
+./mvnw -pl query verify
 ```
 
 For more information about disabling Ryuk, see the [Testcontainers custom configuratio](https://java.testcontainers.org/features/configuration/#disabling-ryuk) document.
