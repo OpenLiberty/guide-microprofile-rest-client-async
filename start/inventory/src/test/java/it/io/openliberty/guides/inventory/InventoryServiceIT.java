@@ -66,7 +66,7 @@ public class InventoryServiceIT {
             .withDockerfile(Paths.get("./Dockerfile"));
 
     private static ConfluentKafkaContainer confluentKafkaContainer =
-        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:7.8.0")
             .withListener("kafka:19092")
             .withNetwork(network);
 

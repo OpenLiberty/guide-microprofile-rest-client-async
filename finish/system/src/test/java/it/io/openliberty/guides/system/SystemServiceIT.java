@@ -32,6 +32,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.utility.DockerImageName;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -57,7 +58,7 @@ public class SystemServiceIT {
             .withDockerfile(Paths.get("./Dockerfile"));
 
     private static ConfluentKafkaContainer confluentKafkaContainer =
-        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:7.8.0")
             .withListener("kafka:19092")
             .withNetwork(network);
 
