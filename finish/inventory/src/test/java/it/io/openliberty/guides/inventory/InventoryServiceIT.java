@@ -13,7 +13,6 @@ package it.io.openliberty.guides.inventory;
 
 import java.util.List;
 import java.time.Duration;
-import org.testcontainers.kafka.ConfluentKafkaContainer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -47,6 +46,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadSerializer;
@@ -66,8 +66,8 @@ public class InventoryServiceIT {
         new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static ConfluentKafkaContainer confluentKafkaContainer =
-        new ConfluentKafkaContainer("confluentinc/cp-kafka:7.8.0")
+    private static ConfluentKafkaContainer kafkaContainer =
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
             .withListener("kafka:19092")
             .withNetwork(network);
 
@@ -78,7 +78,7 @@ public class InventoryServiceIT {
             .waitingFor(Wait.forHttp("/health/ready").forPort(9085))
             .withStartupTimeout(Duration.ofMinutes(2))
             .withLogConsumer(new Slf4jLogConsumer(logger))
-            .dependsOn(confluentKafkaContainer);
+            .dependsOn(kafkaContainer);
 
     private static InventoryResourceClient createRestClient(String urlPath) {
         ClientBuilder builder = ResteasyClientBuilder.newBuilder();
@@ -105,7 +105,7 @@ public class InventoryServiceIT {
             urlPath = "http://localhost:9085";
         } else {
             System.out.println("Testing with mvn verify");
-            confluentKafkaContainer.start();
+            kafkaContainer.start();
             inventoryContainer.withEnv(
                 "mp.messaging.connector.liberty-kafka.bootstrap.servers",
                 "kafka:19092");
@@ -129,7 +129,7 @@ public class InventoryServiceIT {
         } else {
             producerProps.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                confluentKafkaContainer.getBootstrapServers());
+                kafkaContainer.getBootstrapServers());
         }
         producerProps.put(
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
@@ -145,7 +145,7 @@ public class InventoryServiceIT {
     public static void stopContainers() {
         client.resetSystems();
         inventoryContainer.stop();
-        confluentKafkaContainer.stop();
+        kafkaContainer.stop();
         network.close();
     }
 

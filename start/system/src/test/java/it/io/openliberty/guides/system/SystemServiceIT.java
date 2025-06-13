@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Properties;
 import java.net.Socket;
 import java.nio.file.Paths;
-import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -56,8 +56,8 @@ public class SystemServiceIT {
         new ImageFromDockerfile("system:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static ConfluentKafkaContainer confluentKafkaContainer =
-        new ConfluentKafkaContainer("confluentinc/cp-kafka:7.8.0")
+    private static ConfluentKafkaContainer kafkaContainer =
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
             .withListener("kafka:19092")
             .withNetwork(network);
 
@@ -68,7 +68,7 @@ public class SystemServiceIT {
             .waitingFor(Wait.forHttp("/health/ready").forPort(9083))
             .withStartupTimeout(Duration.ofMinutes(2))
             .withLogConsumer(new Slf4jLogConsumer(logger))
-            .dependsOn(confluentKafkaContainer);
+            .dependsOn(kafkaContainer);
 
     private static boolean isServiceRunning(String host, int port) {
         try {
@@ -86,7 +86,7 @@ public class SystemServiceIT {
             System.out.println("Testing with mvn liberty:devc");
         } else {
             System.out.println("Testing with mvn verify");
-            confluentKafkaContainer.start();
+            kafkaContainer.start();
             // tag::bootstrapServerSetup[]
             systemContainer.withEnv(
                 "mp.messaging.connector.liberty-kafka.bootstrap.servers",
@@ -106,7 +106,7 @@ public class SystemServiceIT {
         } else {
             consumerProps.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                confluentKafkaContainer.getBootstrapServers());
+                kafkaContainer.getBootstrapServers());
         }
         consumerProps.put(
             ConsumerConfig.GROUP_ID_CONFIG,
@@ -129,7 +129,7 @@ public class SystemServiceIT {
     @AfterAll
     public static void stopContainers() {
         systemContainer.stop();
-        confluentKafkaContainer.stop();
+        kafkaContainer.stop();
         network.close();
     }
 
