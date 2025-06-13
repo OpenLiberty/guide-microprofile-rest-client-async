@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020, 2024 IBM Corporation and others.
+ * Copyright (c) 2020, 2025 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 @Testcontainers
 public class SystemServiceIT {
@@ -57,9 +58,9 @@ public class SystemServiceIT {
         new ImageFromDockerfile("system:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer =
-        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
-            .withListener(() -> "kafka:19092")
+    private static ConfluentKafkaContainer confluentKafkaContainer =
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
+            .withListener("kafka:19092")
             .withNetwork(network);
 
     private static GenericContainer<?> systemContainer =
@@ -69,7 +70,7 @@ public class SystemServiceIT {
             .waitingFor(Wait.forHttp("/health/ready").forPort(9083))
             .withStartupTimeout(Duration.ofMinutes(2))
             .withLogConsumer(new Slf4jLogConsumer(logger))
-            .dependsOn(kafkaContainer);
+            .dependsOn(confluentKafkaContainer);
 
     private static boolean isServiceRunning(String host, int port) {
         try {
@@ -87,7 +88,7 @@ public class SystemServiceIT {
             System.out.println("Testing with mvn liberty:devc");
         } else {
             System.out.println("Testing with mvn verify");
-            kafkaContainer.start();
+            confluentKafkaContainer.start();
             // tag::bootstrapServerSetup[]
             systemContainer.withEnv(
                 "mp.messaging.connector.liberty-kafka.bootstrap.servers",
@@ -107,7 +108,7 @@ public class SystemServiceIT {
         } else {
             consumerProps.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                kafkaContainer.getBootstrapServers());
+                confluentKafkaContainer.getBootstrapServers());
         }
         consumerProps.put(
             ConsumerConfig.GROUP_ID_CONFIG,
@@ -130,7 +131,7 @@ public class SystemServiceIT {
     @AfterAll
     public static void stopContainers() {
         systemContainer.stop();
-        kafkaContainer.stop();
+        confluentKafkaContainer.stop();
         network.close();
     }
 
