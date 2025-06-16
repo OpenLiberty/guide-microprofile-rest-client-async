@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020, 2024 IBM Corporation and others.
+ * Copyright (c) 2020, 2025 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -33,11 +33,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.Network;
-import org.testcontainers.utility.DockerImageName;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.images.builder.ImageFromDockerfile;
@@ -47,6 +45,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadSerializer;
@@ -66,9 +65,9 @@ public class InventoryServiceIT {
         new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer =
-        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
-            .withListener(() -> "kafka:19092")
+    private static ConfluentKafkaContainer kafkaContainer =
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
+            .withListener("kafka:19092")
             .withNetwork(network);
 
     private static GenericContainer<?> inventoryContainer =
