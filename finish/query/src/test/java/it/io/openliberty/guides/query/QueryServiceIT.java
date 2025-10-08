@@ -32,7 +32,7 @@ import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.kafka.ConfluentKafkaContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -83,8 +83,8 @@ public class QueryServiceIT {
 
     public static MockServerClient mockClient;
 
-    private static ConfluentKafkaContainer kafkaContainer =
-        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
+    private static KafkaContainer kafkaContainer =
+        new KafkaContainer("apache/kafka:latest")
             .withListener("kafka:19092")
             .withNetwork(network);
 
