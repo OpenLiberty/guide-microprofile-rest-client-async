@@ -19,7 +19,7 @@ set -euxo pipefail
 
 ./scripts/buildImages.sh
 
-docker pull -q "bitnamilegacy/kafka:latest"
+docker pull -q "apache/kafka:latest"
 
 ./scripts/startContainers.sh
 
